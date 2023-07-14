@@ -36,7 +36,7 @@ async def add_booking(
         date_from: date,
         date_to: date,
         user: Users = Depends(get_current_user)
-):
+) -> None:
     booking = await BookingDAO.add_booking(
         user_id=user.id,
         room_id=room_id,
