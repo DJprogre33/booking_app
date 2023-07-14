@@ -11,7 +11,7 @@ router = APIRouter(
 
 
 @router.get("/{location}", response_model=list[SHotelsResponse])
-async def get_hotels_by_location(
+async def get_hotels_by_location_and_time(
         location: str,
         date_from: date,
         date_to: date
