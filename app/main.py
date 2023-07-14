@@ -1,6 +1,12 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
+from redis import asyncio as aioredis
 
 from app.images.router import router as images_router
 from app.bookings.router import router as router_bookings
@@ -9,7 +15,15 @@ from app.hotels.router import router as router_hotels
 from app.hotels.rooms.router import router as router_rooms
 from app.pages.router import router as pages_router
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    redis = aioredis.from_url("redis://localhost:6379")
+    FastAPICache.init(RedisBackend(redis), prefix="cache")
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
@@ -35,6 +49,7 @@ app.add_middleware(
                    "Access-Control-Allow-Origin",
                    "Authorization"]
 )
+
 
 
 

@@ -49,3 +49,4 @@ class HotelDAO(BaseDAO):
             available_hotels = await session.execute(get_available_hotels)
             return available_hotels.mappings().all()
 
+
