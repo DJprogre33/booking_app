@@ -4,6 +4,9 @@ from pydantic import ConfigDict
 
 
 class Settings(BaseSettings):
+
+    model_config = ConfigDict(env_file=".env")
+
     MODE: Literal["DEV", "TEST", "PROD"]
 
     DB_HOST: str
@@ -44,9 +47,6 @@ class Settings(BaseSettings):
     @property
     def redis_url(self):
         return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
-
-    class Config:
-        env_file = ".env"
 
 
 settings = Settings()

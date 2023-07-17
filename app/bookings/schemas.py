@@ -17,6 +17,7 @@ class SBookingsResponse(BaseModel):
 
 
 class SBooking(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     room_id: int
@@ -27,8 +28,8 @@ class SBooking(BaseModel):
     total_cost: int
     total_days: int
 
-    class Config:
-        from_attributes = True
+    # class Config:
+    #     from_attributes = True
 
 
 
