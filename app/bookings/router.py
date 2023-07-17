@@ -46,13 +46,7 @@ async def add_booking(
         date_to=date_to
     )
 
-    booking_dict = parse_obj_as(SBooking, booking).dict()
+    booking_dict = SBooking.model_validate(booking).model_dump()
+    send_booking_confirmation_email.delay(booking_dict, user.email)
     return booking_dict
-    #
-    # send_booking_confirmation_email.delay(booking_dict, user.email)
-    #
-    # return booking_dict[id]
-
-    # if not booking:
-    #     raise RoomCanNotBeBooked()
 
