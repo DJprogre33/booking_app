@@ -16,6 +16,10 @@ from app.hotels.router import router as router_hotels
 from app.hotels.rooms.router import router as router_rooms
 from app.pages.router import router as pages_router
 
+from sqladmin import Admin
+from app.database import engine
+
+from app.admin.views import UsersAdmin, BookingsAdmin, RoomsAdmin, HotelsAdmin
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -51,6 +55,13 @@ app.add_middleware(
                    "Authorization"]
 )
 
+
+admin = Admin(app, engine)
+
+admin.add_view(UsersAdmin)
+admin.add_view(BookingsAdmin)
+admin.add_view(RoomsAdmin)
+admin.add_view(HotelsAdmin)
 
 
 
