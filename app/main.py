@@ -20,6 +20,7 @@ from sqladmin import Admin
 from app.database import engine
 
 from app.admin.views import UsersAdmin, BookingsAdmin, RoomsAdmin, HotelsAdmin
+from app.admin.auth import authentication_backend
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -56,7 +57,7 @@ app.add_middleware(
 )
 
 
-admin = Admin(app, engine)
+admin = Admin(app, engine, authentication_backend=authentication_backend)
 
 admin.add_view(UsersAdmin)
 admin.add_view(BookingsAdmin)
