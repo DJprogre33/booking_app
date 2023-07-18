@@ -3,7 +3,7 @@ from app.users.schemas import SUserAuth
 from app.users.dao import UsersDAO
 from app.users.auth import get_password_hash, authenticate_user, create_access_token
 from app.users.models import Users
-from app.users.dependencies import get_current_user
+from app.dependencies import get_current_user
 from app.exceptions import UserAlreadyExistException
 
 

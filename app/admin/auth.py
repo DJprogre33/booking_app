@@ -5,7 +5,7 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from app.users.auth import authenticate_user, create_access_token
-from app.users.dependencies import get_current_user
+from app.dependencies import get_current_user
 
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:

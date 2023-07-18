@@ -5,7 +5,7 @@ from app.dao.base import BaseDAO
 from datetime import date
 from app.hotels.rooms.models import Rooms
 from app.database import engine, async_session_maker
-from app.exceptions import RoomCanNotBeBooked
+from app.exceptions import RoomCanNotBeBookedException
 
 class BookingDAO(BaseDAO):
     model = Bookings
@@ -55,7 +55,7 @@ class BookingDAO(BaseDAO):
                 await session.commit()
                 return new_booking.scalar()
             else:
-                raise RoomCanNotBeBooked()
+                raise RoomCanNotBeBookedException()
 
     @classmethod
     async def get_bookings(

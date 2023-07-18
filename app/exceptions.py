@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 
+
 class BookingAppException(HTTPException):
     status_code = 500
     detail = ""
@@ -36,11 +37,16 @@ class IncorrectTokenFormatException(BookingAppException):
     detail = "Incorrect token format"
 
 
-class IvalidTokenUserIdError(BookingAppException):
+class InvalidTokenUserIException(BookingAppException):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = "Invalid token user id"
 
 
-class RoomCanNotBeBooked(BookingAppException):
+class RoomCanNotBeBookedException(BookingAppException):
     status_code = status.HTTP_409_CONFLICT
     detail = "There are no rooms available"
+
+
+class IncorrectDataRangeException(BookingAppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = "Incorrect data range, data range must be 1 <= data_to - data_from <= 90"

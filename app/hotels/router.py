@@ -1,11 +1,9 @@
-import asyncio
-
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from datetime import date
 from app.hotels.dao import HotelDAO
 from app.hotels.schemas import SHotelsResponse, SHotelResponse
 from fastapi_cache.decorator import cache
-
+from app.dependencies import validate_data_range
 
 router = APIRouter(
     prefix="/hotels",
@@ -18,10 +16,10 @@ router = APIRouter(
 async def get_hotels_by_location_and_time(
         location: str,
         date_from: date,
-        date_to: date
+        date_to: date,
+        validated_dates: tuple = Depends(validate_data_range)
 ):
-    await asyncio.sleep(3)
-
+    date_from, date_to = validated_dates
     return await HotelDAO.get_hotels_with_available_rooms_by_location(
         location,
         date_from,
