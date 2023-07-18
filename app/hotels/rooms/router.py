@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
 from datetime import date
+
+from fastapi import APIRouter, Depends
+
+from app.dependencies import validate_data_range
 from app.hotels.rooms.dao import RoomDAO
 from app.hotels.rooms.schemas import SRoomsResponse
-from app.dependencies import validate_data_range
-
 
 router = APIRouter(
     prefix="/hotels",

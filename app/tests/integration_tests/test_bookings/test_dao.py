@@ -1,6 +1,9 @@
-from app.bookings.dao import BookingDAO
 from datetime import datetime
+
 import pytest
+
+from app.bookings.dao import BookingDAO
+
 
 @pytest.mark.parametrize(
     "user_id,room_id,date_from,date_to",

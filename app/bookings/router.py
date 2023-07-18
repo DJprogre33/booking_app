@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Request, Depends
+from datetime import date
+
+from fastapi import APIRouter, Depends, Request
+
 from app.bookings.dao import BookingDAO
 from app.bookings.schemas import SBooking, SBookingsResponse
-from app.users.models import Users
 from app.dependencies import get_current_user, validate_data_range
-from datetime import date
 from app.tasks.tasks import send_booking_confirmation_email
-
+from app.users.models import Users
 
 router = APIRouter(
     prefix="/bookings",

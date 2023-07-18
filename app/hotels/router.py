@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends
 from datetime import date
-from app.hotels.dao import HotelDAO
-from app.hotels.schemas import SHotelsResponse, SHotelResponse
+
+from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
+
 from app.dependencies import validate_data_range
+from app.hotels.dao import HotelDAO
+from app.hotels.schemas import SHotelResponse, SHotelsResponse
 
 router = APIRouter(
     prefix="/hotels",
