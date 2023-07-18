@@ -50,3 +50,8 @@ class RoomCanNotBeBookedException(BookingAppException):
 class IncorrectDataRangeException(BookingAppException):
     status_code = status.HTTP_400_BAD_REQUEST
     detail = "Incorrect data range, data range must be 1 <= data_to - data_from <= 90"
+
+
+class IncorrectBookingIdException(BookingAppException):
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "Booking with this id was not found"

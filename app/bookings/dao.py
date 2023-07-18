@@ -5,7 +5,9 @@ from app.dao.base import BaseDAO
 from datetime import date
 from app.hotels.rooms.models import Rooms
 from app.database import engine, async_session_maker
-from app.exceptions import RoomCanNotBeBookedException
+from app.exceptions import RoomCanNotBeBookedException, IncorrectBookingIdException
+from app.bookings.schemas import SBookingsResponse
+
 
 class BookingDAO(BaseDAO):
     model = Bookings
@@ -61,9 +63,10 @@ class BookingDAO(BaseDAO):
     async def get_bookings(
             cls,
             user_id: int
-    ):
+    ) -> SBookingsResponse:
         async with async_session_maker() as session:
             get_bookings = select(
+                Bookings.id,
                 Bookings.room_id,
                 Bookings.user_id,
                 Bookings.date_from,
@@ -102,9 +105,8 @@ class BookingDAO(BaseDAO):
 
             deleted_entity_id = deleted_entity_id.scalars().one_or_none()
 
-            if None:
-                # отрефакторить на кастомное
-                raise Exception
+            if deleted_entity_id is None:
+                raise IncorrectBookingIdException()
 
             await session.commit()
 

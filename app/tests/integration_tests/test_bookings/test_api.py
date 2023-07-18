@@ -32,3 +32,22 @@ async def test_add_and_get_booking(
 
     assert len(total_hotels.json()) == booked_rooms
 
+
+async def test_get_and_delete_all_bookings(
+        auth_async_client: AsyncClient
+):
+    responce = await auth_async_client.get("/bookings")
+    bookings_dict = responce.json()
+
+    assert responce.status_code == 200
+    assert len(bookings_dict) == 10
+
+    for booking in bookings_dict:
+        responce = await auth_async_client.delete(f"/bookings/{booking['id']}")
+        assert responce.status_code == 200
+        assert responce.json() == booking["id"]
+
+    responce = await auth_async_client.get("/bookings")
+
+    assert responce.status_code == 200
+    assert not responce.json()
