@@ -4,8 +4,6 @@ from app.bookings.schemas import SBookingsResponse, SBooking
 from app.users.models import Users
 from app.users.dependencies import get_current_user
 from datetime import date
-from app.exceptions import RoomCanNotBeBooked
-from pydantic import parse_obj_as
 from app.tasks.tasks import send_booking_confirmation_email
 
 
@@ -15,7 +13,8 @@ router = APIRouter(
 )
 
 
-@router.get("", response_model=list[SBookingsResponse])
+# @router.get("", response_model=list[SBookingsResponse])
+@router.get("")
 async def get_bookings(request: Request, user: Users = Depends(get_current_user)):
     return await BookingDAO.get_bookings(user_id=user.id)
 

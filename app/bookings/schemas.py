@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import date
+from typing import Optional
 
 
 class SBookingsResponse(BaseModel):
@@ -12,7 +13,7 @@ class SBookingsResponse(BaseModel):
     total_days: int
     image_id: int
     name: str
-    description: str
+    description: Optional[str]
     services: list
 
 

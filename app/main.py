@@ -22,6 +22,7 @@ from app.database import engine
 from app.admin.views import UsersAdmin, BookingsAdmin, RoomsAdmin, HotelsAdmin
 from app.admin.auth import authentication_backend
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     redis = aioredis.from_url(settings.redis_url)
