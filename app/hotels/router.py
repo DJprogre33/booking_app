@@ -2,6 +2,7 @@ from datetime import date
 
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
+from fastapi_versioning import version
 
 from app.dependencies import validate_data_range
 from app.hotels.dao import HotelDAO
@@ -15,6 +16,7 @@ router = APIRouter(
 
 @router.get("/{location}", response_model=list[SHotelsResponse])
 @cache(expire=60)
+@version(1)
 async def get_hotels_by_location_and_time(
         location: str,
         date_from: date,
@@ -30,5 +32,6 @@ async def get_hotels_by_location_and_time(
 
 
 @router.get("/id/{hotel_id}", response_model=SHotelResponse)
+@version(1)
 async def get_hotel_by_id(hotel_id: int):
     return await HotelDAO.find_one_or_none(id=hotel_id)

@@ -3,11 +3,13 @@ import time
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from sqladmin import Admin
+from fastapi_versioning import VersionedFastAPI
 
 from app.admin.auth import authentication_backend
 from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
@@ -25,8 +27,7 @@ import sentry_sdk
 
 
 sentry_sdk.init(
-    dsn="https://e56fa7f63da543bd97629bbccb4ce7b6@o4505554923749376.ingest.sentry.io/4505554928271360",
-
+    dsn=settings.SENTRY_DSN,
     # Set traces_sample_rate to 1.0 to capture 100%
     # of transactions for performance monitoring.
     # We recommend adjusting this value in production,
@@ -43,7 +44,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.include_router(images_router)
 app.include_router(pages_router)
@@ -56,18 +56,21 @@ origins = [
     "http://localhost:3000"
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH", "PUT"],
-    allow_headers=["Content-Type",
-                   "Set-cookie",
-                   "Access-Control-Allow-Headers",
-                   "Access-Control-Allow-Origin",
-                   "Authorization"]
+
+app = VersionedFastAPI(
+    app,
+    version_format='{major}',
+    prefix_format='/v{major}',
+    description="""
+    To access the required documentation, 
+    select the required version and follow the link,
+    e.g. "v1/docs", to access the most up-to-date version 
+    of the API go to "latest/docs"
+    """,
+    enable_latest=True
 )
 
+# app.add_middleware(HTTPSRedirectMiddleware)
 
 admin = Admin(app, engine, authentication_backend=authentication_backend)
 
@@ -90,10 +93,5 @@ async def add_process_time_header(request: Request, call_next):
     )
     return response
 
-@app.get("/sentry-debug")
-async def trigger_error():
-    try:
-        division_by_zero = 1 / 0
-    except ZeroDivisionError:
-        logger.critical("Zero division")
-        return "ez"
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")

@@ -1,6 +1,7 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends
+from fastapi_versioning import version
 
 from app.dependencies import validate_data_range
 from app.hotels.rooms.dao import RoomDAO
@@ -13,6 +14,7 @@ router = APIRouter(
 
 
 @router.get("/{hotel_id}/rooms", response_model=list[SRoomsResponse])
+@version(1)
 async def get_available_hotel_rooms(
         hotel_id: int,
         date_from: date,

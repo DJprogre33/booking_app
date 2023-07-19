@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     MODE: Literal["DEV", "TEST", "PROD"]
     LOG_LEVEL: Literal["DEBUG", "INFO"]
+    SENTRY_DSN: str
 
     DB_HOST: str
     DB_PORT: int

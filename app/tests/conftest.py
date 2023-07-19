@@ -78,9 +78,3 @@ async def auth_async_client():
         )
         assert async_client.cookies["booking_access_token"]
         yield async_client
-
-
-# @pytest.fixture(scope="function")
-# async def session():
-#     async with async_session_maker() as session:
-#         yield session

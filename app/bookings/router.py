@@ -1,12 +1,14 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends, Request
+from fastapi_versioning import version
 
 from app.bookings.dao import BookingDAO
 from app.bookings.schemas import SBooking, SBookingsResponse
 from app.dependencies import get_current_user, validate_data_range
 from app.tasks.tasks import send_booking_confirmation_email
 from app.users.models import Users
+
 
 router = APIRouter(
     prefix="/bookings",
@@ -15,11 +17,13 @@ router = APIRouter(
 
 
 @router.get("", response_model=list[SBookingsResponse])
+@version(1)
 async def get_bookings(request: Request, user: Users = Depends(get_current_user)):
     return await BookingDAO.get_bookings(user_id=user.id)
 
 
 @router.delete("/{booking_id}")
+@version(1)
 async def delete_booking(
         booking_id: int,
         request: Request,
@@ -32,6 +36,7 @@ async def delete_booking(
 
 
 @router.post("")
+@version(1)
 async def add_booking(
         room_id: int,
         date_from: date,
