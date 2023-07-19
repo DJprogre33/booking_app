@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     model_config = ConfigDict(env_file=".env")
 
     MODE: Literal["DEV", "TEST", "PROD"]
+    LOG_LEVEL: Literal["DEBUG", "INFO"]
 
     DB_HOST: str
     DB_PORT: int
