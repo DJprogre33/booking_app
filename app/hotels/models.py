@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, Column, Integer, String, ForeignKey
+from sqlalchemy import JSON, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -13,10 +13,9 @@ class Hotels(Base):
     location = Column(String, nullable=False)
     services = Column(JSON)
     rooms_quantity = Column(Integer, nullable=False)
-    image_id = Column(Integer)
+    image_path = Column(String, nullable=True)
 
     rooms = relationship("Rooms", back_populates="hotels")
-
 
     def __str__(self):
         return f"id: {self.id}, name: {self.name}"

@@ -1,6 +1,6 @@
 from typing import Union
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 
 from app.database import async_session_maker
 
@@ -33,3 +33,11 @@ class BaseDAO:
             entity_id = await session.execute(query)
             await session.commit()
             return entity_id.scalar()
+
+    @classmethod
+    async def update_fields_by_id(cls, entity_id, **data):
+        async with async_session_maker() as session:
+            query = update(cls.model).where(cls.model.id == entity_id).values(**data).returning(cls.model)
+            result = await session.execute(query)
+            await session.commit()
+            return result.scalar()

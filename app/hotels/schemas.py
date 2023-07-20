@@ -5,13 +5,14 @@ class SHotel(BaseModel):
     name: str
     location: str
     services: list
+    rooms_quantity: int
 
 
 class SHotelResponse(BaseModel):
     name: str
     location: str
     rooms_quantity: int
-    image_id: int
+    image_path: str
     id: int
     services: list
 
@@ -22,7 +23,7 @@ class SHotelsResponse(BaseModel):
     location: str
     services: list
     rooms_quantity: int
-    image_id: int
+    image_path: str
     rooms_left: int
 
 

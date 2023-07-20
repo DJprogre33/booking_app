@@ -5,12 +5,16 @@ from jose import JWTError, jwt
 
 from app.config import settings
 from app.exceptions import (
+    AccessDeniedException,
     IncorrectDataRangeException,
+    IncorrectHotelIDException,
     IncorrectTokenFormatException,
     InvalidTokenUserIDException,
     TokenAbsentException,
     TokenExpiredException,
 )
+from app.hotels.dao import HotelDAO
+from app.hotels.models import Hotels
 from app.logger import logger
 from app.users.dao import UsersDAO
 from app.users.models import Users
@@ -67,3 +71,18 @@ def validate_data_range(date_from: date, date_to: date) -> tuple:
         raise IncorrectDataRangeException()
 
     return date_from, date_to
+
+
+async def check_owner(user, hotel_id: int) -> Users:
+
+    hotel = await HotelDAO.find_one_or_none(id=hotel_id)
+
+    if not hotel:
+        logger.warning("Incorrect hotel id", extra={"hotel_id": hotel_id})
+        raise IncorrectHotelIDException()
+
+    if hotel.owner_id != user.id:
+        logger.warning("User isn't an owner", extra={"hotel_id": hotel_id, "user_id": user.id})
+        raise AccessDeniedException()
+
+    return hotel
