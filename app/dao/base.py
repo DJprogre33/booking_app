@@ -4,6 +4,10 @@ from app.database import async_session_maker
 
 
 class BaseDAO:
+    """
+    Basic DAO class that contains common methods for all Sqlalchemy models
+    """
+
     model = None
 
     @classmethod
@@ -26,4 +30,3 @@ class BaseDAO:
             query = insert(cls.model).values(**data)
             await session.execute(query)
             await session.commit()
-
