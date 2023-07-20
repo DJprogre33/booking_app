@@ -1,4 +1,5 @@
 import smtplib
+import time
 from pathlib import Path
 
 from PIL import Image
@@ -30,7 +31,6 @@ def send_booking_confirmation_email(
         booking=booking,
         email_to=settings.SMTP_USER
     )
-
     with smtplib.SMTP_SSL(
         settings.SMTP_HOST,
         settings.SMTP_PORT

@@ -1,4 +1,5 @@
 from datetime import date
+from asyncio import sleep
 
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache
@@ -24,6 +25,7 @@ async def get_hotels_by_location_and_time(
         validated_dates: tuple = Depends(validate_data_range)
 ):
     date_from, date_to = validated_dates
+    await sleep(3)
     return await HotelDAO.get_hotels_with_available_rooms_by_location(
         location,
         date_from,

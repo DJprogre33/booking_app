@@ -57,18 +57,18 @@ origins = [
 ]
 
 
-app = VersionedFastAPI(
-    app,
-    version_format='{major}',
-    prefix_format='/v{major}',
-    description="""
-    To access the required documentation, 
-    select the required version and follow the link,
-    e.g. "v1/docs", to access the most up-to-date version 
-    of the API go to "latest/docs"
-    """,
-    enable_latest=True
-)
+# app = VersionedFastAPI(
+#     app,
+#     version_format='{major}',
+#     prefix_format='/v{major}',
+#     description="""
+#     To access the required documentation,
+#     select the required version and follow the link,
+#     e.g. "v1/docs", to access the most up-to-date version
+#     of the API go to "latest/docs"
+#     """,
+#     enable_latest=True
+# )
 
 # app.add_middleware(HTTPSRedirectMiddleware)
 
