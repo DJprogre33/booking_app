@@ -1,6 +1,12 @@
 from pydantic import BaseModel
 
 
+class SHotel(BaseModel):
+    name: str
+    location: str
+    services: list
+
+
 class SHotelResponse(BaseModel):
     name: str
     location: str

@@ -55,3 +55,8 @@ class IncorrectDataRangeException(BookingAppException):
 class IncorrectBookingIdException(BookingAppException):
     status_code = status.HTTP_404_NOT_FOUND
     detail = "Booking with this id was not found"
+
+
+class RoleAccessDeniedException(BookingAppException):
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = "You do not have permissions to use this endpoint"
