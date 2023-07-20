@@ -9,7 +9,6 @@ from app.dependencies import get_current_user, validate_data_range
 from app.tasks.tasks import send_booking_confirmation_email
 from app.users.models import Users
 
-
 router = APIRouter(
     prefix="/bookings",
     tags=["Bookings"]

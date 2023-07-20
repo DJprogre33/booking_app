@@ -1,5 +1,5 @@
-from datetime import date
 from asyncio import sleep
+from datetime import date
 
 from fastapi import APIRouter, Depends
 from fastapi_cache.decorator import cache

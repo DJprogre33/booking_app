@@ -6,6 +6,7 @@ from pydantic import EmailStr
 
 from app.config import settings
 from app.exceptions import IncorrectEmailOrPasswordException
+from app.logger import logger
 from app.users.dao import UsersDAO
 from app.users.models import Users
 
@@ -39,4 +40,5 @@ async def authenticate_user(email: EmailStr, password: str) -> Users:
         password_is_valid = verify_password(password, existing_user.hashed_password)
         if password_is_valid:
             return existing_user
+    logger.warning("Incorrect email or password")
     raise IncorrectEmailOrPasswordException()
