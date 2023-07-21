@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from app.bookings.dao import BookingDAO
+from app.repositories.bookings import BookingsRepository
 
 
 @pytest.mark.parametrize(

@@ -3,26 +3,23 @@ from contextlib import asynccontextmanager
 
 import sentry_sdk
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-from fastapi_versioning import VersionedFastAPI
 from redis import asyncio as aioredis
 from sqladmin import Admin
 
 from app.admin.auth import authentication_backend
 from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
-from app.bookings.router import router as router_bookings
+from app.api.bookings import router as router_bookings
+from app.api.hotels import router as router_hotels
+from app.api.rooms import router as router_rooms
+from app.api.users import router as router_users
 from app.config import settings
 from app.database import engine
-from app.hotels.rooms.router import router as router_rooms
-from app.hotels.router import router as router_hotels
-from app.images.router import router as images_router
 from app.logger import logger
 from app.pages.router import router as pages_router
-from app.users.router import router as router_users
+
 
 sentry_sdk.init(
     dsn=settings.SENTRY_DSN,
@@ -45,7 +42,6 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-app.include_router(images_router)
 app.include_router(pages_router)
 app.include_router(router_rooms)
 app.include_router(router_hotels)

@@ -2,19 +2,18 @@ from datetime import date
 
 from sqlalchemy import func, select
 
-from app.bookings.models import Bookings
-from app.dao.base import BaseDAO
 from app.database import async_session_maker
-from app.hotels.models import Hotels
-from app.hotels.rooms.models import Rooms
+from app.models.bookings import Bookings
+from app.models.hotels import Hotels
+from app.models.rooms import Rooms
+from app.utils.repository import SQLAlchemyRepository
 
 
-class HotelDAO(BaseDAO):
+class HotelsRepository(SQLAlchemyRepository):
     model = Hotels
 
-    @classmethod
-    async def get_hotels_with_available_rooms_by_location(
-            cls,
+    async def get_hotels_by_location_and_time(
+            self,
             location: str,
             date_from: date,
             date_to: date
@@ -34,17 +33,17 @@ class HotelDAO(BaseDAO):
             ).group_by(Rooms.hotel_id).subquery("booked_rooms")
 
             get_available_hotels = select(
-                Hotels.id,
-                Hotels.name,
-                Hotels.location,
-                Hotels.services,
-                Hotels.rooms_quantity,
-                Hotels.image_id,
-                (Hotels.rooms_quantity - func.coalesce(get_booked_rooms.c.booked_rooms, 0)).label("rooms_left")
-            ).select_from(Hotels).outerjoin(
+                self.model.id,
+                self.model.name,
+                self.model.location,
+                self.model.services,
+                self.model.rooms_quantity,
+                self.model.image_path,
+                (self.model.rooms_quantity - func.coalesce(get_booked_rooms.c.booked_rooms, 0)).label("rooms_left")
+            ).select_from(self.model).outerjoin(
                 get_booked_rooms,
-                Hotels.id == get_booked_rooms.c.hotel_id
-            ).where(Hotels.location.ilike(f"%{location}%"))
+                self.model.id == get_booked_rooms.c.hotel_id
+            ).where(self.model.location.ilike(f"%{location}%"))
 
             # print(query.compile(engine, compile_kwargs={"literal_binds": True}))
 

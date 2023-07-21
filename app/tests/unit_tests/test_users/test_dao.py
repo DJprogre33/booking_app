@@ -1,6 +1,6 @@
 import pytest
 
-from app.users.dao import UsersDAO
+from app.repositories.users import UsersRepository
 
 
 @pytest.mark.parametrize(
