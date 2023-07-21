@@ -4,8 +4,7 @@ from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from app.auth.auth import authenticate_user, create_access_token
-from app.dependencies import get_current_user
+from app.auth.auth import authenticate_user, create_access_token, get_current_user
 
 
 class AdminAuth(AuthenticationBackend):

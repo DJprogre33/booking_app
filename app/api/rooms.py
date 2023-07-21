@@ -8,7 +8,6 @@ from app.api.dependencies import get_rooms_service
 from app.schemas.rooms import SRoomsResponse
 from app.services.rooms import RoomsService
 
-
 router = APIRouter(prefix="/hotels", tags=["Hotels", "Rooms"])
 
 

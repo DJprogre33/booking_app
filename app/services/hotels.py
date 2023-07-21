@@ -3,9 +3,9 @@ import shutil
 import uuid
 from datetime import date
 
-from fastapi import Depends, UploadFile
+from fastapi import Depends, UploadFile, Request
 
-from app.dependencies import get_current_user
+from app.auth.auth import get_current_user
 from app.exceptions import AccessDeniedException, IncorrectHotelIDException
 from app.logger import logger
 from app.models.hotels import Hotels
@@ -37,8 +37,9 @@ class HotelsService:
     async def create_hotel(
             self,
             new_hotel: SHotel,
-            user=Depends(get_current_user)
+            request: Request
     ):
+        user = await get_current_user(request)
         if user.role != "hotel owner":
             logger.warning("Role access denied", extra={"user_id": user.id})
             raise AccessDeniedException()
@@ -51,7 +52,7 @@ class HotelsService:
             owner_id=user.id
         )
 
-    async def check_owner(self, hotel_id: int, user=Depends(get_current_user)) -> Hotels:
+    async def check_owner(self, hotel_id: int, user_id: int) -> Hotels:
 
         hotel = await self.tasks_repo.find_one_or_none(id=hotel_id)
 
@@ -59,8 +60,8 @@ class HotelsService:
             logger.warning("Incorrect hotel id", extra={"hotel_id": hotel_id})
             raise IncorrectHotelIDException()
 
-        if hotel.owner_id != user.id:
-            logger.warning("User isn't an owner", extra={"hotel_id": hotel_id, "user_id": user.id})
+        if hotel.owner_id != user_id:
+            logger.warning("User isn't an owner", extra={"hotel_id": hotel_id, "user_id": user_id})
             raise AccessDeniedException()
 
         return hotel
@@ -68,9 +69,11 @@ class HotelsService:
     async def add_hotel_image(
             self,
             hotel_id: int,
+            request: Request,
             hotel_image: UploadFile
     ):
-        hotel = await self.check_owner(hotel_id)
+        user = await get_current_user(request)
+        hotel = await self.check_owner(hotel_id=hotel_id, user_id=user.id)
 
         if hotel.image_path:
             os.remove(hotel.image_path)
@@ -83,8 +86,9 @@ class HotelsService:
 
         return await self.tasks_repo.update_fields_by_id(hotel_id, image_path=file_path)
 
-    async def delete_hotel_image(self, hotel_id: int):
-        hotel = await self.check_owner(hotel_id)
+    async def delete_hotel_image(self, hotel_id: int, request: Request):
+        user = await get_current_user(request)
+        hotel = await self.check_owner(hotel_id=hotel_id, user_id=user.id)
 
         if hotel.image_path:
             os.remove(hotel.image_path)

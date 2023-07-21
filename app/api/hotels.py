@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, UploadFile
+from fastapi import APIRouter, Depends, UploadFile, Request
 from fastapi_cache.decorator import cache
 from fastapi_versioning import version
 
@@ -9,7 +9,6 @@ from app.api.dependencies import get_hotels_service
 from app.logger import logger
 from app.schemas.hotels import SHotel, SHotelResponse, SHotelsResponse
 from app.services.hotels import HotelsService
-
 
 router = APIRouter(prefix="/hotels", tags=["Hotels"])
 
@@ -39,9 +38,10 @@ async def get_hotel_by_id(
 @router.post("/new")
 async def create_hotel(
     new_hotel: SHotel,
+    request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
-    new_hotel_id = await tasks_service.create_hotel(new_hotel=new_hotel)
+    new_hotel_id = await tasks_service.create_hotel(new_hotel=new_hotel, request=request)
 
     logger.info("Succesful created a new hotel", extra={"new_hotel_id": new_hotel_id})
 
@@ -52,10 +52,11 @@ async def create_hotel(
 async def add_hotel_image(
     hotel_id: int,
     hotel_image: UploadFile,
+    request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
     result = await tasks_service.add_hotel_image(
-        hotel_id=hotel_id, hotel_image=hotel_image
+        hotel_id=hotel_id, hotel_image=hotel_image, request=request
     )
 
     logger.info(
@@ -67,9 +68,11 @@ async def add_hotel_image(
 
 @router.delete("/{hotel_id}/image")
 async def delete_hotel_image(
-    hotel_id: int, tasks_service: Annotated[HotelsService, Depends(get_hotels_service)]
+    hotel_id: int,
+    request: Request,
+    tasks_service: Annotated[HotelsService, Depends(get_hotels_service)]
 ):
-    hotel_id = await tasks_service.delete_hotel_image(hotel_id=hotel_id)
+    hotel_id = await tasks_service.delete_hotel_image(hotel_id=hotel_id, request=request)
     logger.info("Succesfully deleted a hotel image", extra={"hotel_id": hotel_id})
 
     return {"ID of the hotel where the image was deleted": hotel_id}

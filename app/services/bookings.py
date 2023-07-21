@@ -1,8 +1,8 @@
 from datetime import date
 
-from fastapi import Depends
+from fastapi import Request
 
-from app.dependencies import get_current_user
+from app.auth.auth import get_current_user
 from app.models.users import Users
 from app.repositories.bookings import BookingsRepository
 from app.schemas.booking import SBooking
@@ -14,12 +14,14 @@ class BookingService:
     def __init__(self, tasks_repo: BookingsRepository):
         self.task_repo: BookingsRepository = tasks_repo()
 
-    async def get_bookings(self, user: Users = Depends(get_current_user)):
+    async def get_bookings(self, request: Request):
+        user = await get_current_user(request)
         return await self.task_repo.get_bookings(user_id=user.id)
 
     async def delete_booking_by_id(
-        self, booking_id: int, user: Users = Depends(get_current_user)
+        self, booking_id: int, request: Request
     ):
+        user = await get_current_user(request)
         return await self.task_repo.delete_booking_by_id(
             user_id=user.id,
             booking_id=booking_id
@@ -30,8 +32,9 @@ class BookingService:
         room_id: int,
         date_from: date,
         date_to: date,
-        user: Users = Depends(get_current_user),
+        request: Request,
     ):
+        user = await get_current_user(request)
         date_from, date_to = Base.validate_data_range(date_from, date_to)
         booking = await self.task_repo.add_booking(
             user_id=user.id,

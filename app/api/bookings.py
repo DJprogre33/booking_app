@@ -14,20 +14,20 @@ router = APIRouter(prefix="/bookings", tags=["Bookings"])
 @router.get("", response_model=list[SBookingsResponse])
 @version(1)
 async def get_bookings(
-    # request: Request,
+    request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ):
-    return await tasks_service.get_bookings()
+    return await tasks_service.get_bookings(request)
 
 
 @router.delete("/{booking_id}")
 @version(1)
 async def delete_booking(
     booking_id: int,
-    # request: Request,
+    request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ) -> int:
-    return await tasks_service.delete_booking_by_id(booking_id=booking_id)
+    return await tasks_service.delete_booking_by_id(booking_id, request)
 
 
 @router.post("")
@@ -36,8 +36,12 @@ async def add_booking(
     room_id: int,
     date_from: date,
     date_to: date,
+    request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ):
     return await tasks_service.add_bookind(
-        room_id=room_id, date_from=date_from, date_to=date_to
+        room_id=room_id,
+        date_from=date_from,
+        date_to=date_to,
+        request=request
     )

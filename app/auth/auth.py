@@ -1,12 +1,20 @@
 from datetime import datetime, timedelta
 
-from jose import jwt
+from fastapi import Request
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from app.config import settings
-from app.exceptions import IncorrectEmailOrPasswordException
+from app.exceptions import (
+    IncorrectEmailOrPasswordException,
+    IncorrectTokenFormatException,
+    InvalidTokenUserIDException,
+    TokenAbsentException,
+    TokenExpiredException,
+)
 from app.logger import logger
 from app.models.users import Users
+from app.repositories.users import UsersRepository
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -39,3 +47,38 @@ def authenticate_user(existing_user: Users, password: str) -> Users:
             return existing_user
     logger.warning("Incorrect email or password")
     raise IncorrectEmailOrPasswordException()
+
+
+def get_token(request: Request) -> str:
+    token = request.cookies.get("booking_access_token")
+    if not token:
+        logger.warning("Token absent")
+        raise TokenAbsentException()
+    return token
+
+
+async def get_current_user(request: Request) -> Users:
+    token = get_token(request)
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY, settings.HASHING_ALGORITHM)
+    except JWTError as exc:
+        logger.warning("Incorrect token format")
+        raise IncorrectTokenFormatException() from exc
+
+    expire: str = payload.get("exp")
+    if not expire or (int(expire) < datetime.utcnow().timestamp()):
+        expired_time = datetime.utcfromtimestamp(int(expire))
+        logger.warning("Token expired", extra={"expired_time": expired_time})
+        raise TokenExpiredException()
+
+    user_id: str = payload.get("sub")
+    if not user_id:
+        logger.warning("Invalid token user id")
+        raise InvalidTokenUserIDException()
+
+    user = await UsersRepository().find_one_or_none(id=int(user_id))
+    if not user:
+        logger.warning("Invalid token user id")
+        raise InvalidTokenUserIDException()
+
+    return user

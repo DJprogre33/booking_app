@@ -26,4 +26,3 @@ class SHotelsResponse(BaseModel):
     image_path: str
     rooms_left: int
 
-

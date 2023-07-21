@@ -1,7 +1,7 @@
-from fastapi import Depends
+from fastapi import Request
 
 from app.auth.auth import authenticate_user, create_access_token, get_password_hash
-from app.dependencies import get_current_user
+from app.auth.auth import get_current_user
 from app.exceptions import UserAlreadyExistException
 from app.logger import logger
 from app.models.users import Users
@@ -15,6 +15,7 @@ class UsersService:
 
     async def register_user(self, user_data: SUserAuth):
         existing_user = await self.tasks_repo.find_one_or_none(email=user_data.email)
+
         if existing_user:
             logger.warning("User already exists")
             raise UserAlreadyExistException()
@@ -31,5 +32,6 @@ class UsersService:
         return create_access_token({"sub": str(user.id)}), user
 
     @staticmethod
-    async def return_me(user: Users = Depends(get_current_user)):
+    async def return_me(request: Request) -> Users:
+        user = await get_current_user(request)
         return user
