@@ -5,8 +5,10 @@ from fastapi import APIRouter, Depends, Request
 from fastapi_versioning import version
 
 from app.api.dependencies import get_bookings_service
-from app.schemas.booking import SBookingsResponse
+from app.schemas.booking import SBookingsResponse, SBooking
 from app.services.bookings import BookingService
+from app.logger import logger
+
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
@@ -17,7 +19,11 @@ async def get_bookings(
     request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ):
-    return await tasks_service.get_bookings(request)
+    bookings = await tasks_service.get_bookings(request)
+
+    logger.info("The list of bookings was successfully received", extra={"bookings_nums": len(bookings)})
+
+    return bookings
 
 
 @router.delete("/{booking_id}")
@@ -27,10 +33,14 @@ async def delete_booking(
     request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ) -> int:
-    return await tasks_service.delete_booking_by_id(booking_id, request)
+    deleted_booking_id = await tasks_service.delete_booking_by_id(booking_id, request)
+
+    logger.info("The booking was successfully removed ", extra={"deleted_booking_id": deleted_booking_id})
+
+    return deleted_booking_id
 
 
-@router.post("")
+@router.post("", response_model=SBooking)
 @version(1)
 async def add_booking(
     room_id: int,
@@ -39,9 +49,13 @@ async def add_booking(
     request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ):
-    return await tasks_service.add_bookind(
+    booking = await tasks_service.add_bookind(
         room_id=room_id,
         date_from=date_from,
         date_to=date_to,
         request=request
     )
+
+    logger.info("Booking has been successfully created", extra={"booking_id": booking["id"]})
+
+    return booking

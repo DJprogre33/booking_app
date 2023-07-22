@@ -8,6 +8,7 @@ from app.api.dependencies import get_rooms_service
 from app.schemas.rooms import SRoomsResponse
 from app.services.rooms import RoomsService
 
+
 router = APIRouter(prefix="/hotels", tags=["Hotels", "Rooms"])
 
 
@@ -22,3 +23,15 @@ async def get_available_hotel_rooms(
     return await tasks_service.get_availible_hotel_rooms(
         hotel_id=hotel_id, date_from=date_from, date_to=date_to
     )
+
+
+@router.post("/{hotel_id}/{room_id}")
+@version(1)
+async def create_room():
+    pass
+
+
+@router.delete("/{hotel_id}/{room_id}")
+@version(1)
+async def delete_room():
+    pass

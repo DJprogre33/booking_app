@@ -7,6 +7,7 @@ from app.exceptions import IncorrectBookingIdException, RoomCanNotBeBookedExcept
 from app.models.bookings import Bookings
 from app.models.rooms import Rooms
 from app.utils.repository import SQLAlchemyRepository
+from app.logger import logger
 
 
 class BookingsRepository(SQLAlchemyRepository):
@@ -16,6 +17,8 @@ class BookingsRepository(SQLAlchemyRepository):
         self, user_id: int, room_id: int, date_from: date, date_to: date
     ):
         async with async_session_maker() as session:
+            logger.info("The database query begins to generate")
+
             booked_rooms = (
                 select(self.model)
                 .where(
@@ -54,11 +57,16 @@ class BookingsRepository(SQLAlchemyRepository):
 
                 new_booking = await session.execute(add_booking)
                 await session.commit()
+
+                logger.info("Database query successfully completed")
+
                 return new_booking.scalar()
             raise RoomCanNotBeBookedException()
 
     async def get_bookings(self, user_id: int):
         async with async_session_maker() as session:
+            logger.info("The database query begins to generate")
+
             get_bookings = (
                 select(
                     self.model.id,
@@ -81,10 +89,14 @@ class BookingsRepository(SQLAlchemyRepository):
 
             result = await session.execute(get_bookings)
 
+            logger.info("Database query successfully completed")
+
             return result.mappings().all()
 
     async def delete_booking_by_id(self, user_id: int, booking_id: int) -> int:
         async with async_session_maker() as session:
+            logger.info("The database query begins to generate")
+
             to_delete_entity = (
                 delete(self.model)
                 .where((self.model.user_id == user_id) & (self.model.id == booking_id))
@@ -99,5 +111,7 @@ class BookingsRepository(SQLAlchemyRepository):
                 raise IncorrectBookingIdException()
 
             await session.commit()
+
+            logger.info("Database query successfully completed")
 
             return deleted_entity_id

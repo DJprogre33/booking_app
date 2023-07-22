@@ -36,6 +36,7 @@ async def get_hotel_by_id(
 
 
 @router.post("/new")
+@version(1)
 async def create_hotel(
     new_hotel: SHotel,
     request: Request,
@@ -49,6 +50,7 @@ async def create_hotel(
 
 
 @router.patch("/{hotel_id}/image", response_model=SHotelResponse)
+@version(1)
 async def add_hotel_image(
     hotel_id: int,
     hotel_image: UploadFile,
@@ -67,6 +69,7 @@ async def add_hotel_image(
 
 
 @router.delete("/{hotel_id}/image")
+@version(1)
 async def delete_hotel_image(
     hotel_id: int,
     request: Request,
@@ -76,3 +79,15 @@ async def delete_hotel_image(
     logger.info("Succesfully deleted a hotel image", extra={"hotel_id": hotel_id})
 
     return {"ID of the hotel where the image was deleted": hotel_id}
+
+
+@router.patch("/{hotel_id}")
+@version(1)
+async def edit_hotel_data():
+    pass
+
+
+@router.delete("/{hotel_id}")
+@version(1)
+async def delete_hotel():
+    pass
