@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy import insert, select, update
+from sqlalchemy import insert, select, update, delete
 
 from app.database import async_session_maker
 from app.logger import logger
@@ -21,6 +21,10 @@ class AbstractRepository(ABC):
 
     @abstractmethod
     async def update_fields_by_id(self, entity_id, **data):
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete_by_id(self, entity_id):
         raise NotImplementedError
 
 
@@ -71,6 +75,18 @@ class SQLAlchemyRepository(AbstractRepository):
                 .values(**data)
                 .returning(self.model)
             )
+            result = await session.execute(query)
+            await session.commit()
+
+            logger.info("Database query successfully completed")
+
+            return result.scalar()
+
+    async def delete_by_id(self, entity_id):
+        async with async_session_maker() as session:
+            logger.info("The database query begins to generate")
+
+            query = delete(self.model).where(self.model.id == entity_id).returning(self.model)
             result = await session.execute(query)
             await session.commit()
 

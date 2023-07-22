@@ -49,7 +49,10 @@ async def logout_user(response: Response):
 
 @router.get("/me", response_model=SUserResponce)
 @version(1)
-async def return_me(request: Request, tasks_service: Annotated[UsersService, Depends(get_users_service)]):
+async def return_me(
+    request: Request,
+    tasks_service: Annotated[UsersService, Depends(get_users_service)]
+):
     current_user = await tasks_service.return_me(request)
 
     logger.info(
@@ -58,3 +61,19 @@ async def return_me(request: Request, tasks_service: Annotated[UsersService, Dep
     )
 
     return current_user
+
+
+@router.delete("/me", response_model=SUserResponce)
+@version(1)
+async def delete_me(
+    request: Request,
+    tasks_service: Annotated[UsersService, Depends(get_users_service)]
+):
+    deleted_user = await tasks_service.delete_me(request)
+
+    logger.info(
+        "Succesfully deleted user",
+        extra={"user_id": deleted_user.id, "user_email": deleted_user.email},
+    )
+
+    return deleted_user
