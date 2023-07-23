@@ -8,7 +8,6 @@ from fastapi import Depends, UploadFile, Request
 from app.auth.auth import get_current_user
 from app.exceptions import AccessDeniedException, IncorrectHotelIDException
 from app.logger import logger
-from app.models.hotels import Hotels
 from app.repositories.hotels import HotelsRepository
 from app.schemas.hotels import SHotel
 from app.utils.base import Base
@@ -52,20 +51,6 @@ class HotelsService:
             owner_id=user.id
         )
 
-    async def check_owner(self, hotel_id: int, user_id: int) -> Hotels:
-
-        hotel = await self.tasks_repo.find_one_or_none(id=hotel_id)
-
-        if not hotel:
-            logger.warning("Incorrect hotel id", extra={"hotel_id": hotel_id})
-            raise IncorrectHotelIDException()
-
-        if hotel.owner_id != user_id:
-            logger.warning("User isn't an owner", extra={"hotel_id": hotel_id, "user_id": user_id})
-            raise AccessDeniedException()
-
-        return hotel
-
     async def add_hotel_image(
             self,
             hotel_id: int,
@@ -73,7 +58,7 @@ class HotelsService:
             hotel_image: UploadFile
     ):
         user = await get_current_user(request)
-        hotel = await self.check_owner(hotel_id=hotel_id, user_id=user.id)
+        hotel = await Base.check_owner(task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id)
 
         if hotel.image_path:
             os.remove(hotel.image_path)
@@ -88,7 +73,7 @@ class HotelsService:
 
     async def delete_hotel_image(self, hotel_id: int, request: Request):
         user = await get_current_user(request)
-        hotel = await self.check_owner(hotel_id=hotel_id, user_id=user.id)
+        hotel = await Base.check_owner(task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id)
 
         if hotel.image_path:
             os.remove(hotel.image_path)

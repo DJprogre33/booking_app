@@ -65,3 +65,13 @@ class AccessDeniedException(BookingAppException):
 class IncorrectHotelIDException(BookingAppException):
     status_code = status.HTTP_404_NOT_FOUND
     detail = "The hotel not found by id"
+
+
+class RoomLimitExceedException(BookingAppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = "The number of rooms exceeds the total number of rooms in the hotel"
+
+
+class IncorrectIDException(BookingAppException):
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "The entity not found by id"

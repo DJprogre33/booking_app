@@ -4,6 +4,7 @@ from sqlalchemy import insert, select, update, delete
 
 from app.database import async_session_maker
 from app.logger import logger
+from app.exceptions import IncorrectIDException
 
 
 class AbstractRepository(ABC):
@@ -85,6 +86,12 @@ class SQLAlchemyRepository(AbstractRepository):
     async def delete_by_id(self, entity_id):
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
+
+            id_exists = await self.find_one_or_none(id=entity_id)
+
+            if not id_exists:
+                logger.warning("Entity id not found", extra={"entity_id": entity_id})
+                raise IncorrectIDException()
 
             query = delete(self.model).where(self.model.id == entity_id).returning(self.model)
             result = await session.execute(query)

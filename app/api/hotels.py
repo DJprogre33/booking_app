@@ -10,6 +10,7 @@ from app.logger import logger
 from app.schemas.hotels import SHotel, SHotelResponse, SHotelsResponse
 from app.services.hotels import HotelsService
 
+
 router = APIRouter(prefix="/hotels", tags=["Hotels"])
 
 

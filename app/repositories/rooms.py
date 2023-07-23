@@ -4,6 +4,7 @@ from sqlalchemy import func, select
 
 from app.database import async_session_maker
 from app.models.bookings import Bookings
+from app.models.hotels import Hotels
 from app.models.rooms import Rooms
 from app.utils.repository import SQLAlchemyRepository
 
@@ -19,7 +20,6 @@ class RoomsRepository(SQLAlchemyRepository):
     ) -> list[dict]:
 
         async with async_session_maker() as session:
-
             get_booked_rooms = select(
                 self.model.id,
                 func.count().label("booked_rooms")
@@ -50,4 +50,26 @@ class RoomsRepository(SQLAlchemyRepository):
             available_rooms = await session.execute(get_available_rooms)
 
             return available_rooms.mappings().all()
+
+    async def get_rooms_left(
+        self,
+        hotel_id: int
+    ):
+        async with async_session_maker() as session:
+            existing_rooms = select(
+                self.model.hotel_id,
+                func.sum(self.model.quantity).label("existing_rooms")
+            ).select_from(self.model).where(
+                self.model.hotel_id == hotel_id
+            ).group_by(self.model.hotel_id).subquery("existing_rooms")
+
+            rooms_left = select(
+                (Hotels.rooms_quantity - func.coalesce(existing_rooms.c.existing_rooms, 0)).label("rooms_left")
+            ).select_from(Hotels).outerjoin(
+                existing_rooms,
+                Hotels.id == existing_rooms.c.hotel_id
+            )
+
+            rooms_left = await session.execute(rooms_left)
+            return rooms_left.scalar()
 
