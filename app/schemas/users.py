@@ -3,10 +3,15 @@ from typing import Literal
 from pydantic import BaseModel, EmailStr
 
 
-class SUserAuth(BaseModel):
+class SUserRegister(BaseModel):
     email: EmailStr
     password: str
     role: Literal["user", "hotel owner"]
+
+
+class SUserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 
 class SUserResponce(BaseModel):

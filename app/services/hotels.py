@@ -88,6 +88,4 @@ class HotelsService:
         if hotel.image_path:
             os.remove(hotel.image_path)
 
-        hotel = await self.tasks_repo.update_fields_by_id(hotel_id, image_path="")
-
-        return hotel.id
+        return await self.tasks_repo.update_fields_by_id(hotel_id, image_path="")

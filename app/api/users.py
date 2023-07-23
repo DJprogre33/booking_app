@@ -5,7 +5,7 @@ from fastapi_versioning import version
 
 from app.api.dependencies import get_users_service
 from app.logger import logger
-from app.schemas.users import SUserAuth, SUserResponce
+from app.schemas.users import SUserRegister, SUserLogin, SUserResponce
 from app.services.users import UsersService
 
 router = APIRouter(prefix="/auth", tags=["Auth & users"])
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/auth", tags=["Auth & users"])
 @router.post("/register")
 @version(1)
 async def register_user(
-    user_data: SUserAuth,
+    user_data: SUserRegister,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
 ) -> dict:
     user_id = await tasks_service.register_user(user_data=user_data)
@@ -27,7 +27,7 @@ async def register_user(
 @router.post("/login", response_model=SUserResponce)
 @version(1)
 async def login_user(
-    user_data: SUserAuth,
+    user_data: SUserLogin,
     response: Response,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
 ):
@@ -68,12 +68,12 @@ async def return_me(
 async def delete_me(
     request: Request,
     tasks_service: Annotated[UsersService, Depends(get_users_service)]
-):
-    deleted_user = await tasks_service.delete_me(request)
+) -> int:
+    deleted_user_id = await tasks_service.delete_me(request)
 
     logger.info(
         "Succesfully deleted user",
-        extra={"user_id": deleted_user.id, "user_email": deleted_user.email},
+        extra={"user_id": deleted_user_id},
     )
 
-    return deleted_user
+    return deleted_user_id

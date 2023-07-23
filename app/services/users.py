@@ -6,14 +6,14 @@ from app.exceptions import UserAlreadyExistException
 from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
-from app.schemas.users import SUserAuth
+from app.schemas.users import SUserRegister, SUserLogin
 
 
 class UsersService:
     def __init__(self, tasks_repo: UsersRepository):
         self.tasks_repo: UsersRepository = tasks_repo()
 
-    async def register_user(self, user_data: SUserAuth):
+    async def register_user(self, user_data: SUserRegister):
         existing_user = await self.tasks_repo.find_one_or_none(email=user_data.email)
 
         if existing_user:
@@ -26,7 +26,7 @@ class UsersService:
             email=user_data.email, hashed_password=hashed_password, role=user_data.role
         )
 
-    async def login_user(self, user_data: SUserAuth):
+    async def login_user(self, user_data: SUserLogin):
         existing_user = await self.tasks_repo.find_one_or_none(email=user_data.email)
         user = authenticate_user(existing_user=existing_user, password=user_data.password)
         return create_access_token({"sub": str(user.id)}), user
@@ -36,7 +36,7 @@ class UsersService:
         user = await get_current_user(request)
         return user
 
-    async def delete_me(self, request: Request) -> Users:
+    async def delete_me(self, request: Request) -> int:
         user = await get_current_user(request)
         return await self.tasks_repo.delete_by_id(user.id)
 

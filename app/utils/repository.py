@@ -58,7 +58,7 @@ class SQLAlchemyRepository(AbstractRepository):
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
 
-            query = insert(self.model).values(**data).returning(self.model.id)
+            query = insert(self.model).values(**data).returning(self.model)
             entity_id = await session.execute(query)
             await session.commit()
 
