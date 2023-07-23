@@ -66,8 +66,7 @@ async def delete_room(
         request=request
     )
 
-    logger.info("Succesfully deleted room", extra={"room_id": room_id})
+    logger.info("Succesfully deleted room", extra={"deleted_room_id": room_id})
 
     return deleted_room_id
-
 

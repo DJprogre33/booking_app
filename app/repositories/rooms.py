@@ -72,4 +72,3 @@ class RoomsRepository(SQLAlchemyRepository):
 
             rooms_left = await session.execute(rooms_left)
             return rooms_left.scalar()
-

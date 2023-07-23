@@ -75,3 +75,7 @@ class RoomLimitExceedException(BookingAppException):
 class IncorrectIDException(BookingAppException):
     status_code = status.HTTP_404_NOT_FOUND
     detail = "The entity not found by id"
+
+class IncorrectRoomIDException(BookingAppException):
+    status_code = status.HTTP_404_NOT_FOUND
+    detail = "The room not found by id"

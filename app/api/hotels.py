@@ -75,20 +75,24 @@ async def delete_hotel_image(
     hotel_id: int,
     request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)]
-):
-    hotel_id = await tasks_service.delete_hotel_image(hotel_id=hotel_id, request=request)
-    logger.info("Succesfully deleted a hotel image", extra={"hotel_id": hotel_id})
+) -> int:
+    hotel_with_deleted_image_id = await tasks_service.delete_hotel_image(hotel_id=hotel_id, request=request)
+    logger.info("Succesfully deleted a hotel image", extra={"hhotel_with_deleted_image_id": hotel_with_deleted_image_id})
 
-    return {"ID of the hotel where the image was deleted": hotel_id}
-
-
-@router.patch("/{hotel_id}")
-@version(1)
-async def edit_hotel_data():
-    pass
+    return hotel_with_deleted_image_id
 
 
 @router.delete("/{hotel_id}")
 @version(1)
-async def delete_hotel():
-    pass
+async def delete_hotel(
+    hotel_id: int,
+    request: Request,
+    tasks_service: Annotated[HotelsService, Depends(get_hotels_service)]
+):
+    deleted_hotel_id = await tasks_service.delete_hotel(
+        hotel_id=hotel_id,
+        request=request
+    )
+
+    logger.info("Succesfully deleted hotel", extra={"deleted_hotel_id": deleted_hotel_id})
+    return deleted_hotel_id

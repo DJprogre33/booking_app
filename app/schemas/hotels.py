@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class SHotel(BaseModel):
@@ -6,6 +6,13 @@ class SHotel(BaseModel):
     location: str
     services: list
     rooms_quantity: int
+
+    @field_validator("rooms_quantity")
+    @classmethod
+    def check_correct_value(cls, value):
+        if value <= 0:
+            raise ValueError("field must be greater than 0")
+        return value
 
 
 class SHotelResponse(BaseModel):

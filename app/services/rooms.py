@@ -6,7 +6,6 @@ from app.auth.auth import get_current_user
 from app.repositories.hotels import HotelsRepository
 from app.logger import logger
 from app.exceptions import RoomLimitExceedException
-
 from fastapi import Request
 
 
@@ -42,7 +41,7 @@ class RoomsService:
 
         rooms_left = await self.task_repo.get_rooms_left(hotel_id=hotel.id)
 
-        if rooms_left > quantity:
+        if rooms_left >= quantity:
             return await self.task_repo.insert_data(
                 hotel_id=hotel.id,
                 name=name,
@@ -59,18 +58,12 @@ class RoomsService:
         raise RoomLimitExceedException()
 
     async def delete_room(
-            self,
-            hotel_id: int,
-            room_id: int,
-            request: Request
+        self,
+        hotel_id: int,
+        room_id: int,
+        request: Request
     ) -> id:
         user = await get_current_user(request)
         await Base.check_owner(task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id)
 
         return await self.task_repo.delete_by_id(room_id)
-
-
-
-
-
-

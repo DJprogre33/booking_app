@@ -83,7 +83,7 @@ class SQLAlchemyRepository(AbstractRepository):
 
             return result.scalar()
 
-    async def delete_by_id(self, entity_id):
+    async def delete_by_id(self, entity_id) -> int:
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
 
@@ -93,7 +93,7 @@ class SQLAlchemyRepository(AbstractRepository):
                 logger.warning("Entity id not found", extra={"entity_id": entity_id})
                 raise IncorrectIDException()
 
-            query = delete(self.model).where(self.model.id == entity_id).returning(self.model)
+            query = delete(self.model).where(self.model.id == entity_id).returning(self.model.id)
             result = await session.execute(query)
             await session.commit()
 

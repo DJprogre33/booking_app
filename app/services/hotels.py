@@ -51,6 +51,16 @@ class HotelsService:
             owner_id=user.id
         )
 
+    async def delete_hotel(
+        self,
+        hotel_id: int,
+        request: Request
+    ):
+        user = await get_current_user(request)
+        hotel = await Base.check_owner(task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id)
+
+        return await self.tasks_repo.delete_by_id(hotel.id)
+
     async def add_hotel_image(
             self,
             hotel_id: int,
