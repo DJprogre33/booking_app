@@ -27,24 +27,24 @@ async def prepare_database():
         with open(f"app/tests/mock_{model}.json", encoding="UTF-8") as file:
             return json.load(file)
 
-    hotels = open_mock_json("hotels")
     users = open_mock_json("users")
-    bookings = open_mock_json("bookings")
+    hotels = open_mock_json("hotels")
     rooms = open_mock_json("rooms")
+    bookings = open_mock_json("bookings")
 
     for booking in bookings:
         booking["date_from"] = datetime.strptime(booking["date_from"], "%Y-%m-%d")
         booking["date_to"] = datetime.strptime(booking["date_to"], "%Y-%m-%d")
 
     async with async_session_maker() as session:
+        add_users = insert(Users).values(users)
         add_hotels = insert(Hotels).values(hotels)
         add_rooms = insert(Rooms).values(rooms)
-        add_users = insert(Users).values(users)
         add_bookings = insert(Bookings).values(bookings)
 
+        await session.execute(add_users)
         await session.execute(add_hotels)
         await session.execute(add_rooms)
-        await session.execute(add_users)
         await session.execute(add_bookings)
 
         await session.commit()

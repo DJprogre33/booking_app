@@ -1,10 +1,22 @@
 [
     {
-        "email": "test@test.com",
-        "hashed_password": "$2b$12$ib8N/MddMjSxNs4UOF69c.KuO4CyglQHcNATYpHcKJJn5rbltYNFG"
+        "email": "user1@example.com",
+        "hashed_password": "$2b$12$b8gyA.WwlUlFGsrVR..ZSefrG9qjlxyhiVWCKG5PzCg3qOp5zm4S2",
+        "role": "user"
     },
     {
-        "email": "artem@example.com",
-        "hashed_password": "$2b$12$SwAOsDqK7tjnvIcjlTAUvuX6K4xv/zUvqp8Y2oSCtqVv4f/XCB2Bi"
+        "email": "user2@example.com",
+        "hashed_password": "$2b$12$ulZR7nXwXYDAlImwUv2ND.oDZF4XeaL1jm9MGpyM6gQqlWTOna.9K",
+        "role": "user"
+    },
+    {
+        "email": "owner1@example.com",
+        "hashed_password": "$2b$12$EXQywHL9kq9.ZPfUeRNhl.VnK1A5jq/cqdMm7DuqIyAu7479g/cP2",
+        "role": "hotel owner"
+    },
+    {
+        "email": "owner2@example.com",
+        "hashed_password": "$2b$12$qEcLm61m0iJIH0dBIjvCSei0kkMxCXxrkM395bxjowVCj1fiqqYWu",
+        "role": "hotel owner"
     }
 ]

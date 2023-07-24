@@ -5,8 +5,7 @@
         "description": "Невероятный красоты номер.",
         "price": 24500,
         "services": ["Бесплатный Wi‑Fi", "Кондиционер (с климат-контролем)"],
-        "quantity": 5,
-        "image_id": 7
+        "quantity": 5
     },
     {
         "hotel_id": 1,
@@ -14,26 +13,23 @@
         "description": "Лучший номер отеля.",
         "price": 22450,
         "services": ["Бесплатный Wi‑Fi", "Кондиционер"],
-        "quantity": 10,
-        "image_id": 8
+        "quantity": 10
     },
     {
         "hotel_id": 2,
         "name": "Номер на 2-х человек",
         "description": "Красота неописуемая.",
         "price": 4570,
-        "services": [],
-        "quantity": 15,
-        "image_id": 9
+        "services": ["Бесплатный Wi‑Fi", "TV"],
+        "quantity": 15
     },
     {
         "hotel_id": 2,
         "name": "Номер на 3-х человек",
         "description": null,
         "price": 4350,
-        "services": [],
-        "quantity": 8,
-        "image_id": 10
+        "services": ["TV", "Холодильник"],
+        "quantity": 8
     },
     {
         "hotel_id": 3,
@@ -41,17 +37,15 @@
         "description": null,
         "price": 7080,
         "services": ["Холодильник"],
-        "quantity": 20,
-        "image_id": 11
+        "quantity": 20
     },
     {
         "hotel_id": 3,
         "name": "2-комнатный номер люкс комфорт",
         "description": null,
         "price": 9815,
-        "services": [],
-        "quantity": 10,
-        "image_id": 12
+        "services": ["Джакузи", "Домашний кинотеатр"],
+        "quantity": 10
     },
     {
         "hotel_id": 4,
@@ -59,8 +53,7 @@
         "description": null,
         "price": 4300,
         "services": ["Бесплатный Wi‑Fi", "Холодильник"],
-        "quantity": 20,
-        "image_id": 13
+        "quantity": 20
     },
     {
         "hotel_id": 4,
@@ -73,34 +66,30 @@
             "Ванная комната",
             "Кондиционер"
         ],
-        "quantity": 35,
-        "image_id": 14
+        "quantity": 35
     },
     {
         "hotel_id": 5,
         "name": "Номер стандарт с 2 односпальными кроватями (с завтраком)",
         "description": null,
         "price": 5000,
-        "services": [],
-        "quantity": 15,
-        "image_id": 15
+        "services": ["Кондиционер", "Мини бар"],
+        "quantity": 15
     },
     {
         "hotel_id": 5,
         "name": "Номер полулюкс премиум (с завтраком)",
         "description": null,
         "price": 8000,
-        "services": [],
-        "quantity": 7,
-        "image_id": 16
+        "services": ["Джакузи", "Кондиционер"],
+        "quantity": 7
     },
     {
         "hotel_id": 6,
         "name": "Стандарт (типовой корпус)",
         "description": null,
         "price": 8125,
-        "services": [],
-        "quantity": 45,
-        "image_id": 17
+        "services": ["Холодильник", "TV"],
+        "quantity": 45
     }
 ]

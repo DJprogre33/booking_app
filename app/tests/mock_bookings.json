@@ -2,22 +2,22 @@
     {
         "room_id": 1,
         "user_id": 1,
-        "date_from": "2023-06-15",
-        "date_to": "2023-06-30",
+        "date_from": "2023-10-15",
+        "date_to": "2023-09-30",
         "price": 24500
     },
     {
         "room_id": 2,
         "user_id": 1,
-        "date_from": "2023-04-01",
-        "date_to": "2023-04-19",
+        "date_from": "2023-11-01",
+        "date_to": "2023-11-19",
         "price": 4300
     },
     {
         "room_id": 1,
         "user_id": 2,
-        "date_from": "2023-06-05",
-        "date_to": "2023-06-25",
+        "date_from": "2023-12-05",
+        "date_to": "2023-12-25",
         "price": 24500
     }
 ]
