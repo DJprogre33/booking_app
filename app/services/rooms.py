@@ -13,7 +13,7 @@ from fastapi import Request, UploadFile
 
 
 class RoomsService:
-    def __init__(self, tasks_repo: RoomsRepository):
+    def __init__(self, tasks_repo: RoomsRepository()):
         self.tasks_repo: RoomsRepository = tasks_repo()
 
     async def get_availible_hotel_rooms(
