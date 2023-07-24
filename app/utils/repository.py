@@ -66,9 +66,15 @@ class SQLAlchemyRepository(AbstractRepository):
 
             return entity_id.scalar()
 
-    async def update_fields_by_id(self, entity_id, **data):
+    async def update_fields_by_id(self, entity_id: int, **data):
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
+
+            exists_entity = await self.find_one_or_none(id=entity_id)
+
+            if not exists_entity:
+                logger.warning("Entity id not found", extra={"entity_id": entity_id})
+                raise IncorrectIDException()
 
             query = (
                 update(self.model)
@@ -83,13 +89,13 @@ class SQLAlchemyRepository(AbstractRepository):
 
             return result.scalar()
 
-    async def delete_by_id(self, entity_id) -> int:
+    async def delete_by_id(self, entity_id: int) -> int:
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
 
-            id_exists = await self.find_one_or_none(id=entity_id)
+            exists_entity = await self.find_one_or_none(id=entity_id)
 
-            if not id_exists:
+            if not exists_entity:
                 logger.warning("Entity id not found", extra={"entity_id": entity_id})
                 raise IncorrectIDException()
 
