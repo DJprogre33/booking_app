@@ -91,5 +91,21 @@
         "price": 8125,
         "services": ["Холодильник", "TV"],
         "quantity": 45
+    },
+    {
+        "hotel_id": 7,
+        "name": "Королевский Люкс",
+        "description": null,
+        "price": 10000,
+        "services": ["Холодильник", "TV"],
+        "quantity": 1
+    },
+    {
+        "hotel_id": 7,
+        "name": "Подземный Люкс",
+        "description": null,
+        "price": 20000,
+        "services": ["Холодильник", "TV", "Джакузи"],
+        "quantity": 1
     }
 ]

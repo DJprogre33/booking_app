@@ -1,9 +1,18 @@
+"""
+Since the user repository does not have its own functions,
+this file tests the SQLAlchemy repository's basic functions.
+"""
+
 import pytest
 
 from app.repositories.users import UsersRepository
 from app.auth.auth import get_password_hash, verify_password
 from app.models.users import Users
 from app.exceptions import IncorrectIDException
+
+# repository for user query
+tasks_repo = UsersRepository()
+
 
 @pytest.mark.parametrize(
     "user_id,email,exists",
@@ -16,7 +25,7 @@ from app.exceptions import IncorrectIDException
     ]
 )
 async def test_user_find_one_or_none(user_id: int, email: str, exists: bool) -> None:
-    user = await UsersRepository().find_one_or_none(email=email)
+    user = await tasks_repo.find_one_or_none(email=email)
 
     if exists:
         assert user.id == user_id
@@ -33,7 +42,6 @@ async def test_user_find_one_or_none(user_id: int, email: str, exists: bool) -> 
     ]
 )
 async def test_user_find_all(role: str, total: int, emails: tuple) -> None:
-    tasks_repo = UsersRepository()
     users = await tasks_repo.find_all(
         role=role
     )
@@ -51,7 +59,6 @@ async def test_user_find_all(role: str, total: int, emails: tuple) -> None:
     ]
 )
 async def test_insert_data(email: str, password: str, role: str) -> None:
-    tasks_repo = UsersRepository()
     new_user = await tasks_repo.insert_data(
         email=email,
         hashed_password=get_password_hash(password),
@@ -80,9 +87,9 @@ async def test_insert_data(email: str, password: str, role: str) -> None:
     ]
 )
 async def test_update_fields_by_id(user_id: int, new_email: str, new_role: str) -> None:
-    tasks_repo = UsersRepository()
     current_user = await tasks_repo.find_one_or_none(id=user_id)
 
+    # if id not found raise error
     if user_id == 7:
         with pytest.raises(IncorrectIDException):
             await tasks_repo.update_fields_by_id(
@@ -108,8 +115,8 @@ async def test_update_fields_by_id(user_id: int, new_email: str, new_role: str) 
     [5, 6, 7]
 )
 async def test_delete_by_id(user_id: int) -> None:
-    tasks_repo = UsersRepository()
 
+    # if id not found raise error
     if user_id == 7:
         with pytest.raises(IncorrectIDException):
             await tasks_repo.delete_by_id(user_id)
@@ -119,9 +126,3 @@ async def test_delete_by_id(user_id: int) -> None:
 
         user = await tasks_repo.find_one_or_none(id=user_id)
         assert not user
-
-
-
-
-
-
