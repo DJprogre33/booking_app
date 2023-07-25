@@ -43,11 +43,10 @@ class HotelsRepository(SQLAlchemyRepository):
             ).select_from(self.model).outerjoin(
                 get_booked_rooms,
                 self.model.id == get_booked_rooms.c.hotel_id
-            ).where(self.model.location.ilike(f"%{location}%"))
-
-            # print(query.compile(engine, compile_kwargs={"literal_binds": True}))
+            ).where(
+                (self.model.location.ilike(f"%{location}%")) &
+                ((self.model.rooms_quantity - func.coalesce(get_booked_rooms.c.booked_rooms, 0)) > 0)
+            )
 
             available_hotels = await session.execute(get_available_hotels)
             return available_hotels.mappings().all()
-
-
