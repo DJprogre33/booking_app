@@ -15,10 +15,29 @@ from app.models.rooms import Rooms
 from app.models.users import Users
 
 
+async def create_async_client(login_data):
+    """Function which create async client"""
+    async with AsyncClient(app=fastapi_app, base_url="http://test") as async_client:
+        email, password = login_data["email"], login_data["password"]
+        await async_client.post(
+            "/auth/login",
+            json={
+                "email": email,
+                "password": password
+            }
+        )
+        # assert async_client.cookies["booking_access_token"]
+
+        yield async_client
+
+
 @pytest.fixture(scope="session", autouse=True)
 async def prepare_database():
+    """Prepare Database for testing"""
+
     assert settings.MODE == "TEST"
 
+    # drop and create tables
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -27,6 +46,7 @@ async def prepare_database():
         with open(f"app/tests/mock_{model}.json", encoding="UTF-8") as file:
             return json.load(file)
 
+    # loading mock data
     users = open_mock_json("users")
     hotels = open_mock_json("hotels")
     rooms = open_mock_json("rooms")
@@ -36,6 +56,7 @@ async def prepare_database():
         booking["date_from"] = datetime.strptime(booking["date_from"], "%Y-%m-%d")
         booking["date_to"] = datetime.strptime(booking["date_to"], "%Y-%m-%d")
 
+    # insert data
     async with async_session_maker() as session:
         add_users = insert(Users).values(users)
         add_hotels = insert(Hotels).values(hotels)
@@ -65,16 +86,21 @@ async def async_client():
 
 
 @pytest.fixture(scope="session")
-async def auth_async_client():
-    async with AsyncClient(app=fastapi_app, base_url="http://test") as async_client:
-        await async_client.post(
-            "/auth/login",
-            json=(
-                {
-                    "email": "test@test.com",
-                    "password": "test"
-                }
-            )
-        )
-        assert async_client.cookies["booking_access_token"]
+async def auth_async_client(request):
+    default_email = "user1@example.com"
+    default_password = "user1"
+
+    if request.param:
+        login_data = request.param
+    else:
+        login_data = {"email": default_email, "password": default_password}
+
+    async_client = await create_async_client(login_data)
+    yield async_client
+
+
+@pytest.fixture(scope="function")
+async def async_client_from_params(request):
+    login_data = request.param
+    async for async_client in create_async_client(login_data):
         yield async_client

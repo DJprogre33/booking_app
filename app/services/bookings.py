@@ -5,7 +5,7 @@ from fastapi import Request
 from app.auth.auth import get_current_user
 from app.models.users import Users
 from app.repositories.bookings import BookingsRepository
-from app.schemas.booking import SBooking
+from app.schemas.booking import SBookingResponce
 from app.tasks.tasks import send_booking_confirmation_email
 from app.utils.base import Base
 
@@ -42,6 +42,6 @@ class BookingService:
             date_from=date_from,
             date_to=date_to
         )
-        booking_dict = SBooking.model_validate(booking).model_dump()
+        booking_dict = SBookingResponce.model_validate(booking).model_dump()
         send_booking_confirmation_email.delay(booking_dict, user.email)
         return booking_dict

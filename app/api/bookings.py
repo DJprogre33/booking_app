@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi_versioning import version
 
 from app.api.dependencies import get_bookings_service
-from app.schemas.booking import SBookingsResponse, SBooking
+from app.schemas.booking import SBookingsResponse, SBookingResponce
 from app.services.bookings import BookingService
 from app.logger import logger
 
@@ -40,7 +40,7 @@ async def delete_booking(
     return deleted_booking_id
 
 
-@router.post("", response_model=SBooking)
+@router.post("", response_model=SBookingResponce)
 @version(1)
 async def add_booking(
     room_id: int,

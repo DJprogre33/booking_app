@@ -19,7 +19,7 @@ class SBookingsResponse(BaseModel):
     services: list
 
 
-class SBooking(BaseModel):
+class SBookingResponce(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

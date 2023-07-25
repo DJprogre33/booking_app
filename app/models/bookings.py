@@ -9,7 +9,7 @@ class Bookings(Base):
 
     id = Column(Integer, primary_key=True)
     room_id = Column(ForeignKey("rooms.id"), nullable=False)
-    user_id = Column(ForeignKey("users.id"), nullable=False)
+    user_id = Column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     date_from = Column(Date, nullable=False)
     date_to = Column(Date, nullable=True)
     price = Column(Integer, nullable=False)

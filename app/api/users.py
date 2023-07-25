@@ -11,17 +11,17 @@ from app.services.users import UsersService
 router = APIRouter(prefix="/auth", tags=["Auth & users"])
 
 
-@router.post("/register")
+@router.post("/register", response_model=SUserResponce)
 @version(1)
 async def register_user(
     user_data: SUserRegister,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
 ) -> dict:
-    user_id = await tasks_service.register_user(user_data=user_data)
+    user = await tasks_service.register_user(user_data=user_data)
 
-    logger.info("User created", extra={"id": user_id, "email": user_data.email})
+    logger.info("User created", extra={"id": user.id, "email": user.email})
 
-    return {"user_id": user_id}
+    return user
 
 
 @router.post("/login", response_model=SUserResponce)
@@ -63,12 +63,12 @@ async def return_me(
     return current_user
 
 
-@router.delete("/me", response_model=SUserResponce)
+@router.delete("/me")
 @version(1)
 async def delete_me(
     request: Request,
     tasks_service: Annotated[UsersService, Depends(get_users_service)]
-) -> int:
+) -> dict:
     deleted_user_id = await tasks_service.delete_me(request)
 
     logger.info(
@@ -76,4 +76,4 @@ async def delete_me(
         extra={"user_id": deleted_user_id},
     )
 
-    return deleted_user_id
+    return {"deleted_user_id": deleted_user_id}
