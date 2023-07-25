@@ -61,6 +61,7 @@ class BookingsRepository(SQLAlchemyRepository):
                 logger.info("Database query successfully completed")
 
                 return new_booking.scalar()
+            logger.warning("Room can't be booked", extra={"room_id": room_id})
             raise RoomCanNotBeBookedException()
 
     async def get_bookings(self, user_id: int):
@@ -77,7 +78,7 @@ class BookingsRepository(SQLAlchemyRepository):
                     self.model.price,
                     self.model.total_cost,
                     self.model.total_days,
-                    Rooms.image_id,
+                    Rooms.image_path,
                     Rooms.name,
                     Rooms.description,
                     Rooms.services,
@@ -108,7 +109,10 @@ class BookingsRepository(SQLAlchemyRepository):
             deleted_entity_id = deleted_entity_id.scalars().one_or_none()
 
             if deleted_entity_id is None:
-                raise IncorrectBookingIdException()
+                logger.warning("Incorrect booking id or user_id", extra={"user_id": user_id, "booking_id": booking_id})
+                err = IncorrectBookingIdException()
+                err.detail = "Incorrect booking id or user_id"
+                raise err
 
             await session.commit()
 
