@@ -5,12 +5,6 @@ from app.repositories.users import UsersRepository
 
 tasks_repo = UsersRepository()
 
-# Fixture for getting status code in parametrize fixture tests
-@pytest.fixture(scope="function")
-def status_code(request):
-    # Получение значения статусного кода из параметров тестовой функции
-    return request.param
-
 
 @pytest.mark.parametrize(
     "email,password,role,status_code",
@@ -71,21 +65,24 @@ async def test_login_user(
         assert "booking_access_token" in responce.cookies
 
 @pytest.mark.parametrize(
-    "async_client_from_params,status_code",
+    "async_client_from_params,status_code,email",
     [
-        ({"email": "user3@example.com", "password": "user3"}, 200),
-        ({"email": "user3@example.com", "password": "user2"}, 401)
+        ({"email": "user3@example.com", "password": "user3"}, 200, "user3@example.com"),
+        ({"email": "user3@example.com", "password": "user2"}, 401, "user3@example.com")
     ],
-    indirect=True
+    indirect=["async_client_from_params"]
 )
 async def test_get_me(
     async_client_from_params: AsyncClient,
-    status_code: int
+    status_code: int,
+    email: str
 ) -> None:
-    # try to get with auth user
 
     response = await async_client_from_params.get("/auth/me")
     assert response.status_code == status_code
+
+    if response.status_code == 200:
+        assert response.json()["email"] == email
 
 
 @pytest.mark.parametrize(
@@ -93,9 +90,11 @@ async def test_get_me(
     [
         ({"email": "user3@example.com", "password": "user2"}, 401),
         ({"email": "user3@example.com", "password": "user3"}, 200),
-        ({"email": "user3@example.com", "password": "user3"}, 401)
+        ({"email": "user3@example.com", "password": "user3"}, 401),
+        ({"email": "owner3@example.com", "password": "owner2"}, 401),
+        ({"email": "owner3@example.com", "password": "owner3"}, 200),
     ],
-    indirect=True
+    indirect=["async_client_from_params"]
 )
 async def test_delete_me(
     async_client_from_params: AsyncClient,
@@ -103,3 +102,6 @@ async def test_delete_me(
 ) -> None:
     response = await async_client_from_params.delete("/auth/me")
     assert response.status_code == status_code
+    if status_code == 200:
+        deleted_user = await UsersRepository().find_one_or_none(email="user3@example.com")
+        assert not deleted_user

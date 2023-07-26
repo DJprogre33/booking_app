@@ -1,4 +1,5 @@
 from pydantic import BaseModel, field_validator
+from typing import Optional
 
 
 class SHotel(BaseModel):
@@ -16,12 +17,12 @@ class SHotel(BaseModel):
 
 
 class SHotelResponse(BaseModel):
+    id: int
     name: str
     location: str
-    rooms_quantity: int
-    image_path: str
-    id: int
     services: list
+    rooms_quantity: int
+    image_path: Optional[str]
 
 
 class SHotelsResponse(BaseModel):
@@ -30,6 +31,6 @@ class SHotelsResponse(BaseModel):
     location: str
     services: list
     rooms_quantity: int
-    image_path: str
+    image_path: Optional[str]
     rooms_left: int
 

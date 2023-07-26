@@ -7,7 +7,7 @@ from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
 from app.utils.repository import SQLAlchemyRepository
-
+from app.logger import logger
 
 class HotelsRepository(SQLAlchemyRepository):
     model = Hotels
@@ -20,6 +20,7 @@ class HotelsRepository(SQLAlchemyRepository):
     ) -> list[dict]:
 
         async with async_session_maker() as session:
+            logger.info("The database query begins to generate")
 
             get_booked_rooms = select(
                 Rooms.hotel_id,
@@ -49,4 +50,6 @@ class HotelsRepository(SQLAlchemyRepository):
             )
 
             available_hotels = await session.execute(get_available_hotels)
+
+            logger.info("Database query successfully completed")
             return available_hotels.mappings().all()

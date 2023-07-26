@@ -31,7 +31,7 @@ async def create_async_client(login_data):
         yield async_client
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 async def prepare_database():
     """Prepare Database for testing"""
 

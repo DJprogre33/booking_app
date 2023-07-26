@@ -31,7 +31,11 @@ class HotelsService:
         )
 
     async def get_hotel_by_id(self, hotel_id: int):
-        return await self.tasks_repo.find_one_or_none(id=hotel_id)
+        hotel = await self.tasks_repo.find_one_or_none(id=hotel_id)
+        if not hotel:
+            raise IncorrectHotelIDException()
+
+        return hotel
 
     async def create_hotel(
             self,
