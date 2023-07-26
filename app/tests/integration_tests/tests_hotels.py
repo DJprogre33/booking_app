@@ -3,7 +3,6 @@ from httpx import AsyncClient
 from typing import Union
 from app.repositories.hotels import HotelsRepository
 
-
 tasks_repo = HotelsRepository()
 
 
@@ -39,13 +38,13 @@ async def test_get_hotels_by_location_and_time(
     assert responce.status_code == status_code
 
     if responce.status_code == 400:
-        error_detail = """Incorrect data range, data range must be \ 
-    1 <= data_to - data_from <= 90 \ 
-    and date_from can't be earlier then now
-    """
-        assert (
-            responce.json()["detail"] == error_detail
+        error_detail = (
+            "Incorrect data range, data range must be"
+            "1 <= data_to - data_from <= 90"
+            "and date_from can't be earlier then now"
         )
+
+        assert responce.json()["detail"] == error_detail
     else:
         assert len(responce.json()) == total_hotels
 

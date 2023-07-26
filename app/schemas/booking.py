@@ -13,7 +13,7 @@ class SBookingsResponse(BaseModel):
     price: int
     total_cost: int
     total_days: int
-    image_id: int
+    image_path: Optional[str]
     name: str
     description: Optional[str]
     services: list

@@ -3,7 +3,6 @@ from datetime import date
 from fastapi import Request
 
 from app.auth.auth import get_current_user
-from app.models.users import Users
 from app.repositories.bookings import BookingsRepository
 from app.schemas.booking import SBookingResponce
 from app.tasks.tasks import send_booking_confirmation_email

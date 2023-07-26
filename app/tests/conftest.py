@@ -90,13 +90,10 @@ async def auth_async_client(request):
     default_email = "user1@example.com"
     default_password = "user1"
 
-    if request.param:
-        login_data = request.param
-    else:
-        login_data = {"email": default_email, "password": default_password}
+    login_data = {"email": default_email, "password": default_password}
 
-    async_client = await create_async_client(login_data)
-    yield async_client
+    async for async_client in create_async_client(login_data):
+        yield async_client
 
 
 @pytest.fixture(scope="function")
