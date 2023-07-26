@@ -17,7 +17,7 @@ async def test_add_and_get_booking(
         booked_rooms: int,
         status_code: int,
         auth_async_client: AsyncClient
-):
+) -> None:
     """ In this test function we order until we run out of numbers,
      then there's an error."""
     responce = await auth_async_client.post(
@@ -36,7 +36,7 @@ async def test_add_and_get_booking(
 
 async def test_get_and_delete_all_bookings(
         auth_async_client: AsyncClient
-):
+) -> None:
     """ In this test function we get all users order
     and then delete them all. """
     responce = await auth_async_client.get("/bookings")
@@ -54,3 +54,31 @@ async def test_get_and_delete_all_bookings(
 
     assert responce.status_code == 200
     assert not responce.json()
+
+
+@pytest.mark.parametrize(
+    "async_client_from_params,room_id,date_from,date_to,status_code",
+    [
+        ({"email": "user1@example.com", "password": "user1"},
+         12, "2024-12-05", "2024-12-25", 200),
+        ({"email": "user1@example.com", "password": "user1"},
+         13, "2024-12-05", "2024-12-25", 409)
+    ],
+    indirect=["async_client_from_params"]
+)
+async def test_add_booking(
+    async_client_from_params: AsyncClient,
+    room_id: int,
+    date_from: str,
+    date_to: str,
+    status_code: int
+) -> None:
+    responce = await async_client_from_params.post(
+        "/bookings",
+        params={
+            "room_id": room_id,
+            "date_from": date_from,
+            "date_to": date_to
+        }
+    )
+    assert responce.status_code == status_code

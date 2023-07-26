@@ -1,11 +1,11 @@
 from datetime import date
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Request, UploadFile
 from fastapi_versioning import version
 
 from app.api.dependencies import get_rooms_service
-from app.schemas.rooms import SRoomsResponse, SRooms
+from app.schemas.rooms import SRoomsResponse, SRoomResponce, SRooms
 from app.services.rooms import RoomsService
 from app.logger import logger
 
@@ -13,7 +13,7 @@ from app.logger import logger
 router = APIRouter(prefix="/hotels", tags=["Rooms"])
 
 
-@router.get("/{hotel_id}/rooms", response_model=list[SRoomsResponse])
+@router.get("/{hotel_id}/rooms", response_model=Optional[list[SRoomsResponse]])
 @version(1)
 async def get_available_hotel_rooms(
     hotel_id: int,
@@ -28,7 +28,7 @@ async def get_available_hotel_rooms(
     return rooms
 
 
-@router.post("/{hotel_id}/new")
+@router.post("/{hotel_id}/new", response_model=SRoomResponce)
 @version(1)
 async def create_room(
     hotel_id: int,
@@ -36,7 +36,7 @@ async def create_room(
     requets: Request,
     tasks_service: Annotated[RoomsService, Depends(get_rooms_service)]
 ):
-    room_id = await tasks_service.create_room(
+    new_room = await tasks_service.create_room(
         hotel_id=hotel_id,
         name=new_room.name,
         description=new_room.description,
@@ -45,11 +45,10 @@ async def create_room(
         quantity=new_room.quantity,
         request=requets
     )
-    responce = {"room_id": room_id}
 
-    logger.info("Room succesfully created", extra=responce)
+    logger.info("Room succesfully created", extra={"room_id": new_room.id})
 
-    return responce
+    return new_room
 
 
 @router.delete("/{hotel_id}/{room_id}")
@@ -71,14 +70,14 @@ async def delete_room(
     return {"deleted room id": deleted_room_id}
 
 
-@router.patch("/{hotel_id}/{room_id}/image")
+@router.patch("/{hotel_id}/{room_id}/image", response_model=SRoomResponce)
 async def add_room_image(
     hotel_id: int,
     room_id: int,
     room_image: UploadFile,
     request: Request,
     tasks_service: Annotated[RoomsService, Depends(get_rooms_service)],
-):
+) -> dict:
     result = await tasks_service.add_room_image(
         hotel_id=hotel_id, room_id=room_id, room_image=room_image, request=request
     )
@@ -87,7 +86,7 @@ async def add_room_image(
         "Succesfully uploaded a room image", extra={"image_path": result.image_path}
     )
 
-    return {"image_path": result.image_path}
+    return result
 
 
 @router.delete("/{hotel_id}/{room_id}/image")
@@ -96,7 +95,7 @@ async def delete_room_image(
     room_id: int,
     request: Request,
     tasks_service: Annotated[RoomsService, Depends(get_rooms_service)],
-):
+) -> dict:
     room_with_deleted_image = await tasks_service.delete_room_image(
         hotel_id=hotel_id, room_id=room_id, request=request
     )

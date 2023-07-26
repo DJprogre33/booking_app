@@ -10,7 +10,7 @@ from app.repositories.hotels import HotelsRepository
 from app.logger import logger
 from app.exceptions import RoomLimitExceedException, IncorrectRoomIDException
 from fastapi import Request, UploadFile
-
+from app.models.rooms import Rooms
 
 class RoomsService:
     def __init__(self, tasks_repo: RoomsRepository()):
@@ -38,7 +38,7 @@ class RoomsService:
         services: list,
         quantity: int,
         request: Request
-    ) -> dict:
+    ) -> Rooms:
         user = await get_current_user(request)
         hotel = await Base.check_owner(task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id)
 
