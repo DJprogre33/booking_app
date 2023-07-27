@@ -21,7 +21,7 @@ async def test_register_user(
     email: str, password: str, role: str, status_code: int, async_client: AsyncClient
 ) -> None:
     responce = await async_client.post(
-        "/auth/register", json={"email": email, "password": password, "role": role}
+        "/v1/auth/register", json={"email": email, "password": password, "role": role}
     )
     # Check status code
     assert responce.status_code == status_code
@@ -51,7 +51,7 @@ async def test_login_user(
     email: str, password: str, status_code: int, async_client: AsyncClient
 ) -> None:
     responce = await async_client.post(
-        "/auth/login", json={"email": email, "password": password}
+        "/v1/auth/login", json={"email": email, "password": password}
     )
 
     assert responce.status_code == status_code
@@ -76,7 +76,7 @@ async def test_login_user(
 async def test_get_me(
     async_client_from_params: AsyncClient, status_code: int, email: str
 ) -> None:
-    response = await async_client_from_params.get("/auth/me")
+    response = await async_client_from_params.get("/v1/auth/me")
     assert response.status_code == status_code
 
     if response.status_code == 200:
@@ -97,7 +97,7 @@ async def test_get_me(
 async def test_delete_me(
     async_client_from_params: AsyncClient, status_code: int
 ) -> None:
-    response = await async_client_from_params.delete("/auth/me")
+    response = await async_client_from_params.delete("/v1/auth/me")
     assert response.status_code == status_code
     if status_code == 200:
         deleted_user = await UsersRepository().find_one_or_none(

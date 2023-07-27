@@ -34,7 +34,7 @@ async def test_get_hotels_by_location_and_time(
     async_client: AsyncClient,
 ) -> None:
     responce = await async_client.get(
-        f"/hotels/{location}", params={"date_from": date_from, "date_to": date_to}
+        f"/v1/hotels/{location}", params={"date_from": date_from, "date_to": date_to}
     )
 
     assert responce.status_code == status_code
@@ -57,7 +57,7 @@ async def test_get_hotels_by_location_and_time(
 async def test_get_hotel_by_id(
     hotel_id: int, status_code: int, async_client: AsyncClient
 ):
-    responce = await async_client.get(f"/hotels/id/{hotel_id}")
+    responce = await async_client.get(f"/v1/hotels/id/{hotel_id}")
 
     assert responce.status_code == status_code
 
@@ -114,7 +114,7 @@ async def test_create_hotel(
     status_code: int,
 ) -> None:
     responce = await async_client_from_params.post(
-        "/hotels/new",
+        "/v1/hotels/new",
         json={
             "name": name,
             "location": location,
@@ -159,7 +159,7 @@ async def test_add_hotel_image(
     with open(filepath, "rb") as image_file:
         files = {"hotel_image": (filepath, image_file)}
         responce = await async_client_from_params.patch(
-            f"/hotels/{hotel_id}/image", files=files
+            f"/v1/hotels/{hotel_id}/image", files=files
         )
     assert responce.status_code == status_code
 
@@ -183,7 +183,7 @@ async def test_add_hotel_image(
 async def test_delete_hotel_image(
     async_client_from_params: AsyncClient, hotel_id: int, status_code: int
 ):
-    responce = await async_client_from_params.delete(f"/hotels/{hotel_id}/image")
+    responce = await async_client_from_params.delete(f"/v1/hotels/{hotel_id}/image")
     assert responce.status_code == status_code
 
     if responce.status_code == 200:
@@ -208,7 +208,7 @@ async def test_delete_hotel_image(
 async def test_delete_hotel(
     async_client_from_params: AsyncClient, hotel_id: int, status_code: int
 ):
-    responce = await async_client_from_params.delete(f"/hotels/{hotel_id}")
+    responce = await async_client_from_params.delete(f"/v1/hotels/{hotel_id}")
     assert responce.status_code == status_code
 
     if responce.status_code == 200:

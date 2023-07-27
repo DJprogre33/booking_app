@@ -20,7 +20,7 @@ async def create_async_client(login_data):
     async with AsyncClient(app=fastapi_app, base_url="http://test") as async_client:
         email, password = login_data["email"], login_data["password"]
         await async_client.post(
-            "/auth/login", json={"email": email, "password": password}
+            "/v1/auth/login", json={"email": email, "password": password}
         )
         # assert async_client.cookies["booking_access_token"]
 

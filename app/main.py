@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from fastapi_versioning import VersionedFastAPI
 from redis import asyncio as aioredis
 from sqladmin import Admin
 
@@ -21,6 +22,7 @@ from app.database import engine
 from app.logger import logger
 from app.pages.router import router as pages_router
 
+
 sentry_sdk.init(
     dsn=settings.SENTRY_DSN,
     # Set traces_sample_rate to 1.0 to capture 100%
@@ -31,7 +33,14 @@ sentry_sdk.init(
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> None:
+    """
+    The function returns the application lifecycle,
+    commands before yield are executed before startup,
+    after yield are executed after application stop
+    :param app: FastAPI instance
+    :return: None
+    """
     logger.info("Initializing Redis")
     redis = aioredis.from_url(settings.redis_url)
     FastAPICache.init(RedisBackend(redis), prefix="cache")
@@ -52,22 +61,22 @@ app.include_router(pages_router)
 origins = ["http://localhost:3000"]
 
 
-# app = VersionedFastAPI(
-#     app,
-#     version_format='{major}',
-#     prefix_format='/v{major}',
-#     description="""
-#     To access the required documentation,
-#     select the required version and follow the link,
-#     e.g. "v1/docs", to access the most up-to-date version
-#     of the API go to "latest/docs"
-#     """,
-#     enable_latest=True
-# )
+app = VersionedFastAPI(
+    app,
+    version_format='{major}',
+    prefix_format='/v{major}',
+    description="""
+    To access the required documentation,
+    select the required version and follow the link,
+    e.g. "v1/docs", to access the most up-to-date version
+    of the API go to "latest/docs"
+    """,
+    enable_latest=True
+)
 
-# app.add_middleware(HTTPSRedirectMiddleware)
-
+# Add SQLAdmin to the project
 admin = Admin(app, engine, authentication_backend=authentication_backend)
+
 
 admin.add_view(UsersAdmin)
 admin.add_view(BookingsAdmin)
@@ -77,6 +86,12 @@ admin.add_view(HotelsAdmin)
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
+    """
+    The function measures the execution time of each request
+    :param request: request instance
+    :param call_next: function which call API
+    :return: responce to clients
+    """
     start_time = time.time()
     response = await call_next(request)
     process_time = time.time() - start_time
@@ -88,6 +103,6 @@ async def add_process_time_header(request: Request, call_next):
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-
+# dev function to run and debug app
 if __name__ == "__main__":
     uvicorn.run(app)

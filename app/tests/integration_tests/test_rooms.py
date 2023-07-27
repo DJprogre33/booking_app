@@ -30,7 +30,7 @@ async def test_get_available_hotel_rooms(
     async_client: AsyncClient,
 ) -> None:
     responce = await async_client.get(
-        f"hotels/{hotel_id}/rooms", params={"date_from": date_from, "date_to": date_to}
+        f"/v1/hotels/{hotel_id}/rooms", params={"date_from": date_from, "date_to": date_to}
     )
     assert responce.status_code == status_code
 
@@ -57,7 +57,7 @@ async def test_delete_room(
     rooms_left: Union[int, None],
     status_code: int,
 ):
-    responce = await async_client_from_params.delete(f"/hotels/{hotel_id}/{room_id}")
+    responce = await async_client_from_params.delete(f"/v1/hotels/{hotel_id}/{room_id}")
     assert responce.status_code == status_code
 
     if status_code == 200:
@@ -143,7 +143,7 @@ async def test_create_room(
     status_code: int,
 ) -> None:
     responce = await async_client_from_params.post(
-        f"/hotels/{hotel_id}/new",
+        f"/v1/hotels/{hotel_id}/new",
         json={
             "hotel_id": hotel_id,
             "name": name,
@@ -191,7 +191,7 @@ async def test_add_hotel_image(
     with open(filepath, "rb") as image_file:
         files = {"room_image": (filepath, image_file)}
         responce = await async_client_from_params.patch(
-            f"/hotels/{hotel_id}/{room_id}/image", files=files
+            f"/v1/hotels/{hotel_id}/{room_id}/image", files=files
         )
     assert responce.status_code == status_code
 
@@ -215,7 +215,7 @@ async def test_add_hotel_image(
     async_client_from_params: AsyncClient, hotel_id: int, room_id: int, status_code: int
 ):
     responce = await async_client_from_params.delete(
-        f"/hotels/{hotel_id}/{room_id}/image"
+        f"/v1/hotels/{hotel_id}/{room_id}/image"
     )
     assert responce.status_code == status_code
 
