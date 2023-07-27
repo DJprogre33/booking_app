@@ -10,6 +10,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from fastapi_versioning import VersionedFastAPI
 from redis import asyncio as aioredis
 from sqladmin import Admin
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.admin.auth import authentication_backend
 from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
@@ -17,6 +18,7 @@ from app.api.bookings import router as router_bookings
 from app.api.hotels import router as router_hotels
 from app.api.rooms import router as router_rooms
 from app.api.users import router as router_users
+from app.prometheus.prometheus import router as router_prometheus
 from app.config import settings
 from app.database import engine
 from app.logger import logger
@@ -55,6 +57,7 @@ app.include_router(router_users)
 app.include_router(router_bookings)
 app.include_router(router_hotels)
 app.include_router(router_rooms)
+app.include_router(router_prometheus)
 
 
 # add API versioning
@@ -101,6 +104,15 @@ async def add_process_time_header(request: Request, call_next):
         "Requetst execution time", extra={"process_time": round(process_time, 4)}
     )
     return response
+
+
+# setup prometheus
+instrumentator = Instrumentator(
+    should_group_status_codes=False,
+    excluded_handlers=[".*admin.*", "/metrics"]
+)
+
+instrumentator.instrument(app).expose(app)
 
 
 # mount static directory
