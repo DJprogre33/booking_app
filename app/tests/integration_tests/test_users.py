@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient
-from app.repositories.users import UsersRepository
 
+from app.repositories.users import UsersRepository
 
 tasks_repo = UsersRepository()
 

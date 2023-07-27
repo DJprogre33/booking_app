@@ -5,10 +5,9 @@ from fastapi import APIRouter, Depends, Request
 from fastapi_versioning import version
 
 from app.api.dependencies import get_bookings_service
-from app.schemas.booking import SBookingsResponse, SBookingResponce
-from app.services.bookings import BookingService
 from app.logger import logger
-
+from app.schemas.booking import SBookingResponce, SBookingsResponse
+from app.services.bookings import BookingService
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 

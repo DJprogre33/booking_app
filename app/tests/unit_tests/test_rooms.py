@@ -1,7 +1,9 @@
-import pytest
 from datetime import date
-from app.repositories.rooms import RoomsRepository
+
+import pytest
+
 from app.exceptions import IncorrectHotelIDException
+from app.repositories.rooms import RoomsRepository
 
 tasks_repo = RoomsRepository()
 

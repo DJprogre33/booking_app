@@ -5,10 +5,10 @@ this file tests the SQLAlchemy repository's basic functions.
 
 import pytest
 
-from app.repositories.users import UsersRepository
 from app.auth.auth import get_password_hash, verify_password
-from app.models.users import Users
 from app.exceptions import IncorrectIDException
+from app.models.users import Users
+from app.repositories.users import UsersRepository
 
 # repository for user query
 tasks_repo = UsersRepository()

@@ -3,12 +3,13 @@ from datetime import date
 from sqlalchemy import func, select
 
 from app.database import async_session_maker
+from app.exceptions import IncorrectHotelIDException
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
-from app.utils.repository import SQLAlchemyRepository
-from app.exceptions import IncorrectHotelIDException
 from app.repositories.hotels import HotelsRepository
+from app.utils.repository import SQLAlchemyRepository
+
 
 class RoomsRepository(SQLAlchemyRepository):
     model = Rooms

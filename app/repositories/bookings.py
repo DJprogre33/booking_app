@@ -4,10 +4,10 @@ from sqlalchemy import delete, func, insert, select
 
 from app.database import async_session_maker
 from app.exceptions import IncorrectBookingIdException, RoomCanNotBeBookedException
+from app.logger import logger
 from app.models.bookings import Bookings
 from app.models.rooms import Rooms
 from app.utils.repository import SQLAlchemyRepository
-from app.logger import logger
 
 
 class BookingsRepository(SQLAlchemyRepository):

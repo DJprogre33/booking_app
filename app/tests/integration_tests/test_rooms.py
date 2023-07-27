@@ -1,9 +1,9 @@
 from typing import Union
 
-from app.repositories.rooms import RoomsRepository
 import pytest
 from httpx import AsyncClient
 
+from app.repositories.rooms import RoomsRepository
 
 tasks_repo = RoomsRepository()
 

@@ -3,11 +3,12 @@ from datetime import date
 from sqlalchemy import func, select
 
 from app.database import async_session_maker
+from app.logger import logger
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
 from app.utils.repository import SQLAlchemyRepository
-from app.logger import logger
+
 
 class HotelsRepository(SQLAlchemyRepository):
     model = Hotels

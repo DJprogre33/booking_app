@@ -1,10 +1,14 @@
 from datetime import date, datetime, timedelta
 
-from app.exceptions import IncorrectDataRangeException, AccessDeniedException, IncorrectHotelIDException
+from app.exceptions import (
+    AccessDeniedException,
+    IncorrectDataRangeException,
+    IncorrectHotelIDException,
+)
 from app.logger import logger
+from app.models.hotels import Hotels
 from app.repositories.hotels import HotelsRepository
 
-from app.models.hotels import Hotels
 
 class Base:
     """

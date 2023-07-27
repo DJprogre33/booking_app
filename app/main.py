@@ -21,7 +21,6 @@ from app.database import engine
 from app.logger import logger
 from app.pages.router import router as pages_router
 
-
 sentry_sdk.init(
     dsn=settings.SENTRY_DSN,
     # Set traces_sample_rate to 1.0 to capture 100%

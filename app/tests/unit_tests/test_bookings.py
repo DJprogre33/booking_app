@@ -1,9 +1,10 @@
 from datetime import date
-import pytest
-from app.repositories.bookings import BookingsRepository
-from app.exceptions import RoomCanNotBeBookedException, IncorrectBookingIdException
-from app.models.bookings import Bookings
 
+import pytest
+
+from app.exceptions import IncorrectBookingIdException, RoomCanNotBeBookedException
+from app.models.bookings import Bookings
+from app.repositories.bookings import BookingsRepository
 
 tasks_repo = BookingsRepository()
 

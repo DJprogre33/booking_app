@@ -1,5 +1,7 @@
 from datetime import date
+
 import pytest
+
 from app.repositories.hotels import HotelsRepository
 
 tasks_repo = HotelsRepository()

@@ -1,12 +1,16 @@
 from fastapi import Request
 
-from app.auth.auth import authenticate_user, create_access_token, get_password_hash
-from app.auth.auth import get_current_user
+from app.auth.auth import (
+    authenticate_user,
+    create_access_token,
+    get_current_user,
+    get_password_hash,
+)
 from app.exceptions import UserAlreadyExistException
 from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
-from app.schemas.users import SUserRegister, SUserLogin
+from app.schemas.users import SUserLogin, SUserRegister
 
 
 class UsersService:

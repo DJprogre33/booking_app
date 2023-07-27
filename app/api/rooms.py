@@ -5,10 +5,9 @@ from fastapi import APIRouter, Depends, Request, UploadFile
 from fastapi_versioning import version
 
 from app.api.dependencies import get_rooms_service
-from app.schemas.rooms import SRoomsResponse, SRoomResponce, SRooms
-from app.services.rooms import RoomsService
 from app.logger import logger
-
+from app.schemas.rooms import SRoomResponce, SRooms, SRoomsResponse
+from app.services.rooms import RoomsService
 
 router = APIRouter(prefix="/hotels", tags=["Rooms"])
 

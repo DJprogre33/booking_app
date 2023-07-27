@@ -16,7 +16,6 @@ from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

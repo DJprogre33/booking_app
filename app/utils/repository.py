@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
-from sqlalchemy import insert, select, update, delete
+from sqlalchemy import delete, insert, select, update
 
 from app.database import async_session_maker
-from app.logger import logger
 from app.exceptions import IncorrectIDException
+from app.logger import logger
 
 
 class AbstractRepository(ABC):

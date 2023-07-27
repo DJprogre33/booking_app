@@ -1,6 +1,8 @@
+from typing import Union
+
 import pytest
 from httpx import AsyncClient
-from typing import Union
+
 from app.repositories.hotels import HotelsRepository
 
 tasks_repo = HotelsRepository()

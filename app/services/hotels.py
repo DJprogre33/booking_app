@@ -3,7 +3,7 @@ import shutil
 import uuid
 from datetime import date
 
-from fastapi import Depends, UploadFile, Request
+from fastapi import Depends, Request, UploadFile
 
 from app.auth.auth import get_current_user
 from app.exceptions import AccessDeniedException, IncorrectHotelIDException
