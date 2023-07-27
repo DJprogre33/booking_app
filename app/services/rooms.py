@@ -19,16 +19,11 @@ class RoomsService:
         self.tasks_repo: RoomsRepository = tasks_repo()
 
     async def get_availible_hotel_rooms(
-            self,
-            hotel_id: int,
-            date_from: date,
-            date_to: date
+        self, hotel_id: int, date_from: date, date_to: date
     ):
         date_from, date_to = Base.validate_data_range(date_from, date_to)
         return await self.tasks_repo.get_available_hotel_rooms(
-            hotel_id=hotel_id,
-            date_from=date_from,
-            date_to=date_to
+            hotel_id=hotel_id, date_from=date_from, date_to=date_to
         )
 
     async def create_room(
@@ -39,10 +34,12 @@ class RoomsService:
         price: int,
         services: list,
         quantity: int,
-        request: Request
+        request: Request,
     ) -> Rooms:
         user = await get_current_user(request)
-        hotel = await Base.check_owner(task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id)
+        hotel = await Base.check_owner(
+            task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
+        )
 
         rooms_left = await self.tasks_repo.get_rooms_left(hotel_id=hotel.id)
 
@@ -53,35 +50,30 @@ class RoomsService:
                 description=description,
                 price=price,
                 services=services,
-                quantity=quantity
+                quantity=quantity,
             )
 
         logger.warning(
             "The number of rooms exceeds the total number of rooms in the hotel",
-            extra={"rooms_left": rooms_left, "required quantity": quantity}
+            extra={"rooms_left": rooms_left, "required quantity": quantity},
         )
         raise RoomLimitExceedException()
 
-    async def delete_room(
-        self,
-        hotel_id: int,
-        room_id: int,
-        request: Request
-    ) -> id:
+    async def delete_room(self, hotel_id: int, room_id: int, request: Request) -> id:
         user = await get_current_user(request)
-        await Base.check_owner(task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id)
+        await Base.check_owner(
+            task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
+        )
 
         return await self.tasks_repo.delete_by_id(room_id)
 
     async def add_room_image(
-        self,
-        hotel_id: int,
-        room_id: int,
-        room_image: UploadFile,
-        request: Request
+        self, hotel_id: int, room_id: int, room_image: UploadFile, request: Request
     ):
         user = await get_current_user(request)
-        await Base.check_owner(task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id)
+        await Base.check_owner(
+            task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
+        )
         room = await self.tasks_repo.find_one_or_none(id=room_id)
 
         if not room:
@@ -96,16 +88,15 @@ class RoomsService:
         with open(file_path, "wb") as file:
             shutil.copyfileobj(room_image.file, file)
 
-        return await self.tasks_repo.update_fields_by_id(entity_id=room_id, image_path=file_path)
+        return await self.tasks_repo.update_fields_by_id(
+            entity_id=room_id, image_path=file_path
+        )
 
-    async def delete_room_image(
-        self,
-        hotel_id: int,
-        room_id: int,
-        request: Request
-    ):
+    async def delete_room_image(self, hotel_id: int, room_id: int, request: Request):
         user = await get_current_user(request)
-        await Base.check_owner(task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id)
+        await Base.check_owner(
+            task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
+        )
         room = await self.tasks_repo.find_one_or_none(id=room_id)
 
         if not room:
@@ -114,4 +105,6 @@ class RoomsService:
         if room.image_path:
             os.remove(room.image_path)
 
-        return await self.tasks_repo.update_fields_by_id(entity_id=room_id, image_path="")
+        return await self.tasks_repo.update_fields_by_id(
+            entity_id=room_id, image_path=""
+        )

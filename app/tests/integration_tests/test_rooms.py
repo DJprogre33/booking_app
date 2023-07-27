@@ -18,8 +18,8 @@ tasks_repo = RoomsRepository()
         (1, "2024-05-05", "2024-05-10", 200, 2),
         (3, "2024-05-05", "2024-05-10", 200, 2),
         (7, "2024-12-05", "2024-12-25", 200, 0),
-        (7, "2024-12-01", "2024-12-06", 200, 0)
-    ]
+        (7, "2024-12-01", "2024-12-06", 200, 0),
+    ],
 )
 async def test_get_available_hotel_rooms(
     hotel_id: int,
@@ -27,14 +27,10 @@ async def test_get_available_hotel_rooms(
     date_to: str,
     status_code: int,
     available_rooms: Union[int, None],
-    async_client: AsyncClient
+    async_client: AsyncClient,
 ) -> None:
     responce = await async_client.get(
-        f"hotels/{hotel_id}/rooms",
-        params={
-            "date_from": date_from,
-            "date_to": date_to
-        }
+        f"hotels/{hotel_id}/rooms", params={"date_from": date_from, "date_to": date_to}
     )
     assert responce.status_code == status_code
 
@@ -45,43 +41,23 @@ async def test_get_available_hotel_rooms(
 @pytest.mark.parametrize(
     "async_client_from_params,hotel_id,room_id,rooms_left,status_code",
     [
-        (
-            {"email": "user2@example.com", "password": "user1"},
-            1, 1, None, 401
-        ),
-        (
-            {"email": "user2@example.com", "password": "user2"},
-            1, 1, None, 403
-        ),
-        (
-            {"email": "owner1@example.com", "password": "owner1"},
-            1, 15, None, 404
-        ),
-        (
-            {"email": "owner1@example.com", "password": "owner1"},
-            1, 1, 5, 200
-        ),
-        (
-            {"email": "owner1@example.com", "password": "owner1"},
-            1, 1, None, 404
-        ),
-        (
-            {"email": "owner2@example.com", "password": "owner2"},
-            7, 13, 1, 200
-        ),
+        ({"email": "user2@example.com", "password": "user1"}, 1, 1, None, 401),
+        ({"email": "user2@example.com", "password": "user2"}, 1, 1, None, 403),
+        ({"email": "owner1@example.com", "password": "owner1"}, 1, 15, None, 404),
+        ({"email": "owner1@example.com", "password": "owner1"}, 1, 1, 5, 200),
+        ({"email": "owner1@example.com", "password": "owner1"}, 1, 1, None, 404),
+        ({"email": "owner2@example.com", "password": "owner2"}, 7, 13, 1, 200),
     ],
-    indirect=["async_client_from_params"]
+    indirect=["async_client_from_params"],
 )
 async def test_delete_room(
     async_client_from_params: AsyncClient,
     hotel_id: int,
     room_id: int,
     rooms_left: Union[int, None],
-    status_code: int
+    status_code: int,
 ):
-    responce = await async_client_from_params.delete(
-        f"/hotels/{hotel_id}/{room_id}"
-    )
+    responce = await async_client_from_params.delete(f"/hotels/{hotel_id}/{room_id}")
     assert responce.status_code == status_code
 
     if status_code == 200:
@@ -152,19 +128,19 @@ async def test_delete_room(
             ["Wi-FI", "Джакузи", "Сауна"],
             1,
             200,
-        )
+        ),
     ],
     indirect=["async_client_from_params"],
 )
 async def test_create_room(
-        async_client_from_params: AsyncClient,
-        hotel_id: int,
-        name: str,
-        description: str,
-        price: int,
-        services: list,
-        quantity: int,
-        status_code: int,
+    async_client_from_params: AsyncClient,
+    hotel_id: int,
+    name: str,
+    description: str,
+    price: int,
+    services: list,
+    quantity: int,
+    status_code: int,
 ) -> None:
     responce = await async_client_from_params.post(
         f"/hotels/{hotel_id}/new",
@@ -174,8 +150,8 @@ async def test_create_room(
             "description": description,
             "price": price,
             "services": services,
-            "quantity": quantity
-        }
+            "quantity": quantity,
+        },
     )
     assert responce.status_code == status_code
 
@@ -204,15 +180,12 @@ async def test_create_room(
         ({"email": "user1@example.com", "password": "owner1"}, 1, 2, 401),
         ({"email": "owner2@example.com", "password": "owner2"}, 1, 2, 403),
         ({"email": "user1@example.com", "password": "user1"}, 1, 2, 403),
-        ({"email": "owner1@example.com", "password": "owner1"}, 1, 2, 200)
+        ({"email": "owner1@example.com", "password": "owner1"}, 1, 2, 200),
     ],
     indirect=["async_client_from_params"],
 )
 async def test_add_hotel_image(
-        async_client_from_params: AsyncClient,
-        hotel_id: int,
-        room_id: int,
-        status_code: int
+    async_client_from_params: AsyncClient, hotel_id: int, room_id: int, status_code: int
 ):
     filepath = "app/tests/integration_tests/test_image.png"
     with open(filepath, "rb") as image_file:
@@ -227,21 +200,19 @@ async def test_add_hotel_image(
         assert room.image_path
         assert room.id == room_id
 
+
 @pytest.mark.parametrize(
     "async_client_from_params,hotel_id,room_id,status_code",
     [
         ({"email": "user1@example.com", "password": "owner1"}, 1, 2, 401),
         ({"email": "owner2@example.com", "password": "owner2"}, 1, 2, 403),
         ({"email": "user1@example.com", "password": "user1"}, 1, 2, 403),
-        ({"email": "owner1@example.com", "password": "owner1"}, 1, 2, 200)
+        ({"email": "owner1@example.com", "password": "owner1"}, 1, 2, 200),
     ],
     indirect=["async_client_from_params"],
 )
 async def test_add_hotel_image(
-        async_client_from_params: AsyncClient,
-        hotel_id: int,
-        room_id: int,
-        status_code: int
+    async_client_from_params: AsyncClient, hotel_id: int, room_id: int, status_code: int
 ):
     responce = await async_client_from_params.delete(
         f"/hotels/{hotel_id}/{room_id}/image"
@@ -249,6 +220,8 @@ async def test_add_hotel_image(
     assert responce.status_code == status_code
 
     if responce.status_code == 200:
-        room = await tasks_repo.find_one_or_none(id=responce.json()["room with deleted image id"])
+        room = await tasks_repo.find_one_or_none(
+            id=responce.json()["room with deleted image id"]
+        )
         assert not room.image_path
         assert room.id == room_id

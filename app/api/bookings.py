@@ -21,7 +21,10 @@ async def get_bookings(
     """Returns all orders of the current authenticated user"""
     bookings = await tasks_service.get_bookings(request)
 
-    logger.info("The list of bookings was successfully received", extra={"bookings_nums": len(bookings)})
+    logger.info(
+        "The list of bookings was successfully received",
+        extra={"bookings_nums": len(bookings)},
+    )
 
     return bookings
 
@@ -35,9 +38,13 @@ async def delete_booking(
 ) -> dict:
     deleted_booking_id = await tasks_service.delete_booking_by_id(booking_id, request)
 
-    logger.info("The booking was successfully removed ", extra={"deleted_booking_id": deleted_booking_id})
+    logger.info(
+        "The booking was successfully removed ",
+        extra={"deleted_booking_id": deleted_booking_id},
+    )
 
     return {"deleted_booking_id": deleted_booking_id}
+
 
 @router.post("", response_model=SBookingResponce)
 @version(1)
@@ -49,12 +56,11 @@ async def add_booking(
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ):
     booking = await tasks_service.add_bookind(
-        room_id=room_id,
-        date_from=date_from,
-        date_to=date_to,
-        request=request
+        room_id=room_id, date_from=date_from, date_to=date_to, request=request
     )
 
-    logger.info("Booking has been successfully created", extra={"booking_id": booking["id"]})
+    logger.info(
+        "Booking has been successfully created", extra={"booking_id": booking["id"]}
+    )
 
     return booking

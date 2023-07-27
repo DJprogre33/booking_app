@@ -6,6 +6,7 @@ from app.repositories.hotels import HotelsRepository
 
 tasks_repo = HotelsRepository()
 
+
 @pytest.mark.parametrize(
     "location,date_from,date_to,total_hotels",
     [
@@ -15,18 +16,13 @@ tasks_repo = HotelsRepository()
         ("Ижора", date(2024, 11, 15), date(2024, 12, 25), 0),
         ("Ижора", date(2024, 11, 20), date(2024, 12, 23), 0),
         ("Ижора", date(2024, 11, 25), date(2024, 12, 30), 0),
-    ]
+    ],
 )
 async def test_get_hotels_by_location_and_time(
-        location: str,
-        date_from: date,
-        date_to: date,
-        total_hotels: int
+    location: str, date_from: date, date_to: date, total_hotels: int
 ) -> None:
     hotels = await tasks_repo.get_hotels_by_location_and_time(
-        location=location,
-        date_from=date_from,
-        date_to=date_to
+        location=location, date_from=date_from, date_to=date_to
     )
 
     assert len(hotels) == total_hotels

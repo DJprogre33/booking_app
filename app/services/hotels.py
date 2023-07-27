@@ -18,16 +18,11 @@ class HotelsService:
         self.tasks_repo: HotelsRepository = tasks_repo()
 
     async def get_hotels_by_location_and_time(
-            self,
-            location: str,
-            date_from: date,
-            date_to: date
+        self, location: str, date_from: date, date_to: date
     ):
         date_from, date_to = Base.validate_data_range(date_from, date_to)
         return await self.tasks_repo.get_hotels_by_location_and_time(
-            location=location,
-            date_from=date_from,
-            date_to=date_to
+            location=location, date_from=date_from, date_to=date_to
         )
 
     async def get_hotel_by_id(self, hotel_id: int):
@@ -37,11 +32,7 @@ class HotelsService:
 
         return hotel
 
-    async def create_hotel(
-            self,
-            new_hotel: SHotel,
-            request: Request
-    ):
+    async def create_hotel(self, new_hotel: SHotel, request: Request):
         user = await get_current_user(request)
         if user.role != "hotel owner":
             logger.warning("Role access denied", extra={"user_id": user.id})
@@ -52,27 +43,24 @@ class HotelsService:
             location=new_hotel.location,
             services=new_hotel.services,
             rooms_quantity=new_hotel.rooms_quantity,
-            owner_id=user.id
+            owner_id=user.id,
         )
 
-    async def delete_hotel(
-        self,
-        hotel_id: int,
-        request: Request
-    ):
+    async def delete_hotel(self, hotel_id: int, request: Request):
         user = await get_current_user(request)
-        hotel = await Base.check_owner(task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id)
+        hotel = await Base.check_owner(
+            task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id
+        )
 
         return await self.tasks_repo.delete_by_id(hotel.id)
 
     async def add_hotel_image(
-            self,
-            hotel_id: int,
-            request: Request,
-            hotel_image: UploadFile
+        self, hotel_id: int, request: Request, hotel_image: UploadFile
     ):
         user = await get_current_user(request)
-        hotel = await Base.check_owner(task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id)
+        hotel = await Base.check_owner(
+            task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id
+        )
 
         if hotel.image_path:
             os.remove(hotel.image_path)
@@ -87,7 +75,9 @@ class HotelsService:
 
     async def delete_hotel_image(self, hotel_id: int, request: Request):
         user = await get_current_user(request)
-        hotel = await Base.check_owner(task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id)
+        hotel = await Base.check_owner(
+            task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id
+        )
 
         if hotel.image_path:
             os.remove(hotel.image_path)

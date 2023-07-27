@@ -30,6 +30,3 @@ class SBookingResponce(BaseModel):
     price: int
     total_cost: int
     total_days: int
-
-
-

@@ -47,10 +47,10 @@ class RoomCanNotBeBookedException(BookingAppException):
 class IncorrectDataRangeException(BookingAppException):
     status_code = status.HTTP_400_BAD_REQUEST
     detail = (
-            "Incorrect data range, data range must be"
-            "1 <= data_to - data_from <= 90"
-            "and date_from can't be earlier then now"
-        )
+        "Incorrect data range, data range must be"
+        "1 <= data_to - data_from <= 90"
+        "and date_from can't be earlier then now"
+    )
 
 
 class IncorrectBookingIdException(BookingAppException):
@@ -76,6 +76,7 @@ class RoomLimitExceedException(BookingAppException):
 class IncorrectIDException(BookingAppException):
     status_code = status.HTTP_404_NOT_FOUND
     detail = "The entity not found by id"
+
 
 class IncorrectRoomIDException(BookingAppException):
     status_code = status.HTTP_404_NOT_FOUND

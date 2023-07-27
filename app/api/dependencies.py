@@ -11,11 +11,14 @@ from app.services.users import UsersService
 def get_bookings_service():
     return BookingService(BookingsRepository)
 
+
 def get_rooms_service():
     return RoomsService(RoomsRepository)
 
+
 def get_hotels_service():
     return HotelsService(HotelsRepository)
+
 
 def get_users_service():
     return UsersService(UsersRepository)

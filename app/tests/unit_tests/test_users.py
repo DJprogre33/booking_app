@@ -21,8 +21,8 @@ tasks_repo = UsersRepository()
         (2, "user2@example.com", True),
         (3, "owner1@example.com", True),
         (4, "owner2@example.com", True),
-        (5, "unknownemail@test.com", False)
-    ]
+        (5, "unknownemail@test.com", False),
+    ],
 )
 async def test_user_find_one_or_none(user_id: int, email: str, exists: bool) -> None:
     user = await tasks_repo.find_one_or_none(email=email)
@@ -38,13 +38,11 @@ async def test_user_find_one_or_none(user_id: int, email: str, exists: bool) -> 
     "role, total, emails",
     [
         ("user", 2, ("user1@example.com", "user2@example.com")),
-        ("hotel owner", 2, ("owner1@example.com", "owner2@example.com"))
-    ]
+        ("hotel owner", 2, ("owner1@example.com", "owner2@example.com")),
+    ],
 )
 async def test_user_find_all(role: str, total: int, emails: tuple) -> None:
-    users = await tasks_repo.find_all(
-        role=role
-    )
+    users = await tasks_repo.find_all(role=role)
     assert len(users) == total
 
     for user in users:
@@ -56,13 +54,11 @@ async def test_user_find_all(role: str, total: int, emails: tuple) -> None:
     [
         ("user3@example.com", "user3", "user"),
         ("hotel3@example.com", "hotel3", "hotel owner"),
-    ]
+    ],
 )
 async def test_insert_data(email: str, password: str, role: str) -> None:
     new_user = await tasks_repo.insert_data(
-        email=email,
-        hashed_password=get_password_hash(password),
-        role=role
+        email=email, hashed_password=get_password_hash(password), role=role
     )
     # check how SQLAlchemy returning function works
     assert isinstance(new_user, Users)
@@ -84,7 +80,7 @@ async def test_insert_data(email: str, password: str, role: str) -> None:
         (5, "delete_user3@example.com", "hotel owner"),
         (6, "delete_owner3@example.com", "user"),
         (7, "delete_owner3@example.com", "user"),
-    ]
+    ],
 )
 async def test_update_fields_by_id(user_id: int, new_email: str, new_role: str) -> None:
     current_user = await tasks_repo.find_one_or_none(id=user_id)
@@ -93,15 +89,11 @@ async def test_update_fields_by_id(user_id: int, new_email: str, new_role: str) 
     if user_id == 7:
         with pytest.raises(IncorrectIDException):
             await tasks_repo.update_fields_by_id(
-                entity_id=user_id,
-                email=new_email,
-                role=new_role
+                entity_id=user_id, email=new_email, role=new_role
             )
     else:
         updated_user = await tasks_repo.update_fields_by_id(
-            entity_id=user_id,
-            email=new_email,
-            role=new_role
+            entity_id=user_id, email=new_email, role=new_role
         )
         assert updated_user.email != current_user.email
         assert updated_user.role != current_user.role
@@ -110,12 +102,8 @@ async def test_update_fields_by_id(user_id: int, new_email: str, new_role: str) 
         assert updated_user.role == new_role
 
 
-@pytest.mark.parametrize(
-    "user_id",
-    [5, 6, 7]
-)
+@pytest.mark.parametrize("user_id", [5, 6, 7])
 async def test_delete_by_id(user_id: int) -> None:
-
     # if id not found raise error
     if user_id == 7:
         with pytest.raises(IncorrectIDException):

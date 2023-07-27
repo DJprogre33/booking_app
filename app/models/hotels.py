@@ -8,7 +8,9 @@ class Hotels(Base):
     __tablename__ = "hotels"
 
     id = Column(Integer, primary_key=True, nullable=False)
-    owner_id = Column(ForeignKey("users.id", name="owner_id", ondelete="CASCADE"), nullable=False)
+    owner_id = Column(
+        ForeignKey("users.id", name="owner_id", ondelete="CASCADE"), nullable=False
+    )
     name = Column(String, nullable=False)
     location = Column(String, nullable=False)
     services = Column(JSON)
@@ -19,7 +21,3 @@ class Hotels(Base):
 
     def __str__(self):
         return f"id: {self.id}, name: {self.name}"
-
-
-
-

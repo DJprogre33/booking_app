@@ -35,6 +35,7 @@ async def get_hotel_by_id(
     hotel = await tasks_service.get_hotel_by_id(hotel_id=hotel_id)
     return hotel
 
+
 @router.post("/new", response_model=SHotelResponse)
 @version(1)
 async def create_hotel(
@@ -73,10 +74,15 @@ async def add_hotel_image(
 async def delete_hotel_image(
     hotel_id: int,
     request: Request,
-    tasks_service: Annotated[HotelsService, Depends(get_hotels_service)]
+    tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
-    hotel_with_deleted_image = await tasks_service.delete_hotel_image(hotel_id=hotel_id, request=request)
-    logger.info("Succesfully deleted a hotel image", extra={"hotel_with_deleted_image_id": hotel_with_deleted_image.id})
+    hotel_with_deleted_image = await tasks_service.delete_hotel_image(
+        hotel_id=hotel_id, request=request
+    )
+    logger.info(
+        "Succesfully deleted a hotel image",
+        extra={"hotel_with_deleted_image_id": hotel_with_deleted_image.id},
+    )
 
     return {"hotel with deleted image": hotel_with_deleted_image.id}
 
@@ -86,12 +92,13 @@ async def delete_hotel_image(
 async def delete_hotel(
     hotel_id: int,
     request: Request,
-    tasks_service: Annotated[HotelsService, Depends(get_hotels_service)]
+    tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
     deleted_hotel_id = await tasks_service.delete_hotel(
-        hotel_id=hotel_id,
-        request=request
+        hotel_id=hotel_id, request=request
     )
 
-    logger.info("Succesfully deleted hotel", extra={"deleted_hotel_id": deleted_hotel_id})
+    logger.info(
+        "Succesfully deleted hotel", extra={"deleted_hotel_id": deleted_hotel_id}
+    )
     return {"deleted_hotel_id": deleted_hotel_id}

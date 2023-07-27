@@ -11,10 +11,7 @@ class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
         email, password = form["username"], form["password"]
-        user = await authenticate_user(
-            email=email,
-            password=password
-        )
+        user = await authenticate_user(email=email, password=password)
         if user:
             access_token = create_access_token({"sub": str(user.id)})
             request.session.update({"token": access_token})

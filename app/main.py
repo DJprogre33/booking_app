@@ -49,9 +49,7 @@ app.include_router(router_rooms)
 app.include_router(pages_router)
 
 
-origins = [
-    "http://localhost:3000"
-]
+origins = ["http://localhost:3000"]
 
 
 # app = VersionedFastAPI(
@@ -83,10 +81,7 @@ async def add_process_time_header(request: Request, call_next):
     response = await call_next(request)
     process_time = time.time() - start_time
     logger.info(
-        "Requetst execution time",
-        extra={
-            "process_time": round(process_time, 4)
-        }
+        "Requetst execution time", extra={"process_time": round(process_time, 4)}
     )
     return response
 

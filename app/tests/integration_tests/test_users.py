@@ -64,20 +64,18 @@ async def test_login_user(
     elif responce.status_code == 200:
         assert "booking_access_token" in responce.cookies
 
+
 @pytest.mark.parametrize(
     "async_client_from_params,status_code,email",
     [
         ({"email": "user3@example.com", "password": "user3"}, 200, "user3@example.com"),
-        ({"email": "user3@example.com", "password": "user2"}, 401, "user3@example.com")
+        ({"email": "user3@example.com", "password": "user2"}, 401, "user3@example.com"),
     ],
-    indirect=["async_client_from_params"]
+    indirect=["async_client_from_params"],
 )
 async def test_get_me(
-    async_client_from_params: AsyncClient,
-    status_code: int,
-    email: str
+    async_client_from_params: AsyncClient, status_code: int, email: str
 ) -> None:
-
     response = await async_client_from_params.get("/auth/me")
     assert response.status_code == status_code
 
@@ -94,14 +92,15 @@ async def test_get_me(
         ({"email": "owner3@example.com", "password": "owner2"}, 401),
         ({"email": "owner3@example.com", "password": "owner3"}, 200),
     ],
-    indirect=["async_client_from_params"]
+    indirect=["async_client_from_params"],
 )
 async def test_delete_me(
-    async_client_from_params: AsyncClient,
-    status_code: int
+    async_client_from_params: AsyncClient, status_code: int
 ) -> None:
     response = await async_client_from_params.delete("/auth/me")
     assert response.status_code == status_code
     if status_code == 200:
-        deleted_user = await UsersRepository().find_one_or_none(email="user3@example.com")
+        deleted_user = await UsersRepository().find_one_or_none(
+            email="user3@example.com"
+        )
         assert not deleted_user

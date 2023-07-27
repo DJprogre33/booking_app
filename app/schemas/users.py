@@ -18,5 +18,3 @@ class SUserResponce(BaseModel):
     id: int
     email: EmailStr
     role: Literal["user", "hotel owner", "admin"]
-
-

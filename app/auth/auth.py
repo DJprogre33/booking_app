@@ -32,9 +32,7 @@ def create_access_token(data: dict) -> str:
     expire = datetime.utcnow() + timedelta(minutes=30)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode,
-        settings.JWT_SECRET_KEY,
-        settings.HASHING_ALGORITHM
+        to_encode, settings.JWT_SECRET_KEY, settings.HASHING_ALGORITHM
     )
     return encoded_jwt
 

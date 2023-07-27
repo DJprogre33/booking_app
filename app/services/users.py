@@ -32,7 +32,9 @@ class UsersService:
 
     async def login_user(self, user_data: SUserLogin):
         existing_user = await self.tasks_repo.find_one_or_none(email=user_data.email)
-        user = authenticate_user(existing_user=existing_user, password=user_data.password)
+        user = authenticate_user(
+            existing_user=existing_user, password=user_data.password
+        )
         return create_access_token({"sub": str(user.id)}), user
 
     @staticmethod
@@ -43,4 +45,3 @@ class UsersService:
     async def delete_me(self, request: Request) -> int:
         user = await get_current_user(request)
         return await self.tasks_repo.delete_by_id(user.id)
-

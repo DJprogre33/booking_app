@@ -99,7 +99,11 @@ class SQLAlchemyRepository(AbstractRepository):
                 logger.warning("Entity id not found", extra={"entity_id": entity_id})
                 raise IncorrectIDException()
 
-            query = delete(self.model).where(self.model.id == entity_id).returning(self.model.id)
+            query = (
+                delete(self.model)
+                .where(self.model.id == entity_id)
+                .returning(self.model.id)
+            )
             result = await session.execute(query)
             await session.commit()
 

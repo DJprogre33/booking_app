@@ -109,7 +109,10 @@ class BookingsRepository(SQLAlchemyRepository):
             deleted_entity_id = deleted_entity_id.scalars().one_or_none()
 
             if deleted_entity_id is None:
-                logger.warning("Incorrect booking id or user_id", extra={"user_id": user_id, "booking_id": booking_id})
+                logger.warning(
+                    "Incorrect booking id or user_id",
+                    extra={"user_id": user_id, "booking_id": booking_id},
+                )
                 err = IncorrectBookingIdException()
                 err.detail = "Incorrect booking id or user_id"
                 raise err

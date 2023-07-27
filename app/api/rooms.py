@@ -33,7 +33,7 @@ async def create_room(
     hotel_id: int,
     new_room: SRooms,
     requets: Request,
-    tasks_service: Annotated[RoomsService, Depends(get_rooms_service)]
+    tasks_service: Annotated[RoomsService, Depends(get_rooms_service)],
 ):
     new_room = await tasks_service.create_room(
         hotel_id=hotel_id,
@@ -42,7 +42,7 @@ async def create_room(
         price=new_room.price,
         services=new_room.services,
         quantity=new_room.quantity,
-        request=requets
+        request=requets,
     )
 
     logger.info("Room succesfully created", extra={"room_id": new_room.id})
@@ -56,12 +56,10 @@ async def delete_room(
     hotel_id: int,
     room_id: int,
     request: Request,
-    tasks_service: Annotated[RoomsService, Depends(get_rooms_service)]
+    tasks_service: Annotated[RoomsService, Depends(get_rooms_service)],
 ) -> dict:
     deleted_room_id = await tasks_service.delete_room(
-        hotel_id=hotel_id,
-        room_id=room_id,
-        request=request
+        hotel_id=hotel_id, room_id=room_id, request=request
     )
 
     logger.info("Succesfully deleted room", extra={"deleted_room_id": room_id})
@@ -100,7 +98,8 @@ async def delete_room_image(
     )
 
     logger.info(
-        "Succesfully deleted a room image", extra={"room id": room_with_deleted_image.id}
+        "Succesfully deleted a room image",
+        extra={"room id": room_with_deleted_image.id},
     )
 
     return {"room with deleted image id": room_with_deleted_image.id}
