@@ -5,7 +5,7 @@ from datetime import date
 
 from fastapi import Request, UploadFile
 
-from app.auth.auth import get_current_user
+from app.auth.auth import get_current_user, get_token
 from app.exceptions import IncorrectRoomIDException, RoomLimitExceedException
 from app.logger import logger
 from app.models.rooms import Rooms
@@ -36,7 +36,8 @@ class RoomsService:
         quantity: int,
         request: Request,
     ) -> Rooms:
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         hotel = await Base.check_owner(
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )
@@ -60,7 +61,8 @@ class RoomsService:
         raise RoomLimitExceedException()
 
     async def delete_room(self, hotel_id: int, room_id: int, request: Request) -> id:
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         await Base.check_owner(
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )
@@ -70,7 +72,8 @@ class RoomsService:
     async def add_room_image(
         self, hotel_id: int, room_id: int, room_image: UploadFile, request: Request
     ):
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         await Base.check_owner(
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )
@@ -93,7 +96,8 @@ class RoomsService:
         )
 
     async def delete_room_image(self, hotel_id: int, room_id: int, request: Request):
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         await Base.check_owner(
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )

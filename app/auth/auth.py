@@ -16,6 +16,7 @@ from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -54,8 +55,7 @@ def get_token(request: Request) -> str:
     return token
 
 
-async def get_current_user(request: Request) -> Users:
-    token = get_token(request)
+async def get_current_user(token: str) -> Users:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, settings.HASHING_ALGORITHM)
     except JWTError as exc:

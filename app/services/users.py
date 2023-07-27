@@ -5,6 +5,7 @@ from app.auth.auth import (
     create_access_token,
     get_current_user,
     get_password_hash,
+    get_token
 )
 from app.exceptions import UserAlreadyExistException
 from app.logger import logger
@@ -39,9 +40,11 @@ class UsersService:
 
     @staticmethod
     async def return_me(request: Request) -> Users:
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         return user
 
     async def delete_me(self, request: Request) -> int:
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         return await self.tasks_repo.delete_by_id(user.id)

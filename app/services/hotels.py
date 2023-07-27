@@ -5,7 +5,7 @@ from datetime import date
 
 from fastapi import Depends, Request, UploadFile
 
-from app.auth.auth import get_current_user
+from app.auth.auth import get_current_user, get_token
 from app.exceptions import AccessDeniedException, IncorrectHotelIDException
 from app.logger import logger
 from app.repositories.hotels import HotelsRepository
@@ -33,7 +33,8 @@ class HotelsService:
         return hotel
 
     async def create_hotel(self, new_hotel: SHotel, request: Request):
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         if user.role != "hotel owner":
             logger.warning("Role access denied", extra={"user_id": user.id})
             raise AccessDeniedException()
@@ -47,7 +48,8 @@ class HotelsService:
         )
 
     async def delete_hotel(self, hotel_id: int, request: Request):
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         hotel = await Base.check_owner(
             task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id
         )
@@ -57,7 +59,8 @@ class HotelsService:
     async def add_hotel_image(
         self, hotel_id: int, request: Request, hotel_image: UploadFile
     ):
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         hotel = await Base.check_owner(
             task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id
         )
@@ -74,7 +77,8 @@ class HotelsService:
         return await self.tasks_repo.update_fields_by_id(hotel_id, image_path=file_path)
 
     async def delete_hotel_image(self, hotel_id: int, request: Request):
-        user = await get_current_user(request)
+        token = get_token(request)
+        user = await get_current_user(token)
         hotel = await Base.check_owner(
             task_repo=self.tasks_repo, hotel_id=hotel_id, user_id=user.id
         )
