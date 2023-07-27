@@ -1,5 +1,4 @@
 import smtplib
-import time
 from pathlib import Path
 
 from PIL import Image
@@ -12,6 +11,7 @@ from app.tasks.email_templates import create_booking_confirmation_template
 
 @celery.task
 def process_pic(path: str):
+    """Task for compressing downloaded images"""
     img_path = Path(path)
     img = Image.open(img_path)
     img_resized_large = img.resize((1000, 500))
@@ -22,8 +22,9 @@ def process_pic(path: str):
 
 @celery.task
 def send_booking_confirmation_email(booking: dict, email_to: EmailStr):
+    """Task for sending messages to mail about successful booking"""
     msg_content = create_booking_confirmation_template(
-        booking=booking, email_to=settings.SMTP_USER
+        booking=booking, email_to=email_to
     )
     with smtplib.SMTP_SSL(settings.SMTP_HOST, settings.SMTP_PORT) as server:
         server.login(settings.SMTP_USER, settings.SMTP_PASS)

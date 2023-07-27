@@ -7,7 +7,7 @@ from app.services.hotels import HotelsService
 from app.services.rooms import RoomsService
 from app.services.users import UsersService
 
-
+# functions return the service instance
 def get_bookings_service():
     return BookingService(BookingsRepository)
 

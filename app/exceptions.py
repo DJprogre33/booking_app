@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 
 
 class BookingAppException(HTTPException):
+    """Base class for all project exceptions"""
     status_code = 500
     detail = ""
 

@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    """A class for handling secret data from an .env file"""
     model_config = ConfigDict(env_file=".env")
 
     MODE: Literal["DEV", "TEST", "PROD"]

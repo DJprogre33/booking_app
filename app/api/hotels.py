@@ -10,6 +10,7 @@ from app.logger import logger
 from app.schemas.hotels import SHotel, SHotelResponse, SHotelsResponse
 from app.services.hotels import HotelsService
 
+
 router = APIRouter(prefix="/hotels", tags=["Hotels"])
 
 
@@ -22,6 +23,7 @@ async def get_hotels_by_location_and_time(
     date_to: date,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
+    """Gives a list of hotels with free rooms for a certain date"""
     return await tasks_service.get_hotels_by_location_and_time(
         location=location, date_from=date_from, date_to=date_to
     )
@@ -32,6 +34,7 @@ async def get_hotels_by_location_and_time(
 async def get_hotel_by_id(
     hotel_id: int, tasks_service: Annotated[HotelsService, Depends(get_hotels_service)]
 ):
+    """Returns the hotel by id"""
     hotel = await tasks_service.get_hotel_by_id(hotel_id=hotel_id)
     return hotel
 
@@ -43,6 +46,7 @@ async def create_hotel(
     request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
+    """Creates a hotel if the user has the hotel_owner role"""
     new_hotel = await tasks_service.create_hotel(new_hotel=new_hotel, request=request)
 
     logger.info("Succesful created a new hotel", extra={"new_hotel_id": new_hotel.id})
@@ -58,6 +62,7 @@ async def add_hotel_image(
     request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
+    """Adds an image for the created hotel"""
     result = await tasks_service.add_hotel_image(
         hotel_id=hotel_id, hotel_image=hotel_image, request=request
     )
@@ -76,6 +81,7 @@ async def delete_hotel_image(
     request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
+    """Deletes the image for a hotel by id"""
     hotel_with_deleted_image = await tasks_service.delete_hotel_image(
         hotel_id=hotel_id, request=request
     )
@@ -94,6 +100,7 @@ async def delete_hotel(
     request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
+    """Deletes a hotel by id if the user is the owner of the hotel"""
     deleted_hotel_id = await tasks_service.delete_hotel(
         hotel_id=hotel_id, request=request
     )

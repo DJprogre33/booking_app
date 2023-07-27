@@ -20,9 +20,9 @@ from app.api.users import router as router_users
 from app.config import settings
 from app.database import engine
 from app.logger import logger
-from app.pages.router import router as pages_router
 
 
+# Init Sentry for monitoring server errors
 sentry_sdk.init(
     dsn=settings.SENTRY_DSN,
     # Set traces_sample_rate to 1.0 to capture 100%
@@ -55,12 +55,12 @@ app.include_router(router_users)
 app.include_router(router_bookings)
 app.include_router(router_hotels)
 app.include_router(router_rooms)
-app.include_router(pages_router)
 
 
 origins = ["http://localhost:3000"]
 
 
+# add API versioning
 app = VersionedFastAPI(
     app,
     version_format='{major}',
@@ -101,6 +101,7 @@ async def add_process_time_header(request: Request, call_next):
     return response
 
 
+# mount static directory
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # dev function to run and debug app

@@ -77,12 +77,14 @@ def event_loop(request):
 
 @pytest.fixture(scope="function")
 async def async_client():
+    """Creates default async client"""
     async with AsyncClient(app=fastapi_app, base_url="http://test") as async_client:
         yield async_client
 
 
 @pytest.fixture(scope="session")
 async def auth_async_client(request):
+    """Creates default authenticated async client"""
     default_email = "user1@example.com"
     default_password = "user1"
 
@@ -94,6 +96,7 @@ async def auth_async_client(request):
 
 @pytest.fixture(scope="function")
 async def async_client_from_params(request):
+    """Creates authenticated async client from multiple parameters"""
     login_data = request.param
     async for async_client in create_async_client(login_data):
         yield async_client

@@ -6,6 +6,7 @@ from app.config import settings
 
 
 def create_booking_confirmation_template(booking: dict, email_to: EmailStr):
+    """Message template to send about successful booking"""
     email = EmailMessage()
 
     email["subject"] = "Confirmation of room booking"
@@ -14,9 +15,9 @@ def create_booking_confirmation_template(booking: dict, email_to: EmailStr):
 
     email.set_content(
         f"""
-            <h1>Подтвердите бронирование</h1>
-            Вы забронировали отель с {booking["date_from"]}
-            по {booking["date_to"]}
+            <h1>You've booked a room</h1>
+            ou booked a room from {booking["date_from"]}
+            to {booking["date_to"]}
         """,
         subtype="html",
     )

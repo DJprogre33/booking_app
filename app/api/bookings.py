@@ -36,6 +36,7 @@ async def delete_booking(
     request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ) -> dict:
+    """Deletes the current user's bookings by id"""
     deleted_booking_id = await tasks_service.delete_booking_by_id(booking_id, request)
 
     logger.info(
@@ -55,6 +56,7 @@ async def add_booking(
     request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
 ):
+    """Adds bookings for the current user"""
     booking = await tasks_service.add_bookind(
         room_id=room_id, date_from=date_from, date_to=date_to, request=request
     )

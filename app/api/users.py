@@ -8,6 +8,7 @@ from app.logger import logger
 from app.schemas.users import SUserLogin, SUserRegister, SUserResponce
 from app.services.users import UsersService
 
+
 router = APIRouter(prefix="/auth", tags=["Auth & users"])
 
 
@@ -17,6 +18,7 @@ async def register_user(
     user_data: SUserRegister,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
 ) -> dict:
+    """Registers a new user"""
     user = await tasks_service.register_user(user_data=user_data)
 
     logger.info("User created", extra={"id": user.id, "email": user.email})
@@ -31,6 +33,7 @@ async def login_user(
     response: Response,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
 ):
+    """Login an existing user"""
     access_token, user = await tasks_service.login_user(user_data=user_data)
     response.set_cookie("booking_access_token", access_token, httponly=True)
 
@@ -42,6 +45,7 @@ async def login_user(
 @router.post("/logout")
 @version(1)
 async def logout_user(response: Response):
+    """Logout an existing user"""
     response.delete_cookie("booking_access_token")
 
     logger.info("Successfully logged out")
@@ -52,6 +56,7 @@ async def logout_user(response: Response):
 async def return_me(
     request: Request, tasks_service: Annotated[UsersService, Depends(get_users_service)]
 ):
+    """Returns the current authenticated user"""
     current_user = await tasks_service.return_me(request)
 
     logger.info(
@@ -67,6 +72,7 @@ async def return_me(
 async def delete_me(
     request: Request, tasks_service: Annotated[UsersService, Depends(get_users_service)]
 ) -> dict:
+    """Deletes the user account"""
     deleted_user_id = await tasks_service.delete_me(request)
 
     logger.info(
