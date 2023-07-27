@@ -14,7 +14,7 @@ class SUserLogin(BaseModel):
     password: str
 
 
-class SUserResponce(BaseModel):
+class SUserResponse(BaseModel):
     id: int
     email: EmailStr
     role: Literal["user", "hotel owner", "admin"]

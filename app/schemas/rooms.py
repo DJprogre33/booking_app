@@ -18,7 +18,7 @@ class SRooms(BaseModel):
         return value
 
 
-class SRoomResponce(BaseModel):
+class SRoomResponse(BaseModel):
     id: int
     hotel_id: int
     name: str

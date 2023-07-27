@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, Request, UploadFile
 from fastapi_cache.decorator import cache
@@ -14,7 +14,7 @@ from app.services.hotels import HotelsService
 router = APIRouter(prefix="/hotels", tags=["Hotels"])
 
 
-@router.get("/{location}", response_model=list[SHotelsResponse])
+@router.get("/{location}", response_model=Optional[list[SHotelsResponse]])
 @cache(expire=60)
 @version(1)
 async def get_hotels_by_location_and_time(
@@ -28,9 +28,9 @@ async def get_hotels_by_location_and_time(
         location=location, date_from=date_from, date_to=date_to
     )
 
-    logger.info("Succesful return hotels", extra={"total_hotels": len(hotels)})
+    logger.info("Succesful return hotels")
 
-    return
+    return hotels
 
 
 @router.get("/id/{hotel_id}", response_model=SHotelResponse)

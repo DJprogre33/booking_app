@@ -19,12 +19,12 @@ services:
     container_name: booking_app
     env_file:
       - .env-non-dev
-    depends_on:
-      - postgres_db
-      - redis
     command: ["/booking/docker/app.sh"]
     ports:
       - "9000:8000"
+    depends_on:
+      - postgres_db
+      - redis
 
   celery:
     image: booking_celery
@@ -45,7 +45,7 @@ services:
     command: [ "/booking/docker/celery.sh", "flower" ]
     env_file:
       - .env-non-dev
-    depends_on:
-      - redis
     ports:
       - "5555:5555"
+    depends_on:
+      - redis

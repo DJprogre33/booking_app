@@ -48,16 +48,13 @@ async def lifespan(app: FastAPI) -> None:
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 
 app.include_router(router_users)
 app.include_router(router_bookings)
 app.include_router(router_hotels)
 app.include_router(router_rooms)
-
-
-origins = ["http://localhost:3000"]
 
 
 # add API versioning
@@ -71,8 +68,13 @@ app = VersionedFastAPI(
     e.g. "v1/docs", to access the most up-to-date version
     of the API go to "latest/docs"
     """,
-    enable_latest=True
+    enable_latest=True,
+    lifespan=lifespan
 )
+
+
+origins = ["http://localhost:3000"]
+
 
 # Add SQLAdmin to the project
 admin = Admin(app, engine, authentication_backend=authentication_backend)
@@ -90,7 +92,7 @@ async def add_process_time_header(request: Request, call_next):
     The function measures the execution time of each request
     :param request: request instance
     :param call_next: function which call API
-    :return: responce to clients
+    :return: response to clients
     """
     start_time = time.time()
     response = await call_next(request)

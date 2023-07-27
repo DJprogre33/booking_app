@@ -5,14 +5,14 @@ from fastapi_versioning import version
 
 from app.api.dependencies import get_users_service
 from app.logger import logger
-from app.schemas.users import SUserLogin, SUserRegister, SUserResponce
+from app.schemas.users import SUserLogin, SUserRegister, SUserResponse
 from app.services.users import UsersService
 
 
 router = APIRouter(prefix="/auth", tags=["Auth & users"])
 
 
-@router.post("/register", response_model=SUserResponce)
+@router.post("/register", response_model=SUserResponse)
 @version(1)
 async def register_user(
     user_data: SUserRegister,
@@ -26,7 +26,7 @@ async def register_user(
     return user
 
 
-@router.post("/login", response_model=SUserResponce)
+@router.post("/login", response_model=SUserResponse)
 @version(1)
 async def login_user(
     user_data: SUserLogin,
@@ -51,7 +51,7 @@ async def logout_user(response: Response) -> None:
     logger.info("Successfully logged out")
 
 
-@router.get("/me", response_model=SUserResponce)
+@router.get("/me", response_model=SUserResponse)
 @version(1)
 async def return_me(
     request: Request, tasks_service: Annotated[UsersService, Depends(get_users_service)]

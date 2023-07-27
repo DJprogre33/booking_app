@@ -4,7 +4,7 @@ from fastapi import Request
 
 from app.auth.auth import get_current_user, get_token
 from app.repositories.bookings import BookingsRepository
-from app.schemas.booking import SBookingResponce
+from app.schemas.booking import SBookingResponse
 from app.tasks.tasks import send_booking_confirmation_email
 from app.utils.base import Base
 
@@ -38,6 +38,6 @@ class BookingService:
         booking = await self.task_repo.add_booking(
             user_id=user.id, room_id=room_id, date_from=date_from, date_to=date_to
         )
-        booking_dict = SBookingResponce.model_validate(booking).model_dump()
+        booking_dict = SBookingResponse.model_validate(booking).model_dump()
         send_booking_confirmation_email.delay(booking_dict, user.email)
         return booking_dict

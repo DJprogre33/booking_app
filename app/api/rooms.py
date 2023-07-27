@@ -6,7 +6,7 @@ from fastapi_versioning import version
 
 from app.api.dependencies import get_rooms_service
 from app.logger import logger
-from app.schemas.rooms import SRoomResponce, SRooms, SRoomsResponse
+from app.schemas.rooms import SRoomResponse, SRooms, SRoomsResponse
 from app.services.rooms import RoomsService
 
 router = APIRouter(prefix="/hotels", tags=["Rooms"])
@@ -28,7 +28,7 @@ async def get_available_hotel_rooms(
     return rooms
 
 
-@router.post("/{hotel_id}/new", response_model=SRoomResponce)
+@router.post("/{hotel_id}/new", response_model=SRoomResponse)
 @version(1)
 async def create_room(
     hotel_id: int,
@@ -70,7 +70,7 @@ async def delete_room(
     return {"deleted room id": deleted_room_id}
 
 
-@router.patch("/{hotel_id}/{room_id}/image", response_model=SRoomResponce)
+@router.patch("/{hotel_id}/{room_id}/image", response_model=SRoomResponse)
 async def add_room_image(
     hotel_id: int,
     room_id: int,

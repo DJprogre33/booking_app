@@ -20,15 +20,15 @@ tasks_repo = UsersRepository()
 async def test_register_user(
     email: str, password: str, role: str, status_code: int, async_client: AsyncClient
 ) -> None:
-    responce = await async_client.post(
+    response = await async_client.post(
         "/v1/auth/register", json={"email": email, "password": password, "role": role}
     )
     # Check status code
-    assert responce.status_code == status_code
+    assert response.status_code == status_code
 
     # Check detail for custom error
     if status_code == 409:
-        assert responce.json()["detail"] == "The user alredy exists"
+        assert response.json()["detail"] == "The user alredy exists"
 
     elif status_code == 200:
         # Check that user was created
@@ -50,19 +50,19 @@ async def test_register_user(
 async def test_login_user(
     email: str, password: str, status_code: int, async_client: AsyncClient
 ) -> None:
-    responce = await async_client.post(
+    response = await async_client.post(
         "/v1/auth/login", json={"email": email, "password": password}
     )
 
-    assert responce.status_code == status_code
+    assert response.status_code == status_code
 
     # check 401 error
-    if responce.status_code == 401:
-        assert responce.json()["detail"] == "Invalid email or password"
+    if response.status_code == 401:
+        assert response.json()["detail"] == "Invalid email or password"
 
     # check cookie header
-    elif responce.status_code == 200:
-        assert "booking_access_token" in responce.cookies
+    elif response.status_code == 200:
+        assert "booking_access_token" in response.cookies
 
 
 @pytest.mark.parametrize(

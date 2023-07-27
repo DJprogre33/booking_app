@@ -29,13 +29,13 @@ async def test_get_available_hotel_rooms(
     available_rooms: Union[int, None],
     async_client: AsyncClient,
 ) -> None:
-    responce = await async_client.get(
+    response = await async_client.get(
         f"/v1/hotels/{hotel_id}/rooms", params={"date_from": date_from, "date_to": date_to}
     )
-    assert responce.status_code == status_code
+    assert response.status_code == status_code
 
-    if responce.status_code == 200:
-        assert len(responce.json()) == available_rooms
+    if response.status_code == 200:
+        assert len(response.json()) == available_rooms
 
 
 @pytest.mark.parametrize(
@@ -57,11 +57,11 @@ async def test_delete_room(
     rooms_left: Union[int, None],
     status_code: int,
 ):
-    responce = await async_client_from_params.delete(f"/v1/hotels/{hotel_id}/{room_id}")
-    assert responce.status_code == status_code
+    response = await async_client_from_params.delete(f"/v1/hotels/{hotel_id}/{room_id}")
+    assert response.status_code == status_code
 
     if status_code == 200:
-        responce.json()["deleted_room_id"] = room_id
+        response.json()["deleted_room_id"] = room_id
         rooms = await tasks_repo.get_rooms_left(hotel_id)
         assert rooms == rooms_left
 
@@ -142,7 +142,7 @@ async def test_create_room(
     quantity: int,
     status_code: int,
 ) -> None:
-    responce = await async_client_from_params.post(
+    response = await async_client_from_params.post(
         f"/v1/hotels/{hotel_id}/new",
         json={
             "hotel_id": hotel_id,
@@ -153,20 +153,20 @@ async def test_create_room(
             "quantity": quantity,
         },
     )
-    assert responce.status_code == status_code
+    assert response.status_code == status_code
 
     # check that we created correct hotel, which returns by .returning() method
     if status_code == 200:
-        responce_json = responce.json()
-        assert responce_json["name"] == name
-        assert responce_json["hotel_id"] == hotel_id
-        assert responce_json["price"] == price
-        assert responce_json["services"] == services
-        assert responce_json["quantity"] == quantity
+        response_json = response.json()
+        assert response_json["name"] == name
+        assert response_json["hotel_id"] == hotel_id
+        assert response_json["price"] == price
+        assert response_json["services"] == services
+        assert response_json["quantity"] == quantity
 
         # Get created room from db
-        room = await tasks_repo.find_one_or_none(id=responce_json["id"])
-        assert room.id == responce_json["id"]
+        room = await tasks_repo.find_one_or_none(id=response_json["id"])
+        assert room.id == response_json["id"]
         assert room.name == name
         assert room.hotel_id == hotel_id
         assert room.price == price
@@ -190,13 +190,13 @@ async def test_add_hotel_image(
     filepath = "app/tests/integration_tests/test_image.png"
     with open(filepath, "rb") as image_file:
         files = {"room_image": (filepath, image_file)}
-        responce = await async_client_from_params.patch(
+        response = await async_client_from_params.patch(
             f"/v1/hotels/{hotel_id}/{room_id}/image", files=files
         )
-    assert responce.status_code == status_code
+    assert response.status_code == status_code
 
-    if responce.status_code == 200:
-        room = await tasks_repo.find_one_or_none(id=responce.json()["id"])
+    if response.status_code == 200:
+        room = await tasks_repo.find_one_or_none(id=response.json()["id"])
         assert room.image_path
         assert room.id == room_id
 
@@ -214,14 +214,14 @@ async def test_add_hotel_image(
 async def test_add_hotel_image(
     async_client_from_params: AsyncClient, hotel_id: int, room_id: int, status_code: int
 ):
-    responce = await async_client_from_params.delete(
+    response = await async_client_from_params.delete(
         f"/v1/hotels/{hotel_id}/{room_id}/image"
     )
-    assert responce.status_code == status_code
+    assert response.status_code == status_code
 
-    if responce.status_code == 200:
+    if response.status_code == 200:
         room = await tasks_repo.find_one_or_none(
-            id=responce.json()["room with deleted image id"]
+            id=response.json()["room with deleted image id"]
         )
         assert not room.image_path
         assert room.id == room_id
