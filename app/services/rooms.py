@@ -15,7 +15,7 @@ from app.utils.base import Base
 
 
 class RoomsService:
-    def __init__(self, tasks_repo: RoomsRepository()):
+    def __init__(self, tasks_repo: RoomsRepository()) -> None:
         self.tasks_repo: RoomsRepository = tasks_repo()
 
     async def get_availible_hotel_rooms(

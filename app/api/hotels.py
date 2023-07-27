@@ -24,9 +24,13 @@ async def get_hotels_by_location_and_time(
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
 ):
     """Gives a list of hotels with free rooms for a certain date"""
-    return await tasks_service.get_hotels_by_location_and_time(
+    hotels = await tasks_service.get_hotels_by_location_and_time(
         location=location, date_from=date_from, date_to=date_to
     )
+
+    logger.info("Succesful return hotels", extra={"total_hotels": len(hotels)})
+
+    return
 
 
 @router.get("/id/{hotel_id}", response_model=SHotelResponse)
@@ -36,6 +40,10 @@ async def get_hotel_by_id(
 ):
     """Returns the hotel by id"""
     hotel = await tasks_service.get_hotel_by_id(hotel_id=hotel_id)
+
+    logger.info(
+        "Succesfully return a hotel", extra={"hotel_id": hotel.id}
+    )
     return hotel
 
 
@@ -70,7 +78,6 @@ async def add_hotel_image(
     logger.info(
         "Succesfully uploaded a hotel image", extra={"image_path": result.image_path}
     )
-
     return result
 
 
@@ -80,7 +87,7 @@ async def delete_hotel_image(
     hotel_id: int,
     request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
-):
+) -> dict[str, int]:
     """Deletes the image for a hotel by id"""
     hotel_with_deleted_image = await tasks_service.delete_hotel_image(
         hotel_id=hotel_id, request=request
@@ -89,7 +96,6 @@ async def delete_hotel_image(
         "Succesfully deleted a hotel image",
         extra={"hotel_with_deleted_image_id": hotel_with_deleted_image.id},
     )
-
     return {"hotel with deleted image": hotel_with_deleted_image.id}
 
 
@@ -99,7 +105,7 @@ async def delete_hotel(
     hotel_id: int,
     request: Request,
     tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
-):
+) -> dict[str, int]:
     """Deletes a hotel by id if the user is the owner of the hotel"""
     deleted_hotel_id = await tasks_service.delete_hotel(
         hotel_id=hotel_id, request=request

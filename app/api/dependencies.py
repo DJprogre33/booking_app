@@ -8,17 +8,17 @@ from app.services.rooms import RoomsService
 from app.services.users import UsersService
 
 # functions return the service instance
-def get_bookings_service():
+def get_bookings_service() -> BookingService:
     return BookingService(BookingsRepository)
 
 
-def get_rooms_service():
+def get_rooms_service() -> RoomsService:
     return RoomsService(RoomsRepository)
 
 
-def get_hotels_service():
+def get_hotels_service() -> HotelsService:
     return HotelsService(HotelsRepository)
 
 
-def get_users_service():
+def get_users_service() -> UsersService:
     return UsersService(UsersRepository)

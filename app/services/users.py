@@ -15,7 +15,7 @@ from app.schemas.users import SUserLogin, SUserRegister
 
 
 class UsersService:
-    def __init__(self, tasks_repo: UsersRepository()):
+    def __init__(self, tasks_repo: UsersRepository()) -> None:
         self.tasks_repo: UsersRepository = tasks_repo()
 
     async def register_user(self, user_data: SUserRegister):

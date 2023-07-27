@@ -6,6 +6,7 @@ from app.models.rooms import Rooms
 from app.models.users import Users
 
 
+# views are responsible for displaying table models in the admin panel
 class UsersAdmin(ModelView, model=Users):
     column_list = [Users.id, Users.email] + [Users.bookings]
     column_details_exclude_list = [Users.hashed_password]

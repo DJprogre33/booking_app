@@ -14,7 +14,7 @@ from app.utils.base import Base
 
 
 class HotelsService:
-    def __init__(self, tasks_repo: HotelsRepository()):
+    def __init__(self, tasks_repo: HotelsRepository()) -> None:
         self.tasks_repo: HotelsRepository = tasks_repo()
 
     async def get_hotels_by_location_and_time(

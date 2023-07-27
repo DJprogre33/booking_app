@@ -35,7 +35,7 @@ async def delete_booking(
     booking_id: int,
     request: Request,
     tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
-) -> dict:
+) -> dict[str, int]:
     """Deletes the current user's bookings by id"""
     deleted_booking_id = await tasks_service.delete_booking_by_id(booking_id, request)
 

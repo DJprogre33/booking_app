@@ -8,7 +8,7 @@ from app.auth.auth import authenticate_user, create_access_token, get_current_us
 from app.repositories.users import UsersRepository
 
 class AdminAuth(AuthenticationBackend):
-    async def login(self, request: Request) -> bool:
+    async def login(self, request: Request) -> Optional[bool]:
         form = await request.form()
         email, password = form["username"], form["password"]
         user = await UsersRepository().find_one_or_none(email=email)

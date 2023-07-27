@@ -10,7 +10,7 @@ from app.utils.base import Base
 
 
 class BookingService:
-    def __init__(self, tasks_repo: BookingsRepository()):
+    def __init__(self, tasks_repo: BookingsRepository()) -> None:
         self.task_repo: BookingsRepository = tasks_repo()
 
     async def get_bookings(self, request: Request):

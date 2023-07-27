@@ -44,7 +44,7 @@ async def login_user(
 
 @router.post("/logout")
 @version(1)
-async def logout_user(response: Response):
+async def logout_user(response: Response) -> None:
     """Logout an existing user"""
     response.delete_cookie("booking_access_token")
 
@@ -71,7 +71,7 @@ async def return_me(
 @version(1)
 async def delete_me(
     request: Request, tasks_service: Annotated[UsersService, Depends(get_users_service)]
-) -> dict:
+) -> dict[str, int]:
     """Deletes the user account"""
     deleted_user_id = await tasks_service.delete_me(request)
 

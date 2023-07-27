@@ -59,7 +59,7 @@ async def delete_room(
     room_id: int,
     request: Request,
     tasks_service: Annotated[RoomsService, Depends(get_rooms_service)],
-) -> dict:
+) -> dict[str, int]:
     """Deletes a room for a specific hotel, user must be the owner of the hotel"""
     deleted_room_id = await tasks_service.delete_room(
         hotel_id=hotel_id, room_id=room_id, request=request
@@ -77,7 +77,7 @@ async def add_room_image(
     room_image: UploadFile,
     request: Request,
     tasks_service: Annotated[RoomsService, Depends(get_rooms_service)],
-) -> dict:
+):
     """Adds an image for a specific room, user must be a hotel owner"""
     result = await tasks_service.add_room_image(
         hotel_id=hotel_id, room_id=room_id, room_image=room_image, request=request
@@ -96,7 +96,7 @@ async def delete_room_image(
     room_id: int,
     request: Request,
     tasks_service: Annotated[RoomsService, Depends(get_rooms_service)],
-) -> dict:
+) -> dict[str, int]:
     """Deletes an image for a specific room, user must be a hotel owner"""
     room_with_deleted_image = await tasks_service.delete_room_image(
         hotel_id=hotel_id, room_id=room_id, request=request
