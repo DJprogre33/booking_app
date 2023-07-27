@@ -8,7 +8,6 @@ from app.logger import logger
 from app.schemas.users import SUserLogin, SUserRegister, SUserResponse
 from app.services.users import UsersService
 
-
 router = APIRouter(prefix="/auth", tags=["Auth & users"])
 
 

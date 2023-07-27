@@ -8,9 +8,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_versioning import VersionedFastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 from redis import asyncio as aioredis
 from sqladmin import Admin
-from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.admin.auth import authentication_backend
 from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
@@ -18,11 +18,10 @@ from app.api.bookings import router as router_bookings
 from app.api.hotels import router as router_hotels
 from app.api.rooms import router as router_rooms
 from app.api.users import router as router_users
-from app.prometheus.prometheus import router as router_prometheus
 from app.config import settings
 from app.database import engine
 from app.logger import logger
-
+from app.prometheus.prometheus import router as router_prometheus
 
 # Init Sentry for monitoring server errors
 sentry_sdk.init(
