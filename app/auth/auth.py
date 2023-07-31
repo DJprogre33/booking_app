@@ -72,7 +72,7 @@ async def get_current_user(token: str) -> Users:
         logger.warning("Invalid token user id")
         raise InvalidTokenUserIDException()
 
-    user = await UsersRepository().find_one_or_none(id=int(user_id))
+    user = await UsersRepository.find_one_or_none(id=int(user_id))
     if not user:
         logger.warning("Invalid token user id")
         raise InvalidTokenUserIDException()

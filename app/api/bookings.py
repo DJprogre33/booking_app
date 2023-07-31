@@ -7,7 +7,8 @@ from fastapi_versioning import version
 from app.api.dependencies import get_bookings_service
 from app.logger import logger
 from app.schemas.booking import SBookingResponse, SBookingsResponse
-from app.services.bookings import BookingService
+from app.services.bookings import BookingsService
+
 
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
@@ -16,7 +17,7 @@ router = APIRouter(prefix="/bookings", tags=["Bookings"])
 @version(1)
 async def get_bookings(
     request: Request,
-    tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
+    tasks_service: Annotated[BookingsService, Depends(get_bookings_service)],
 ):
     """Returns all orders of the current authenticated user"""
     bookings = await tasks_service.get_bookings(request)
@@ -34,7 +35,7 @@ async def get_bookings(
 async def delete_booking(
     booking_id: int,
     request: Request,
-    tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
+    tasks_service: Annotated[BookingsService, Depends(get_bookings_service)],
 ) -> dict[str, int]:
     """Deletes the current user's bookings by id"""
     deleted_booking_id = await tasks_service.delete_booking_by_id(booking_id, request)
@@ -54,7 +55,7 @@ async def add_booking(
     date_from: date,
     date_to: date,
     request: Request,
-    tasks_service: Annotated[BookingService, Depends(get_bookings_service)],
+    tasks_service: Annotated[BookingsService, Depends(get_bookings_service)],
 ):
     """Adds bookings for the current user"""
     booking = await tasks_service.add_bookind(

@@ -6,7 +6,8 @@ from app.exceptions import IncorrectBookingIdException, RoomCanNotBeBookedExcept
 from app.models.bookings import Bookings
 from app.repositories.bookings import BookingsRepository
 
-tasks_repo = BookingsRepository()
+
+tasks_repo = BookingsRepository
 
 
 @pytest.mark.parametrize("user_id,total_bookings", [(1, 3), (2, 2)])

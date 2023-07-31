@@ -3,7 +3,7 @@ from httpx import AsyncClient
 
 from app.repositories.users import UsersRepository
 
-tasks_repo = UsersRepository()
+tasks_repo = UsersRepository
 
 
 @pytest.mark.parametrize(
@@ -100,7 +100,7 @@ async def test_delete_me(
     response = await async_client_from_params.delete("/v1/auth/me")
     assert response.status_code == status_code
     if status_code == 200:
-        deleted_user = await UsersRepository().find_one_or_none(
+        deleted_user = await tasks_repo.find_one_or_none(
             email="user3@example.com"
         )
         assert not deleted_user

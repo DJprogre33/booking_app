@@ -12,19 +12,20 @@ from app.utils.repository import SQLAlchemyRepository
 
 class BookingsRepository(SQLAlchemyRepository):
     model = Bookings
-
+    
+    @classmethod
     async def add_booking(
-        self, user_id: int, room_id: int, date_from: date, date_to: date
+        cls, user_id: int, room_id: int, date_from: date, date_to: date
     ):
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
 
             booked_rooms = (
-                select(self.model)
+                select(cls.model)
                 .where(
-                    (self.model.room_id == room_id)
-                    & (self.model.date_from <= date_to)
-                    & (self.model.date_to >= date_from)
+                    (cls.model.room_id == room_id)
+                    & (cls.model.date_from <= date_to)
+                    & (cls.model.date_to >= date_from)
                 )
                 .cte("booked_rooms")
             )
@@ -44,7 +45,7 @@ class BookingsRepository(SQLAlchemyRepository):
                 price = await session.execute(get_price)
                 price: int = price.scalar()
                 add_booking = (
-                    insert(self.model)
+                    insert(cls.model)
                     .values(
                         room_id=room_id,
                         user_id=user_id,
@@ -52,7 +53,7 @@ class BookingsRepository(SQLAlchemyRepository):
                         date_to=date_to,
                         price=price,
                     )
-                    .returning(self.model)
+                    .returning(cls.model)
                 )
 
                 new_booking = await session.execute(add_booking)
@@ -63,29 +64,30 @@ class BookingsRepository(SQLAlchemyRepository):
                 return new_booking.scalar()
             logger.warning("Room can't be booked", extra={"room_id": room_id})
             raise RoomCanNotBeBookedException()
-
-    async def get_bookings(self, user_id: int):
+    
+    @classmethod
+    async def get_bookings(cls, user_id: int):
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
 
             get_bookings = (
                 select(
-                    self.model.id,
-                    self.model.room_id,
-                    self.model.user_id,
-                    self.model.date_from,
-                    self.model.date_to,
-                    self.model.price,
-                    self.model.total_cost,
-                    self.model.total_days,
+                    cls.model.id,
+                    cls.model.room_id,
+                    cls.model.user_id,
+                    cls.model.date_from,
+                    cls.model.date_to,
+                    cls.model.price,
+                    cls.model.total_cost,
+                    cls.model.total_days,
                     Rooms.image_path,
                     Rooms.name,
                     Rooms.description,
                     Rooms.services,
                 )
-                .select_from(self.model)
-                .join(Rooms, self.model.room_id == Rooms.id)
-                .where(self.model.user_id == user_id)
+                .select_from(cls.model)
+                .join(Rooms, cls.model.room_id == Rooms.id)
+                .where(cls.model.user_id == user_id)
             )
 
             result = await session.execute(get_bookings)
@@ -93,15 +95,16 @@ class BookingsRepository(SQLAlchemyRepository):
             logger.info("Database query successfully completed")
 
             return result.mappings().all()
-
-    async def delete_booking_by_id(self, user_id: int, booking_id: int) -> int:
+    
+    @classmethod
+    async def delete_booking_by_id(cls, user_id: int, booking_id: int) -> int:
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
 
             to_delete_entity = (
-                delete(self.model)
-                .where((self.model.user_id == user_id) & (self.model.id == booking_id))
-                .returning(self.model.id)
+                delete(cls.model)
+                .where((cls.model.user_id == user_id) & (cls.model.id == booking_id))
+                .returning(cls.model.id)
             )
 
             deleted_entity_id = await session.execute(to_delete_entity)

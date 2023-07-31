@@ -5,7 +5,8 @@ import pytest
 from app.exceptions import IncorrectHotelIDException
 from app.repositories.rooms import RoomsRepository
 
-tasks_repo = RoomsRepository()
+
+tasks_repo = RoomsRepository
 
 
 @pytest.mark.parametrize(

@@ -12,9 +12,10 @@ from app.utils.repository import SQLAlchemyRepository
 
 class HotelsRepository(SQLAlchemyRepository):
     model = Hotels
-
+    
+    @classmethod
     async def get_hotels_by_location_and_time(
-        self, location: str, date_from: date, date_to: date
+        cls, location: str, date_from: date, date_to: date
     ) -> list[dict]:
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
@@ -32,26 +33,26 @@ class HotelsRepository(SQLAlchemyRepository):
 
             get_available_hotels = (
                 select(
-                    self.model.id,
-                    self.model.name,
-                    self.model.location,
-                    self.model.services,
-                    self.model.rooms_quantity,
-                    self.model.image_path,
+                    cls.model.id,
+                    cls.model.name,
+                    cls.model.location,
+                    cls.model.services,
+                    cls.model.rooms_quantity,
+                    cls.model.image_path,
                     (
-                        self.model.rooms_quantity
+                        cls.model.rooms_quantity
                         - func.coalesce(get_booked_rooms.c.booked_rooms, 0)
                     ).label("rooms_left"),
                 )
-                .select_from(self.model)
+                .select_from(cls.model)
                 .outerjoin(
-                    get_booked_rooms, self.model.id == get_booked_rooms.c.hotel_id
+                    get_booked_rooms, cls.model.id == get_booked_rooms.c.hotel_id
                 )
                 .where(
-                    (self.model.location.ilike(f"%{location}%"))
+                    (cls.model.location.ilike(f"%{location}%"))
                     & (
                         (
-                            self.model.rooms_quantity
+                            cls.model.rooms_quantity
                             - func.coalesce(get_booked_rooms.c.booked_rooms, 0)
                         )
                         > 0

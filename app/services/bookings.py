@@ -9,24 +9,26 @@ from app.tasks.tasks import send_booking_confirmation_email
 from app.utils.base import Base
 
 
-class BookingService:
-    def __init__(self, tasks_repo: BookingsRepository()) -> None:
-        self.task_repo: BookingsRepository = tasks_repo()
-
-    async def get_bookings(self, request: Request):
+class BookingsService:
+    tasks_repo: BookingsRepository = BookingsRepository
+    
+    @classmethod
+    async def get_bookings(cls, request: Request):
         token = get_token(request)
         user = await get_current_user(token)
-        return await self.task_repo.get_bookings(user_id=user.id)
-
-    async def delete_booking_by_id(self, booking_id: int, request: Request):
+        return await cls.tasks_repo.get_bookings(user_id=user.id)
+    
+    @classmethod
+    async def delete_booking_by_id(cls, booking_id: int, request: Request):
         token = get_token(request)
         user = await get_current_user(token)
-        return await self.task_repo.delete_booking_by_id(
+        return await cls.tasks_repo.delete_booking_by_id(
             user_id=user.id, booking_id=booking_id
         )
-
+    
+    @classmethod
     async def add_bookind(
-        self,
+        cls,
         room_id: int,
         date_from: date,
         date_to: date,
@@ -35,7 +37,7 @@ class BookingService:
         token = get_token(request)
         user = await get_current_user(token)
         date_from, date_to = Base.validate_data_range(date_from, date_to)
-        booking = await self.task_repo.add_booking(
+        booking = await cls.tasks_repo.add_booking(
             user_id=user.id, room_id=room_id, date_from=date_from, date_to=date_to
         )
         booking_dict = SBookingResponse.model_validate(booking).model_dump()

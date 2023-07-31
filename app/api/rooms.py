@@ -9,6 +9,7 @@ from app.logger import logger
 from app.schemas.rooms import SRoomResponse, SRooms, SRoomsResponse
 from app.services.rooms import RoomsService
 
+
 router = APIRouter(prefix="/hotels", tags=["Rooms"])
 
 

@@ -15,19 +15,20 @@ from app.utils.base import Base
 
 
 class RoomsService:
-    def __init__(self, tasks_repo: RoomsRepository()) -> None:
-        self.tasks_repo: RoomsRepository = tasks_repo()
-
+    tasks_repo: RoomsRepository = RoomsRepository
+    
+    @classmethod
     async def get_availible_hotel_rooms(
-        self, hotel_id: int, date_from: date, date_to: date
+        cls, hotel_id: int, date_from: date, date_to: date
     ):
         date_from, date_to = Base.validate_data_range(date_from, date_to)
-        return await self.tasks_repo.get_available_hotel_rooms(
+        return await cls.tasks_repo.get_available_hotel_rooms(
             hotel_id=hotel_id, date_from=date_from, date_to=date_to
         )
-
+    
+    @classmethod
     async def create_room(
-        self,
+        cls,
         hotel_id: int,
         name: str,
         description: str,
@@ -42,10 +43,10 @@ class RoomsService:
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )
 
-        rooms_left = await self.tasks_repo.get_rooms_left(hotel_id=hotel.id)
+        rooms_left = await cls.tasks_repo.get_rooms_left(hotel_id=hotel.id)
 
         if rooms_left >= quantity:
-            return await self.tasks_repo.insert_data(
+            return await cls.tasks_repo.insert_data(
                 hotel_id=hotel.id,
                 name=name,
                 description=description,
@@ -59,25 +60,27 @@ class RoomsService:
             extra={"rooms_left": rooms_left, "required quantity": quantity},
         )
         raise RoomLimitExceedException()
-
-    async def delete_room(self, hotel_id: int, room_id: int, request: Request) -> id:
+    
+    @classmethod
+    async def delete_room(cls, hotel_id: int, room_id: int, request: Request) -> id:
         token = get_token(request)
         user = await get_current_user(token)
         await Base.check_owner(
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )
 
-        return await self.tasks_repo.delete_by_id(room_id)
-
+        return await cls.tasks_repo.delete_by_id(room_id)
+    
+    @classmethod
     async def add_room_image(
-        self, hotel_id: int, room_id: int, room_image: UploadFile, request: Request
+        cls, hotel_id: int, room_id: int, room_image: UploadFile, request: Request
     ):
         token = get_token(request)
         user = await get_current_user(token)
         await Base.check_owner(
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )
-        room = await self.tasks_repo.find_one_or_none(id=room_id)
+        room = await cls.tasks_repo.find_one_or_none(id=room_id)
 
         if not room:
             raise IncorrectRoomIDException()
@@ -91,17 +94,18 @@ class RoomsService:
         with open(file_path, "wb") as file:
             shutil.copyfileobj(room_image.file, file)
 
-        return await self.tasks_repo.update_fields_by_id(
+        return await cls.tasks_repo.update_fields_by_id(
             entity_id=room_id, image_path=file_path
         )
-
-    async def delete_room_image(self, hotel_id: int, room_id: int, request: Request):
+    
+    @classmethod
+    async def delete_room_image(cls, hotel_id: int, room_id: int, request: Request):
         token = get_token(request)
         user = await get_current_user(token)
         await Base.check_owner(
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )
-        room = await self.tasks_repo.find_one_or_none(id=room_id)
+        room = await cls.tasks_repo.find_one_or_none(id=room_id)
 
         if not room:
             raise IncorrectRoomIDException()
@@ -109,6 +113,6 @@ class RoomsService:
         if room.image_path:
             os.remove(room.image_path)
 
-        return await self.tasks_repo.update_fields_by_id(
+        return await cls.tasks_repo.update_fields_by_id(
             entity_id=room_id, image_path=""
         )

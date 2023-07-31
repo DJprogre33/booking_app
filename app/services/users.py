@@ -15,11 +15,11 @@ from app.schemas.users import SUserLogin, SUserRegister
 
 
 class UsersService:
-    def __init__(self, tasks_repo: UsersRepository()) -> None:
-        self.tasks_repo: UsersRepository = tasks_repo()
-
-    async def register_user(self, user_data: SUserRegister):
-        existing_user = await self.tasks_repo.find_one_or_none(email=user_data.email)
+    tasks_repo: UsersRepository = UsersRepository
+    
+    @classmethod
+    async def register_user(cls, user_data: SUserRegister):
+        existing_user = await cls.tasks_repo.find_one_or_none(email=user_data.email)
 
         if existing_user:
             logger.warning("User already exists")
@@ -27,12 +27,13 @@ class UsersService:
 
         hashed_password = get_password_hash(user_data.password)
 
-        return await self.tasks_repo.insert_data(
+        return await cls.tasks_repo.insert_data(
             email=user_data.email, hashed_password=hashed_password, role=user_data.role
         )
-
-    async def login_user(self, user_data: SUserLogin):
-        existing_user = await self.tasks_repo.find_one_or_none(email=user_data.email)
+    
+    @classmethod
+    async def login_user(cls, user_data: SUserLogin):
+        existing_user = await cls.tasks_repo.find_one_or_none(email=user_data.email)
         user = authenticate_user(
             existing_user=existing_user, password=user_data.password
         )
@@ -43,8 +44,9 @@ class UsersService:
         token = get_token(request)
         user = await get_current_user(token)
         return user
-
-    async def delete_me(self, request: Request) -> int:
+    
+    @classmethod
+    async def delete_me(cls, request: Request) -> int:
         token = get_token(request)
         user = await get_current_user(token)
-        return await self.tasks_repo.delete_by_id(user.id)
+        return await cls.tasks_repo.delete_by_id(user.id)

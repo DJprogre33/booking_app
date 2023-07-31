@@ -13,7 +13,7 @@ class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> Optional[bool]:
         form = await request.form()
         email, password = form["username"], form["password"]
-        user = await UsersRepository().find_one_or_none(email=email)
+        user = await UsersRepository.find_one_or_none(email=email)
         existing_user = authenticate_user(user, password)
         if existing_user.role == "admin":
             access_token = create_access_token({"sub": str(existing_user.id)})

@@ -5,7 +5,8 @@ from httpx import AsyncClient
 
 from app.repositories.rooms import RoomsRepository
 
-tasks_repo = RoomsRepository()
+
+tasks_repo = RoomsRepository
 
 
 @pytest.mark.parametrize(

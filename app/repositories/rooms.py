@@ -19,47 +19,48 @@ class RoomsRepository(SQLAlchemyRepository):
         hotel = await HotelsRepository().find_one_or_none(id=hotel_id)
         if not hotel:
             raise IncorrectHotelIDException()
-
+    
+    @classmethod
     async def get_available_hotel_rooms(
-        self, hotel_id: int, date_from: date, date_to: date
+        cls, hotel_id: int, date_from: date, date_to: date
     ) -> list[dict]:
         async with async_session_maker() as session:
-            await self.hotel_exists(hotel_id)
+            await cls.hotel_exists(hotel_id)
 
             get_booked_rooms = (
-                select(self.model.id, func.count().label("booked_rooms"))
-                .select_from(self.model)
-                .join(Bookings, Bookings.room_id == self.model.id)
+                select(cls.model.id, func.count().label("booked_rooms"))
+                .select_from(cls.model)
+                .join(Bookings, Bookings.room_id == cls.model.id)
                 .where(
                     (Bookings.date_from <= date_to) & (Bookings.date_to >= date_from)
                 )
-                .group_by(self.model.id)
+                .group_by(cls.model.id)
                 .subquery("booked_rooms")
             )
 
             get_available_rooms = (
                 select(
-                    self.model.id,
-                    self.model.hotel_id,
-                    self.model.name,
-                    self.model.description,
-                    self.model.services,
-                    self.model.price,
-                    self.model.quantity,
-                    self.model.image_path,
-                    (self.model.price * (date_to - date_from).days).label("total_cost"),
+                    cls.model.id,
+                    cls.model.hotel_id,
+                    cls.model.name,
+                    cls.model.description,
+                    cls.model.services,
+                    cls.model.price,
+                    cls.model.quantity,
+                    cls.model.image_path,
+                    (cls.model.price * (date_to - date_from).days).label("total_cost"),
                     (
-                        self.model.quantity
+                        cls.model.quantity
                         - func.coalesce(get_booked_rooms.c.booked_rooms, 0)
                     ).label("rooms_left"),
                 )
-                .select_from(self.model)
-                .outerjoin(get_booked_rooms, self.model.id == get_booked_rooms.c.id)
+                .select_from(cls.model)
+                .outerjoin(get_booked_rooms, cls.model.id == get_booked_rooms.c.id)
                 .where(
-                    (self.model.hotel_id == hotel_id)
+                    (cls.model.hotel_id == hotel_id)
                     & (
                         (
-                            self.model.quantity
+                            cls.model.quantity
                             - func.coalesce(get_booked_rooms.c.booked_rooms, 0)
                         )
                         > 0
@@ -70,8 +71,9 @@ class RoomsRepository(SQLAlchemyRepository):
             available_rooms = await session.execute(get_available_rooms)
 
             return available_rooms.mappings().all()
-
-    async def get_rooms_left(self, hotel_id: int) -> int:
+    
+    @classmethod
+    async def get_rooms_left(cls, hotel_id: int) -> int:
         """
         The function is used when creating hotels and adding rooms by the owner,
         it checks that the owner does not add more rooms than there are rooms
@@ -80,16 +82,16 @@ class RoomsRepository(SQLAlchemyRepository):
         :return:
         """
         async with async_session_maker() as session:
-            await self.hotel_exists(hotel_id)
+            await cls.hotel_exists(hotel_id)
 
             existing_rooms = (
                 select(
-                    self.model.hotel_id,
-                    func.sum(self.model.quantity).label("existing_rooms"),
+                    cls.model.hotel_id,
+                    func.sum(cls.model.quantity).label("existing_rooms"),
                 )
-                .select_from(self.model)
-                .where(self.model.hotel_id == hotel_id)
-                .group_by(self.model.hotel_id)
+                .select_from(cls.model)
+                .where(cls.model.hotel_id == hotel_id)
+                .group_by(cls.model.hotel_id)
                 .subquery("existing_rooms")
             )
 
