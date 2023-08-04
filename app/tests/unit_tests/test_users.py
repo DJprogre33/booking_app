@@ -10,7 +10,6 @@ from app.exceptions import IncorrectIDException
 from app.models.users import Users
 from app.repositories.users import UsersRepository
 
-
 # repository for user query
 tasks_repo = UsersRepository
 

@@ -4,7 +4,6 @@ from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
 
-
 # Select the database operation mode
 if settings.MODE == "TEST":
     database_url = settings.test_database_url

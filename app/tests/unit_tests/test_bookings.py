@@ -6,7 +6,6 @@ from app.exceptions import IncorrectBookingIdException, RoomCanNotBeBookedExcept
 from app.models.bookings import Bookings
 from app.repositories.bookings import BookingsRepository
 
-
 tasks_repo = BookingsRepository
 
 
