@@ -8,7 +8,10 @@ from app.logger import logger
 from app.schemas.users import SUserLogin, SUserRegister, SUserResponse
 from app.services.users import UsersService
 
-router = APIRouter(prefix="/auth", tags=["Auth & users"])
+from fastapi.security import OAuth2PasswordRequestForm
+
+
+router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post("/register", response_model=SUserResponse)
@@ -28,13 +31,15 @@ async def register_user(
 @router.post("/login", response_model=SUserResponse)
 @version(1)
 async def login_user(
-    user_data: SUserLogin,
     response: Response,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
+    credentials: OAuth2PasswordRequestForm = Depends()
 ):
     """Login an existing user"""
-    access_token, user = await tasks_service.login_user(user_data=user_data)
-    response.set_cookie("booking_access_token", access_token, httponly=True)
+    access_token, user = await tasks_service.login_user(
+        credentials.password, credentials.username
+    )
+    response.set_cookie("access_token", access_token, httponly=True)
 
     logger.info("Successfully logged in", extra={"id": user.id, "email": user.email})
 

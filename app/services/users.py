@@ -12,7 +12,7 @@ from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
 from app.schemas.users import SUserLogin, SUserRegister
-
+from pydantic import EmailStr
 
 class UsersService:
     tasks_repo: UsersRepository = UsersRepository
@@ -32,10 +32,10 @@ class UsersService:
         )
     
     @classmethod
-    async def login_user(cls, user_data: SUserLogin):
-        existing_user = await cls.tasks_repo.find_one_or_none(email=user_data.email)
+    async def login_user(cls, password: str, email: EmailStr) -> tuple[str, Users]:
+        existing_user = await cls.tasks_repo.find_one_or_none(email=email)
         user = authenticate_user(
-            existing_user=existing_user, password=user_data.password
+            existing_user=existing_user, password=password
         )
         return create_access_token({"sub": str(user.id)}), user
 

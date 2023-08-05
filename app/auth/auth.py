@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
+from typing import Optional
 
-from fastapi import Request
+from fastapi import Request, Depends
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -15,8 +16,13 @@ from app.exceptions import (
 from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
+from app.utils.auth import OAuth2PasswordBearerWithCookie
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="users/login")
 
 
 def get_password_hash(password: str) -> str:
@@ -54,7 +60,7 @@ def get_token(request: Request) -> str:
     return token
 
 
-async def get_current_user(token: str) -> Users:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> Optional[Users]:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, settings.HASHING_ALGORITHM)
     except JWTError as exc:
