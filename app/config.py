@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str
     HASHING_ALGORITHM: str
 
+    REFRESH_TOKEN_EXPIRE_DAYS: int
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+
     @property
     def database_url(self):
         user = f"{self.DB_USER}:{self.DB_PASS}"
