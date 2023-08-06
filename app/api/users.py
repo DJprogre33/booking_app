@@ -14,47 +14,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("/register", response_model=SUserResponse)
-@version(1)
-async def register_user(
-    user_data: SUserRegister,
-    tasks_service: Annotated[UsersService, Depends(get_users_service)],
-) -> dict:
-    """Registers a new user"""
-    user = await tasks_service.register_user(user_data=user_data)
-
-    logger.info("User created", extra={"id": user.id, "email": user.email})
-
-    return user
-
-
-@router.post("/login", response_model=SUserResponse)
-@version(1)
-async def login_user(
-    response: Response,
-    tasks_service: Annotated[UsersService, Depends(get_users_service)],
-    credentials: OAuth2PasswordRequestForm = Depends()
-):
-    """Login an existing user"""
-    access_token, user = await tasks_service.login_user(
-        credentials.password, credentials.username
-    )
-    response.set_cookie("access_token", access_token, httponly=True)
-
-    logger.info("Successfully logged in", extra={"id": user.id, "email": user.email})
-
-    return user
-
-
-@router.post("/logout")
-@version(1)
-async def logout_user(response: Response) -> None:
-    """Logout an existing user"""
-    response.delete_cookie("booking_access_token")
-
-    logger.info("Successfully logged out")
-
-
 @router.get("/me", response_model=SUserResponse)
 @version(1)
 async def return_me(
