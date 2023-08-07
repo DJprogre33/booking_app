@@ -5,7 +5,7 @@ from datetime import date
 
 from fastapi import Request, UploadFile
 
-from app.auth.auth import get_current_user, get_token
+# from app.auth.auth import get_current_user, get_token
 from app.exceptions import IncorrectRoomIDException, RoomLimitExceedException
 from app.logger import logger
 from app.models.rooms import Rooms

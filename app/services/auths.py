@@ -4,10 +4,7 @@ from fastapi import Request
 from typing import Optional, Tuple, Type
 from datetime import date, timedelta, datetime
 from app.utils.auth import (
-    create_access_token,
-    get_current_user,
     get_password_hash,
-    get_token,
     verify_password
 )
 from app.exceptions import UserAlreadyExistException, IncorrectEmailOrPasswordException, TokenAbsentException, TokenExpiredException, InvalidTokenUserIDException
@@ -22,22 +19,22 @@ from jose import jwt
 
 
 class AuthsService:
-    tasks_repo: UsersRepository = AuthsRepository
+    tasks_repo: AuthsRepository = AuthsRepository
 
     @classmethod
     async def register_user(cls, user_data: SUserRegister) -> Users:
-        existing_user = await cls.tasks_repo.find_one_or_none(email=user_data.email)
+        existing_user = await UsersRepository.find_one_or_none(email=user_data.email)
         if existing_user:
             logger.warning("User already exists")
             raise UserAlreadyExistException()
         hashed_password = get_password_hash(user_data.password)
-        return await cls.tasks_repo.insert_data(
+        return await UsersRepository.insert_data(
             email=user_data.email, hashed_password=hashed_password, role=user_data.role
         )
 
     @classmethod
     async def login_user(cls, password: str, email: EmailStr) -> tuple[SToken, Users]:
-        existing_user = await cls.tasks_repo.find_one_or_none(email=email)
+        existing_user = await UsersRepository.find_one_or_none(email=email)
         user = cls._authenticate_user(
             existing_user=existing_user, password=password
         )

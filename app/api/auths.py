@@ -12,6 +12,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.models.users import Users
 from app.dependencies import get_current_user
 
+
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
@@ -67,6 +68,7 @@ async def logout_user(
     await tasks_service.logout_user(request.cookies.get("refresh_token"))
     logger.info("Successfully logged out")
     return {"message": "Successfully logged out"}
+
 
 @router.post("/refresh")
 async def refresh_token(

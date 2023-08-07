@@ -103,7 +103,7 @@ class SQLAlchemyRepository(AbstractRepository):
         async with async_session_maker() as session:
             query = (
                 delete(cls.model)
-                .where(**filter_by)
+                .filter_by(**filter_by)
                 .returning(cls.model.id)
             )
             result = await session.execute(query)

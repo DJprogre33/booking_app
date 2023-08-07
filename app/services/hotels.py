@@ -5,7 +5,7 @@ from datetime import date
 
 from fastapi import Request, UploadFile
 
-from app.auth.auth import get_current_user, get_token
+# from app.auth.auth import get_current_user, get_token
 from app.exceptions import AccessDeniedException, IncorrectHotelIDException
 from app.logger import logger
 from app.repositories.hotels import HotelsRepository

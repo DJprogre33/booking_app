@@ -1,13 +1,13 @@
 from fastapi import Request
 from typing import Optional
 
-from app.auth.auth import (
-    authenticate_user,
-    create_access_token,
-    get_current_user,
-    get_password_hash,
-    get_token,
-)
+# from app.auth.auth import (
+#     authenticate_user,
+#     create_access_token,
+#     get_current_user,
+#     get_password_hash,
+#     get_token,
+# )
 from app.exceptions import UserAlreadyExistException
 from app.logger import logger
 from app.models.users import Users
