@@ -1,10 +1,11 @@
 from typing import Optional
 
+from pydantic import EmailStr
+
 from app.exceptions import IncorrectIDException
 from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
-from pydantic import EmailStr
 from app.utils.auth import get_password_hash
 
 

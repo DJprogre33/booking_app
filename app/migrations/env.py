@@ -8,7 +8,7 @@ from app.database import Base
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
-from app.models.users import Users, RefreshSessions
+from app.models.users import RefreshSessions, Users
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

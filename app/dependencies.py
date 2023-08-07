@@ -1,20 +1,26 @@
+from datetime import datetime
 from typing import Type
 
+from fastapi import Depends
+from jose import JWTError, jwt
+
+from app.config import settings
+from app.exceptions import (
+    AccessDeniedException,
+    IncorrectTokenFormatException,
+    InvalidTokenUserIDException,
+    TokenExpiredException,
+)
+from app.logger import logger
+from app.models.users import Users
+from app.repositories.users import UsersRepository
+from app.services.auths import AuthsService
 from app.services.bookings import BookingsService
 from app.services.hotels import HotelsService
 from app.services.rooms import RoomsService
 from app.services.users import UsersService
-from app.services.auths import AuthsService
 from app.utils.auth import oauth2_scheme
-from app.models.users import Users
-from app.exceptions import IncorrectTokenFormatException, TokenExpiredException, InvalidTokenUserIDException, AccessDeniedException
-from app.config import settings
-from app.logger import logger
-from app.repositories.users import UsersRepository
 
-from fastapi import Depends
-from jose import jwt, JWTError
-from datetime import datetime
 
 # functions return the service instance
 def get_bookings_service() -> Type[BookingsService]:

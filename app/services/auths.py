@@ -1,19 +1,23 @@
 import uuid
+from datetime import datetime, timedelta
 
-from datetime import timedelta, datetime
-from app.utils.auth import (
-    get_password_hash,
-    verify_password
+from jose import jwt
+from pydantic import EmailStr
+
+from app.config import settings
+from app.exceptions import (
+    IncorrectEmailOrPasswordException,
+    InvalidTokenUserIDException,
+    TokenAbsentException,
+    TokenExpiredException,
+    UserAlreadyExistException,
 )
-from app.exceptions import UserAlreadyExistException, IncorrectEmailOrPasswordException, TokenAbsentException, TokenExpiredException, InvalidTokenUserIDException
 from app.logger import logger
 from app.models.users import Users
-from app.repositories.users import UsersRepository
 from app.repositories.auths import AuthsRepository
+from app.repositories.users import UsersRepository
 from app.schemas.users import SToken, SUserRegister
-from pydantic import EmailStr
-from app.config import settings
-from jose import jwt
+from app.utils.auth import get_password_hash, verify_password
 
 
 class AuthsService:

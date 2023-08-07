@@ -1,5 +1,5 @@
-from app.utils.repository import SQLAlchemyRepository
 from app.models.users import RefreshSessions
+from app.utils.repository import SQLAlchemyRepository
 
 
 class AuthsRepository(SQLAlchemyRepository):

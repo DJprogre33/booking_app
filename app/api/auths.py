@@ -2,16 +2,15 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, Response, status
-from fastapi_versioning import version
-from app.config import settings
-from app.dependencies import get_auths_service
-from app.logger import logger
-from app.schemas.users import SUserRegister, SUserResponse, SToken
-from app.services.auths import AuthsService
 from fastapi.security import OAuth2PasswordRequestForm
-from app.models.users import Users
-from app.dependencies import get_current_user
+from fastapi_versioning import version
 
+from app.config import settings
+from app.dependencies import get_auths_service, get_current_user
+from app.logger import logger
+from app.models.users import Users
+from app.schemas.users import SToken, SUserRegister, SUserResponse
+from app.services.auths import AuthsService
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

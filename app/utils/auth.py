@@ -1,11 +1,9 @@
-from fastapi import HTTPException, status, Request
-from fastapi.security import OAuth2PasswordBearer
-from fastapi.security.utils import get_authorization_scheme_param
-
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import Request, Depends
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordBearer
+from fastapi.security.utils import get_authorization_scheme_param
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -41,7 +39,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2PasswordBearer):
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="users/login")
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="auth/login")
 
 
 def get_password_hash(password: str) -> str:

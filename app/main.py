@@ -14,11 +14,11 @@ from sqladmin import Admin
 
 # from app.admin.auth import authentication_backend
 from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
+from app.api.auths import router as auth_router
 from app.api.bookings import router as router_bookings
 from app.api.hotels import router as router_hotels
 from app.api.rooms import router as router_rooms
 from app.api.users import router as router_users
-from app.api.auths import router as auth_router
 from app.config import settings
 from app.database import engine
 from app.logger import logger

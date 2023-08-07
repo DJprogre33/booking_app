@@ -3,13 +3,11 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Request
 from fastapi_versioning import version
 
-from app.dependencies import get_users_service
+from app.dependencies import get_current_superuser, get_current_user, get_users_service
 from app.logger import logger
+from app.models.users import Users
 from app.schemas.users import SUserResponse, SUserUpdate
 from app.services.users import UsersService
-from app.dependencies import get_current_superuser, get_current_user
-from app.models.users import Users
-
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
