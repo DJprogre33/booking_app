@@ -52,7 +52,7 @@ class AuthsService:
     async def logout_user(cls, token: uuid.UUID) -> None:
         refresh_session = await cls.tasks_repo.find_one_or_none(refresh_token=token)
         if refresh_session:
-            await cls.tasks_repo.delete_by_id(refresh_session.id)
+            await cls.tasks_repo.delete(id=refresh_session.id)
 
     @classmethod
     async def refresh_token(cls, token: uuid.UUID) -> SToken:
@@ -61,7 +61,7 @@ class AuthsService:
         if refresh_session is None:
             raise TokenAbsentException()
         if datetime.utcnow() >= refresh_session.created_at + timedelta(seconds=refresh_session.expires_in):
-            await cls.tasks_repo.delete_by_id(refresh_session.id)
+            await cls.tasks_repo.delete(id=refresh_session.id)
             raise TokenExpiredException()
 
         user = await UsersRepository.find_one_or_none(id=refresh_session.user_id)
@@ -80,6 +80,10 @@ class AuthsService:
             expires_in=refresh_token_expires.total_seconds()
         )
         return SToken(access_token=access_token, refresh_token=refresh_token)
+
+    @classmethod
+    async def abort_all_sessions(cls, user_id: uuid.UUID) -> None:
+        await cls.tasks_repo.delete(id=user_id)
 
     @classmethod
     def _authenticate_user(cls, existing_user: Users, password: str) -> Users:

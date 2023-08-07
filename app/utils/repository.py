@@ -30,7 +30,7 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_by_id(self, entity_id):
+    async def delete(self, **filter_by):
         raise NotImplementedError
 
 
@@ -99,19 +99,11 @@ class SQLAlchemyRepository(AbstractRepository):
             return result.scalar()
 
     @classmethod
-    async def delete_by_id(cls, entity_id: int) -> int:
+    async def delete(cls, **filter_by) -> int:
         async with async_session_maker() as session:
-            logger.info("The database query begins to generate")
-
-            exists_entity = await cls.find_one_or_none(id=entity_id)
-
-            if not exists_entity:
-                logger.warning("Entity id not found", extra={"entity_id": entity_id})
-                raise IncorrectIDException()
-
             query = (
                 delete(cls.model)
-                .where(cls.model.id == entity_id)
+                .where(**filter_by)
                 .returning(cls.model.id)
             )
             result = await session.execute(query)

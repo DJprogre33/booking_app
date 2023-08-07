@@ -103,13 +103,13 @@ async def test_update_fields_by_id(user_id: int, new_email: str, new_role: str) 
 
 
 @pytest.mark.parametrize("user_id", [5, 6, 7])
-async def test_delete_by_id(user_id: int) -> None:
+async def test_delete(user_id: int) -> None:
     # if id not found raise error
     if user_id == 7:
         with pytest.raises(IncorrectIDException):
-            await tasks_repo.delete_by_id(user_id)
+            await tasks_repo.delete(id=user_id)
     else:
-        deleted_user_id = await tasks_repo.delete_by_id(user_id)
+        deleted_user_id = await tasks_repo.delete(id = user_id)
         assert deleted_user_id == user_id
 
         user = await tasks_repo.find_one_or_none(id=user_id)

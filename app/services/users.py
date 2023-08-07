@@ -47,4 +47,4 @@ class UsersService:
     async def delete_me(cls, request: Request) -> int:
         token = get_token(request)
         user = await get_current_user(token)
-        return await cls.tasks_repo.delete_by_id(user.id)
+        return await cls.tasks_repo.delete(id=user.id)

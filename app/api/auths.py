@@ -10,6 +10,7 @@ from app.schemas.users import SUserRegister, SUserResponse, SToken
 from app.services.auths import AuthsService
 from fastapi.security import OAuth2PasswordRequestForm
 from app.models.users import Users
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -93,6 +94,10 @@ async def refresh_token(
 @router.post("/abort")
 async def abort_all_sessions(
     response: Response,
+    tasks_service: Annotated[AuthsService, Depends(get_auths_service)],
     user: Users = Depends(get_current_user)
 ):
-    pass
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
+
+    await tasks_service.abort_all_sessions(user_id=user.id)

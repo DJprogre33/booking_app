@@ -55,8 +55,7 @@ class HotelsService:
         hotel = await Base.check_owner(
             task_repo=cls.tasks_repo, hotel_id=hotel_id, user_id=user.id
         )
-
-        return await cls.tasks_repo.delete_by_id(hotel.id)
+        return await cls.tasks_repo.delete(id=hotel.id)
 
     @classmethod
     async def add_hotel_image(

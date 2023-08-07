@@ -69,7 +69,7 @@ class RoomsService:
             task_repo=HotelsRepository(), hotel_id=hotel_id, user_id=user.id
         )
 
-        return await cls.tasks_repo.delete_by_id(room_id)
+        return await cls.tasks_repo.delete(id=room_id)
     
     @classmethod
     async def add_room_image(
