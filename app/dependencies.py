@@ -7,7 +7,7 @@ from app.services.users import UsersService
 from app.services.auths import AuthsService
 from app.utils.auth import oauth2_scheme
 from app.models.users import Users
-from app.exceptions import IncorrectTokenFormatException, TokenExpiredException, InvalidTokenUserIDException
+from app.exceptions import IncorrectTokenFormatException, TokenExpiredException, InvalidTokenUserIDException, AccessDeniedException
 from app.config import settings
 from app.logger import logger
 from app.repositories.users import UsersRepository
@@ -62,6 +62,12 @@ async def get_current_user(
         logger.warning("Invalid token user id")
         raise InvalidTokenUserIDException()
     return user
+
+
+async def get_current_superuser(current_user: Users = Depends(get_current_user)) -> Users:
+    if current_user.role != "admin":
+        raise AccessDeniedException
+    return current_user
 
 
 async def get_current_hotel_owner(current_user: Users = Depends(get_current_user)) -> Users:

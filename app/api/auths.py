@@ -91,7 +91,9 @@ async def refresh_token(
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         httponly=True
     )
+    logger.info("Successfully refresh tokens")
     return new_tokens
+
 
 @router.post("/abort")
 async def abort_all_sessions(
@@ -103,4 +105,5 @@ async def abort_all_sessions(
     response.delete_cookie("refresh_token")
 
     await tasks_service.abort_all_sessions(user_id=user.id)
+    logger.info("Successfully aborted all sessions", extra={"id": user.id, "email": user.email})
     return {"message": "All sessions was aborted"}

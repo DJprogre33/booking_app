@@ -1,8 +1,6 @@
 import uuid
 
-from fastapi import Request
-from typing import Optional, Tuple, Type
-from datetime import date, timedelta, datetime
+from datetime import timedelta, datetime
 from app.utils.auth import (
     get_password_hash,
     verify_password
