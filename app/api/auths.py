@@ -65,7 +65,7 @@ async def logout_user(
     """Logout an existing user"""
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
-    await tasks_service.logout_user(request.cookies.get("refresh_token"))
+    await tasks_service.logout_user(uuid.UUID(request.cookies.get("refresh_token")))
     logger.info("Successfully logged out")
     return {"message": "Successfully logged out"}
 
@@ -103,3 +103,4 @@ async def abort_all_sessions(
     response.delete_cookie("refresh_token")
 
     await tasks_service.abort_all_sessions(user_id=user.id)
+    return {"message": "All sessions was aborted"}

@@ -41,7 +41,7 @@ class AuthsService:
         access_token = cls._create_access_token(user.id)
         refresh_token = cls._create_refresh_token()
         refresh_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        await cls.tasks_repo.insert_data(refresh_token=refresh_token, expires_in=refresh_token_expires.total_seconds())
+        await cls.tasks_repo.insert_data(refresh_token=refresh_token, expires_in=refresh_token_expires.total_seconds(), user_id=user.id)
         token = SToken(access_token=access_token, refresh_token=refresh_token)
         return token, user
 
@@ -80,7 +80,7 @@ class AuthsService:
 
     @classmethod
     async def abort_all_sessions(cls, user_id: uuid.UUID) -> None:
-        await cls.tasks_repo.delete(id=user_id)
+        await cls.tasks_repo.delete(user_id=user_id)
 
     @classmethod
     def _authenticate_user(cls, existing_user: Users, password: str) -> Users:
