@@ -12,7 +12,7 @@ from app.exceptions import UserAlreadyExistException
 from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
-from app.schemas.users import Token, SUserRegister
+from app.schemas.users import SToken, SUserRegister
 from pydantic import EmailStr
 
 class UsersService:

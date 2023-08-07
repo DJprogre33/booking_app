@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Request
 from fastapi_versioning import version
 
-from app.api.dependencies import get_bookings_service
+from app.dependencies import get_bookings_service
 from app.logger import logger
 from app.schemas.booking import SBookingResponse, SBookingsResponse
 from app.services.bookings import BookingsService

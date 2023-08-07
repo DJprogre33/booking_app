@@ -4,7 +4,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, Request, UploadFile
 from fastapi_versioning import version
 
-from app.api.dependencies import get_rooms_service
+from app.dependencies import get_rooms_service
 from app.logger import logger
 from app.schemas.rooms import SRoomResponse, SRooms, SRoomsResponse
 from app.services.rooms import RoomsService

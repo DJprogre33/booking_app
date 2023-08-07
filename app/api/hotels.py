@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, Request, UploadFile
 from fastapi_cache.decorator import cache
 from fastapi_versioning import version
 
-from app.api.dependencies import get_hotels_service
+from app.dependencies import get_hotels_service
 from app.logger import logger
 from app.schemas.hotels import SHotel, SHotelResponse, SHotelsResponse
 from app.services.hotels import HotelsService

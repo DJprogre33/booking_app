@@ -1,4 +1,4 @@
-
+import uuid
 from typing import Literal
 
 from pydantic import BaseModel, EmailStr
@@ -21,7 +21,7 @@ class SUserResponse(BaseModel):
     role: Literal["user", "hotel owner", "admin"]
 
 
-class Token(BaseModel):
+class SToken(BaseModel):
     access_token: str
-    refresh_token: str
+    refresh_token: uuid.UUID
     token_type: str = "Bearer"

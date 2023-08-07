@@ -1,14 +1,15 @@
+import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi_versioning import version
 from app.config import settings
-from app.api.dependencies import get_auths_service
+from app.dependencies import get_auths_service
 from app.logger import logger
-from app.schemas.users import SUserLogin, SUserRegister, SUserResponse
+from app.schemas.users import SUserRegister, SUserResponse, SToken
 from app.services.auths import AuthsService
 from fastapi.security import OAuth2PasswordRequestForm
-
+from app.models.users import Users
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -18,8 +19,8 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 async def register_user(
     user_data: SUserRegister,
     tasks_service: Annotated[AuthsService, Depends(get_auths_service)],
-) -> SUserResponse:
-    """Registers a new user"""
+):
+    """Register a new user"""
     user = await tasks_service.register_user(user_data=user_data)
     logger.info("User created", extra={"id": user.id, "email": user.email})
     return user
@@ -54,8 +55,44 @@ async def login_user(
 
 @router.post("/logout")
 @version(1)
-async def logout_user(response: Response) -> None:
+async def logout_user(
+    request: Request,
+    response: Response,
+    tasks_service: Annotated[AuthsService, Depends(get_auths_service)]
+) -> dict:
     """Logout an existing user"""
-    response.delete_cookie("booking_access_token")
-
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
+    await tasks_service.logout_user(request.cookies.get("refresh_token"))
     logger.info("Successfully logged out")
+    return {"message": "Successfully logged out"}
+
+@router.post("/refresh")
+async def refresh_token(
+    request: Request,
+    response: Response,
+    tasks_service: Annotated[AuthsService, Depends(get_auths_service)]
+) -> SToken:
+    new_tokens = await tasks_service.refresh_token(
+        uuid.UUID(request.cookies.get("refresh_token"))
+    )
+    response.set_cookie(
+        "access_token",
+        new_tokens.access_token,
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        httponly=True
+    )
+    response.set_cookie(
+        "refresh_token",
+        new_tokens.refresh_token,
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        httponly=True
+    )
+    return new_tokens
+
+@router.post("/abort")
+async def abort_all_sessions(
+    response: Response,
+    user: Users = Depends(get_current_user)
+):
+    pass
