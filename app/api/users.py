@@ -5,7 +5,7 @@ from fastapi_versioning import version
 
 from app.dependencies import get_users_service
 from app.logger import logger
-from app.schemas.users import SUserResponse
+from app.schemas.users import SUserResponse, SUserUpdate
 from app.services.users import UsersService
 from app.dependencies import get_current_superuser, get_current_user
 from app.models.users import Users
@@ -40,19 +40,88 @@ async def return_me(
         extra={"user_id": current_user.id, "user_email": current_user.email},
     )
     return current_user
-#
-#
-# @router.delete("/me")
-# @version(1)
-# async def delete_me(
-#     request: Request, tasks_service: Annotated[UsersService, Depends(get_users_service)]
-# ) -> dict[str, int]:
-#     """Deletes the user account"""
-#     deleted_user_id = await tasks_service.delete_me(request)
-#
-#     logger.info(
-#         "Succesfully deleted user",
-#         extra={"user_id": deleted_user_id},
-#     )
-#
-#     return {"deleted_user_id": deleted_user_id}
+
+
+@router.put("/me", response_model=SUserResponse)
+@version(1)
+async def update_me(
+    user_data: SUserUpdate,
+    tasks_service: Annotated[UsersService, Depends(get_users_service)],
+    current_user: Users = Depends(get_current_user)
+):
+    """Returns the current updated user"""
+    updated_user = await tasks_service.update_me(
+        user_id=current_user.id,
+        email=user_data.email,
+        password=user_data.password
+    )
+    logger.info(
+        "Succesfully updated user",
+        extra={"user_id": updated_user.id, "user_email": updated_user.email},
+    )
+    return updated_user
+
+
+@router.delete("/me", response_model=SUserResponse)
+@version(1)
+async def delete_me(
+    tasks_service: Annotated[UsersService, Depends(get_users_service)],
+    current_user: Users = Depends(get_current_user)
+):
+    """Deletes the user account"""
+    deleted_user = await tasks_service.delete_me(current_user.id)
+    logger.info(
+        "Succesfully deleted user",
+        extra={"user_id": deleted_user.id},
+    )
+    return deleted_user
+
+
+@router.get("/{user_id}", response_model=SUserResponse)
+async def update_user_from_superuser(
+    user_id: int,
+    tasks_service: Annotated[UsersService, Depends(get_users_service)],
+    current_user: Users = Depends(get_current_user)
+):
+    """Returns user by id"""
+    user = await tasks_service.get_user(user_id)
+    logger.info(
+        "Succesfully got user",
+        extra={"user_id": user.id, "user_email": user.email},
+    )
+    return user
+
+
+@router.put("/{user_id}", response_model=SUserResponse)
+async def update_user_from_superuser(
+    user_data: SUserUpdate,
+    user_id: int,
+    tasks_service: Annotated[UsersService, Depends(get_users_service)],
+    current_user: Users = Depends(get_current_superuser)
+):
+    """Update user by id, current user must have super permissions"""
+    user = await tasks_service.update_user_from_superuser(
+        user_id=user_id,
+        password=user_data.password,
+        email=user_data.email
+    )
+    logger.info(
+        "Succesfully updated user",
+        extra={"user_id": user.id, "user_email": user.email},
+    )
+    return user
+
+
+@router.delete("/{user_id}", response_model=SUserResponse)
+async def delete_user_from_superuser(
+    user_id: int,
+    tasks_service: Annotated[UsersService, Depends(get_users_service)],
+    current_user: Users = Depends(get_current_superuser)
+):
+    """Delete user by id, current user must have super permissions"""
+    user = await tasks_service.delete_user_from_superuser(user_id)
+    logger.info(
+        "Succesfully deleted user",
+        extra={"user_id": user.id, "user_email": user.email},
+    )
+    return user

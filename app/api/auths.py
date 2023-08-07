@@ -47,7 +47,7 @@ async def login_user(
     )
     response.set_cookie(
         "refresh_token",
-        tokens.refresh_token,
+        str(tokens.refresh_token),
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         httponly=True
     )
@@ -87,7 +87,7 @@ async def refresh_token(
     )
     response.set_cookie(
         "refresh_token",
-        new_tokens.refresh_token,
+        str(new_tokens.refresh_token),
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         httponly=True
     )
