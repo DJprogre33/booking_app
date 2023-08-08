@@ -1,4 +1,10 @@
 from fastapi import HTTPException, status
+from pydantic import BaseModel
+
+
+class SExstraResponse(BaseModel):
+    """Class for extra responses in OpenAPI doc"""
+    detail: str
 
 
 class BookingAppException(HTTPException):

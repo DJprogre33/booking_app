@@ -24,14 +24,14 @@ class Base:
                 "date_from can't be earlier then now",
                 extra={"date_from": date_from, "date_to": date_to},
             )
-            raise IncorrectDataRangeException()
+            raise IncorrectDataRangeException
 
         if booking_period < timedelta(days=1) or booking_period > timedelta(days=90):
             logger.error(
                 "Incorrect data range",
                 extra={"date_from": date_from, "date_to": date_to},
             )
-            raise IncorrectDataRangeException()
+            raise IncorrectDataRangeException
 
         return date_from, date_to
 
@@ -43,12 +43,12 @@ class Base:
 
         if not hotel:
             logger.warning("Incorrect hotel id", extra={"hotel_id": hotel_id})
-            raise IncorrectHotelIDException()
+            raise IncorrectHotelIDException
 
         if hotel.owner_id != user_id:
             logger.warning(
                 "User isn't an owner", extra={"hotel_id": hotel_id, "user_id": user_id}
             )
-            raise AccessDeniedException()
+            raise AccessDeniedException
 
         return hotel

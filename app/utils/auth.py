@@ -1,22 +1,12 @@
-from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Request
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.security.utils import get_authorization_scheme_param
-from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from app.config import settings
-from app.exceptions import (
-    IncorrectTokenFormatException,
-    InvalidTokenUserIDException,
-    TokenAbsentException,
-    TokenExpiredException,
-)
+from app.exceptions import IncorrectTokenFormatException
 from app.logger import logger
-from app.models.users import Users
-from app.repositories.users import UsersRepository
 
 
 class OAuth2PasswordBearerWithCookie(OAuth2PasswordBearer):
@@ -26,13 +16,9 @@ class OAuth2PasswordBearerWithCookie(OAuth2PasswordBearer):
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != "bearer":
             if self.auto_error:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Not authenticated",
-                    headers={"WWW-Authenticate": "Bearer"},
-                )
-            else:
-                return None
+                logger.error("Incorrect token format")
+                raise IncorrectTokenFormatException
+            return None
         return param
 
 

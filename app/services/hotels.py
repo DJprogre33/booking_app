@@ -29,7 +29,7 @@ class HotelsService:
     async def get_hotel_by_id(cls, hotel_id: int):
         hotel = await cls.tasks_repo.find_one_or_none(id=hotel_id)
         if not hotel:
-            raise IncorrectHotelIDException()
+            raise IncorrectHotelIDException
         return hotel
 
     @classmethod
@@ -38,7 +38,7 @@ class HotelsService:
         user = await get_current_user(token)
         if user.role != "hotel owner":
             logger.warning("Role access denied", extra={"user_id": user.id})
-            raise AccessDeniedException()
+            raise AccessDeniedException
 
         return await cls.tasks_repo.insert_data(
             name=new_hotel.name,

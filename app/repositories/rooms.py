@@ -18,7 +18,7 @@ class RoomsRepository(SQLAlchemyRepository):
     async def hotel_exists(hotel_id):
         hotel = await HotelsRepository().find_one_or_none(id=hotel_id)
         if not hotel:
-            raise IncorrectHotelIDException()
+            raise IncorrectHotelIDException
     
     @classmethod
     async def get_available_hotel_rooms(

@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_versioning import version
 
+from app.exceptions import SExstraResponse
 from app.config import settings
 from app.dependencies import get_auths_service, get_current_user
 from app.logger import logger
@@ -12,14 +13,22 @@ from app.models.users import Users
 from app.schemas.users import SToken, SUserRegister, SUserResponse
 from app.services.auths import AuthsService
 
+
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@router.post("/register", response_model=SUserResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=SUserResponse,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        409: {"model": SExstraResponse}
+    }
+)
 @version(1)
 async def register_user(
     user_data: SUserRegister,
-    tasks_service: Annotated[AuthsService, Depends(get_auths_service)],
+    tasks_service: Annotated[AuthsService, Depends(get_auths_service)]
 ):
     """Register a new user"""
     user = await tasks_service.register_user(user_data=user_data)
@@ -27,7 +36,13 @@ async def register_user(
     return user
 
 
-@router.post("/login", response_model=SUserResponse)
+@router.post(
+    "/login",
+    response_model=SUserResponse,
+    responses={
+        401: {"model": SExstraResponse}
+    }
+)
 @version(1)
 async def login_user(
     response: Response,
@@ -69,7 +84,13 @@ async def logout_user(
     return {"message": "Successfully logged out"}
 
 
-@router.post("/refresh")
+@router.post(
+    "/refresh",
+    response_model=SToken,
+    responses={
+        401: {"model": SExstraResponse}
+    }
+)
 async def refresh_token(
     request: Request,
     response: Response,
@@ -94,7 +115,12 @@ async def refresh_token(
     return new_tokens
 
 
-@router.post("/abort")
+@router.post(
+    "/abort",
+    responses={
+        401: {"model": SExstraResponse}
+    }
+)
 async def abort_all_sessions(
     response: Response,
     tasks_service: Annotated[AuthsService, Depends(get_auths_service)],

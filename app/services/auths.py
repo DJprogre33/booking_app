@@ -28,7 +28,7 @@ class AuthsService:
         existing_user = await UsersRepository.find_one_or_none(email=user_data.email)
         if existing_user:
             logger.warning("User already exists")
-            raise UserAlreadyExistException()
+            raise UserAlreadyExistException
         hashed_password = get_password_hash(user_data.password)
         return await UsersRepository.insert_data(
             email=user_data.email, hashed_password=hashed_password, role=user_data.role
@@ -58,14 +58,14 @@ class AuthsService:
         refresh_session = await cls.tasks_repo.find_one_or_none(refresh_token=token)
 
         if refresh_session is None:
-            raise TokenAbsentException()
+            raise TokenAbsentException
         if datetime.utcnow() >= refresh_session.created_at + timedelta(seconds=refresh_session.expires_in):
             await cls.tasks_repo.delete(id=refresh_session.id)
-            raise TokenExpiredException()
+            raise TokenExpiredException
 
         user = await UsersRepository.find_one_or_none(id=refresh_session.user_id)
         if user is None:
-            raise InvalidTokenUserIDException()
+            raise InvalidTokenUserIDException
 
         access_token = cls._create_access_token(user.id)
         refresh_token_expires = timedelta(
@@ -91,7 +91,7 @@ class AuthsService:
             if password_is_valid:
                 return existing_user
         logger.warning("Incorrect email or password")
-        raise IncorrectEmailOrPasswordException()
+        raise IncorrectEmailOrPasswordException
 
     @classmethod
     def _create_access_token(cls, user_id: int) -> str:

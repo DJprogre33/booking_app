@@ -59,7 +59,7 @@ class RoomsService:
             "The number of rooms exceeds the total number of rooms in the hotel",
             extra={"rooms_left": rooms_left, "required quantity": quantity},
         )
-        raise RoomLimitExceedException()
+        raise RoomLimitExceedException
     
     @classmethod
     async def delete_room(cls, hotel_id: int, room_id: int, request: Request) -> id:
@@ -83,7 +83,7 @@ class RoomsService:
         room = await cls.tasks_repo.find_one_or_none(id=room_id)
 
         if not room:
-            raise IncorrectRoomIDException()
+            raise IncorrectRoomIDException
 
         if room.image_path:
             os.remove(room.image_path)
@@ -108,7 +108,7 @@ class RoomsService:
         room = await cls.tasks_repo.find_one_or_none(id=room_id)
 
         if not room:
-            raise IncorrectRoomIDException()
+            raise IncorrectRoomIDException
 
         if room.image_path:
             os.remove(room.image_path)

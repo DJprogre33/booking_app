@@ -63,7 +63,7 @@ class BookingsRepository(SQLAlchemyRepository):
 
                 return new_booking.scalar()
             logger.warning("Room can't be booked", extra={"room_id": room_id})
-            raise RoomCanNotBeBookedException()
+            raise RoomCanNotBeBookedException
     
     @classmethod
     async def get_bookings(cls, user_id: int):
@@ -116,7 +116,7 @@ class BookingsRepository(SQLAlchemyRepository):
                     "Incorrect booking id or user_id",
                     extra={"user_id": user_id, "booking_id": booking_id},
                 )
-                err = IncorrectBookingIdException()
+                err = IncorrectBookingIdException
                 err.detail = "Incorrect booking id or user_id"
                 raise err
 

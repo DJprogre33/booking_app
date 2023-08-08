@@ -1,6 +1,6 @@
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi_versioning import version
 
 from app.dependencies import get_current_superuser, get_current_user, get_users_service
@@ -8,11 +8,19 @@ from app.logger import logger
 from app.models.users import Users
 from app.schemas.users import SUserResponse, SUserUpdate
 from app.services.users import UsersService
+from app.exceptions import SExstraResponse
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.get("", response_model=Optional[list[SUserResponse]])
+@router.get(
+    "",
+    response_model=Optional[list[SUserResponse]],
+    responses={
+        401: {"model": SExstraResponse},
+        403: {"model": SExstraResponse}
+    }
+)
 async def get_users_list(
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
     current_user: Users = Depends(get_current_superuser),
@@ -25,7 +33,13 @@ async def get_users_list(
     return users
 
 
-@router.get("/me", response_model=SUserResponse)
+@router.get(
+    "/me",
+    response_model=SUserResponse,
+    responses={
+        401: {"model": SExstraResponse}
+    }
+)
 @version(1)
 async def return_me(
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
@@ -40,7 +54,13 @@ async def return_me(
     return current_user
 
 
-@router.put("/me", response_model=SUserResponse)
+@router.put(
+    "/me",
+    response_model=SUserResponse,
+    responses={
+        401: {"model": SExstraResponse}
+    }
+)
 @version(1)
 async def update_me(
     user_data: SUserUpdate,
@@ -60,7 +80,13 @@ async def update_me(
     return updated_user
 
 
-@router.delete("/me", response_model=SUserResponse)
+@router.delete(
+    "/me",
+    response_model=SUserResponse,
+    responses={
+        401: {"model": SExstraResponse}
+    }
+)
 @version(1)
 async def delete_me(
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
@@ -75,8 +101,16 @@ async def delete_me(
     return deleted_user
 
 
-@router.get("/{user_id}", response_model=SUserResponse)
-async def update_user_from_superuser(
+@router.get(
+    "/{user_id}",
+    response_model=SUserResponse,
+    responses={
+        401: {"model": SExstraResponse},
+        403: {"model": SExstraResponse},
+        404: {"model": SExstraResponse}
+    }
+)
+async def get_user_from_superuser(
     user_id: int,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
     current_user: Users = Depends(get_current_user)
@@ -90,7 +124,15 @@ async def update_user_from_superuser(
     return user
 
 
-@router.put("/{user_id}", response_model=SUserResponse)
+@router.put(
+    "/{user_id}",
+    response_model=SUserResponse,
+    responses={
+        401: {"model": SExstraResponse},
+        403: {"model": SExstraResponse},
+        404: {"model": SExstraResponse}
+    }
+)
 async def update_user_from_superuser(
     user_data: SUserUpdate,
     user_id: int,
@@ -110,7 +152,15 @@ async def update_user_from_superuser(
     return user
 
 
-@router.delete("/{user_id}", response_model=SUserResponse)
+@router.delete(
+    "/{user_id}",
+    response_model=SUserResponse,
+    responses={
+        401: {"model": SExstraResponse},
+        403: {"model": SExstraResponse},
+        404: {"model": SExstraResponse}
+    }
+)
 async def delete_user_from_superuser(
     user_id: int,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
