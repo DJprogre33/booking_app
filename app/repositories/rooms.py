@@ -3,30 +3,22 @@ from datetime import date
 from sqlalchemy import func, select
 
 from app.database import async_session_maker
-from app.exceptions import IncorrectHotelIDException
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
-from app.repositories.hotels import HotelsRepository
 from app.utils.repository import SQLAlchemyRepository
+from app.schemas.hotels import SHotelsResponse
+from typing import Optional
 
 
 class RoomsRepository(SQLAlchemyRepository):
     model = Rooms
 
-    @staticmethod
-    async def hotel_exists(hotel_id):
-        hotel = await HotelsRepository().find_one_or_none(id=hotel_id)
-        if not hotel:
-            raise IncorrectHotelIDException
-    
     @classmethod
     async def get_available_hotel_rooms(
         cls, hotel_id: int, date_from: date, date_to: date
-    ) -> list[dict]:
+    ) -> Optional[list[SHotelsResponse]]:
         async with async_session_maker() as session:
-            await cls.hotel_exists(hotel_id)
-
             get_booked_rooms = (
                 select(cls.model.id, func.count().label("booked_rooms"))
                 .select_from(cls.model)
@@ -37,7 +29,6 @@ class RoomsRepository(SQLAlchemyRepository):
                 .group_by(cls.model.id)
                 .subquery("booked_rooms")
             )
-
             get_available_rooms = (
                 select(
                     cls.model.id,
@@ -67,9 +58,7 @@ class RoomsRepository(SQLAlchemyRepository):
                     )
                 )
             )
-
             available_rooms = await session.execute(get_available_rooms)
-
             return available_rooms.mappings().all()
     
     @classmethod
@@ -82,8 +71,6 @@ class RoomsRepository(SQLAlchemyRepository):
         :return:
         """
         async with async_session_maker() as session:
-            await cls.hotel_exists(hotel_id)
-
             existing_rooms = (
                 select(
                     cls.model.hotel_id,
@@ -94,7 +81,6 @@ class RoomsRepository(SQLAlchemyRepository):
                 .group_by(cls.model.hotel_id)
                 .subquery("existing_rooms")
             )
-
             rooms_left = (
                 select(
                     (
@@ -105,7 +91,5 @@ class RoomsRepository(SQLAlchemyRepository):
                 .select_from(Hotels)
                 .join(existing_rooms, Hotels.id == existing_rooms.c.hotel_id)
             )
-
             rooms_left = await session.execute(rooms_left)
-
             return rooms_left.scalar()

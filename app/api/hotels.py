@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, Request, UploadFile
+from fastapi import APIRouter, Depends, UploadFile
 from fastapi_cache.decorator import cache
 from fastapi_versioning import version
 
@@ -10,7 +10,7 @@ from app.logger import logger
 from app.schemas.hotels import SHotel, SHotelResponse, SHotelsResponse
 from app.exceptions import SExstraResponse
 from app.services.hotels import HotelsService
-from app.dependencies import get_current_user, get_current_hotel_owner
+from app.dependencies import get_current_hotel_owner
 from app.models.users import Users
 
 router = APIRouter(prefix="/hotels", tags=["Hotels"])
@@ -31,9 +31,44 @@ async def create_hotel(
     current_user: Users = Depends(get_current_hotel_owner)
 ):
     """Creates a hotel if the user has the hotel_owner role"""
-    new_hotel = await tasks_service.create_hotel(new_hotel=new_hotel, owner_id=current_user.id)
+    new_hotel = await tasks_service.create_hotel(
+        name=new_hotel.name,
+        location=new_hotel.location,
+        services=new_hotel.services,
+        rooms_quantity=new_hotel.rooms_quantity,
+        owner_id=current_user.id
+    )
     logger.info("Succesful created a new hotel", extra={"new_hotel_id": new_hotel.id})
     return new_hotel
+
+
+@router.put(
+    "/{hotel_id}",
+    response_model=SHotelResponse,
+    responses={
+        401: {"model": SExstraResponse},
+        403: {"model": SExstraResponse},
+        404: {"model": SExstraResponse},
+    }
+)
+@version(1)
+async def update_hotel(
+    hotel_id: int,
+    new_hotel: SHotel,
+    tasks_service: Annotated[HotelsService, Depends(get_hotels_service)],
+    current_user: Users = Depends(get_current_hotel_owner)
+):
+    """Updates a hotel if the user has the hotel_owner role"""
+    updated_hotel = await tasks_service.update_hotel(
+        hotel_id=hotel_id,
+        name=new_hotel.name,
+        location=new_hotel.location,
+        services=new_hotel.services,
+        rooms_quantity=new_hotel.rooms_quantity,
+        owner_id=current_user.id
+    )
+    logger.info("Succesful created a new hotel", extra={"new_hotel_id": updated_hotel.id})
+    return updated_hotel
 
 
 @router.patch(

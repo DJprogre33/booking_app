@@ -32,12 +32,39 @@ class HotelsService:
         return hotel
 
     @classmethod
-    async def create_hotel(cls, new_hotel: SHotel, owner_id: int) -> Hotels:
+    async def create_hotel(
+            cls,
+            name: str,
+            location: str,
+            services: list,
+            rooms_quantity: int,
+            owner_id: int
+    ) -> Hotels:
         return await cls.tasks_repo.insert_data(
-            name=new_hotel.name,
-            location=new_hotel.location,
-            services=new_hotel.services,
-            rooms_quantity=new_hotel.rooms_quantity,
+            name=name,
+            location=location,
+            services=services,
+            rooms_quantity=rooms_quantity,
+            owner_id=owner_id,
+        )
+
+    @classmethod
+    async def update_hotel(
+            cls,
+            hotel_id: int,
+            name: str,
+            location: str,
+            services: list,
+            rooms_quantity: int,
+            owner_id: int
+    ) -> Hotels:
+        hotel = await cls.check_hotel_owner(hotel_id=hotel_id, owner_id=owner_id)
+        return await cls.tasks_repo.update_fields_by_id(
+            entity_id=hotel.id,
+            name=name,
+            location=location,
+            services=services,
+            rooms_quantity=rooms_quantity,
             owner_id=owner_id,
         )
 
