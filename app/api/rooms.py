@@ -44,9 +44,37 @@ async def create_room(
     return new_room
 
 
-# @router.put("/{hotel_id}/{room_id}")
-# async def update_room():
-#     pass
+@router.put(
+    "/{hotel_id}/{room_id}",
+    response_model=SRoomResponse,
+    responses={
+        400: {"model": SExstraResponse},
+        401: {"model": SExstraResponse},
+        403: {"model": SExstraResponse},
+        404: {"model": SExstraResponse}
+    }
+)
+@version(1)
+async def update_room(
+    hotel_id: int,
+    room_id: int,
+    room_data: SRooms,
+    tasks_service: Annotated[RoomsService, Depends(get_rooms_service)],
+    current_user: Users = Depends(get_current_hotel_owner)
+):
+    """Adds a room for a specific hotel, user must be the owner of the hotel"""
+    new_room = await tasks_service.update_room(
+        hotel_id=hotel_id,
+        room_id=room_id,
+        name=room_data.name,
+        description=room_data.description,
+        price=room_data.price,
+        services=room_data.services,
+        quantity=room_data.quantity,
+        owner_id=current_user.id
+    )
+    logger.info("Room succesfully created", extra={"room_id": new_room.id})
+    return new_room
 
 
 @router.delete(

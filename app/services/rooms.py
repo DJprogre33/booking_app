@@ -46,9 +46,46 @@ class RoomsService:
         raise RoomLimitExceedException
 
     @classmethod
+    async def update_room(
+            cls,
+            hotel_id: int,
+            room_id: int,
+            name: str,
+            description: str,
+            price: int,
+            services: list,
+            quantity: int,
+            owner_id: int
+    ) -> Rooms:
+        hotel = await HotelsService.check_hotel_owner(hotel_id=hotel_id, owner_id=owner_id)
+        room = await cls.tasks_repo.find_one_or_none(id=room_id)
+        if not room:
+            raise IncorrectRoomIDException
+
+        rooms_left = await cls.tasks_repo.get_rooms_left(hotel_id=hotel.id)
+        if rooms_left >= quantity:
+            return await cls.tasks_repo.update_fields_by_id(
+                entity_id=room.id,
+                hotel_id=hotel.id,
+                name=name,
+                description=description,
+                price=price,
+                services=services,
+                quantity=quantity,
+            )
+        logger.warning(
+            "The number of rooms exceeds the total number of rooms in the hotel",
+            extra={"rooms_left": rooms_left, "required quantity": quantity},
+        )
+        raise RoomLimitExceedException
+
+    @classmethod
     async def delete_room(cls, hotel_id: int, room_id: int, owner_id: int) -> Rooms:
         hotel = await HotelsService.check_hotel_owner(hotel_id=hotel_id, owner_id=owner_id)
-        return await cls.tasks_repo.delete(id=room_id, hotel_id=hotel.id)
+        room = await cls.tasks_repo.find_one_or_none(id=room_id)
+        if not room:
+            raise IncorrectRoomIDException
+        return await cls.tasks_repo.delete(id=room.id, hotel_id=hotel.id)
 
     @classmethod
     async def add_room_image(
