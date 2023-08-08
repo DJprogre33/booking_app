@@ -21,6 +21,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
         403: {"model": SExstraResponse}
     }
 )
+@version(1)
 async def get_users_list(
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
     current_user: Users = Depends(get_current_superuser),
@@ -110,6 +111,7 @@ async def delete_me(
         404: {"model": SExstraResponse}
     }
 )
+@version(1)
 async def get_user_from_superuser(
     user_id: int,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],
@@ -133,6 +135,7 @@ async def get_user_from_superuser(
         404: {"model": SExstraResponse}
     }
 )
+@version(1)
 async def update_user_from_superuser(
     user_data: SUserUpdate,
     user_id: int,
@@ -161,6 +164,7 @@ async def update_user_from_superuser(
         404: {"model": SExstraResponse}
     }
 )
+@version(1)
 async def delete_user_from_superuser(
     user_id: int,
     tasks_service: Annotated[UsersService, Depends(get_users_service)],

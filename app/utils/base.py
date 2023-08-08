@@ -1,13 +1,7 @@
 from datetime import date, datetime, timedelta
 
-from app.exceptions import (
-    AccessDeniedException,
-    IncorrectDataRangeException,
-    IncorrectHotelIDException,
-)
+from app.exceptions import IncorrectDataRangeException
 from app.logger import logger
-from app.models.hotels import Hotels
-from app.repositories.hotels import HotelsRepository
 
 
 class Base:
@@ -32,23 +26,4 @@ class Base:
                 extra={"date_from": date_from, "date_to": date_to},
             )
             raise IncorrectDataRangeException
-
         return date_from, date_to
-
-    @staticmethod
-    async def check_owner(
-        task_repo: HotelsRepository, hotel_id: int, user_id: int
-    ) -> Hotels:
-        hotel = await task_repo.find_one_or_none(id=hotel_id)
-
-        if not hotel:
-            logger.warning("Incorrect hotel id", extra={"hotel_id": hotel_id})
-            raise IncorrectHotelIDException
-
-        if hotel.owner_id != user_id:
-            logger.warning(
-                "User isn't an owner", extra={"hotel_id": hotel_id, "user_id": user_id}
-            )
-            raise AccessDeniedException
-
-        return hotel

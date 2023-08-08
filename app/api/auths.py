@@ -91,6 +91,7 @@ async def logout_user(
         401: {"model": SExstraResponse}
     }
 )
+@version(1)
 async def refresh_token(
     request: Request,
     response: Response,
@@ -121,6 +122,7 @@ async def refresh_token(
         401: {"model": SExstraResponse}
     }
 )
+@version(1)
 async def abort_all_sessions(
     response: Response,
     tasks_service: Annotated[AuthsService, Depends(get_auths_service)],

@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Optional
 
 from sqlalchemy import func, select
 
@@ -8,6 +9,7 @@ from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
 from app.utils.repository import SQLAlchemyRepository
+from app.schemas.hotels import SHotelsResponse
 
 
 class HotelsRepository(SQLAlchemyRepository):
@@ -16,7 +18,7 @@ class HotelsRepository(SQLAlchemyRepository):
     @classmethod
     async def get_hotels_by_location_and_time(
         cls, location: str, date_from: date, date_to: date
-    ) -> list[dict]:
+    ) -> Optional[list[SHotelsResponse]]:
         async with async_session_maker() as session:
             logger.info("The database query begins to generate")
 
@@ -59,8 +61,6 @@ class HotelsRepository(SQLAlchemyRepository):
                     )
                 )
             )
-
             available_hotels = await session.execute(get_available_hotels)
-
             logger.info("Database query successfully completed")
             return available_hotels.mappings().all()
