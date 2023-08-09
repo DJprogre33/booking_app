@@ -63,7 +63,7 @@ class RoomsService:
             raise IncorrectRoomIDException
 
         rooms_left = await cls.tasks_repo.get_rooms_left(hotel_id=hotel.id)
-        if rooms_left >= quantity:
+        if rooms_left + room.quantity >= quantity:
             return await cls.tasks_repo.update_fields_by_id(
                 entity_id=room.id,
                 hotel_id=hotel.id,

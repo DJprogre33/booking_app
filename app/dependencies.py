@@ -82,9 +82,3 @@ async def get_current_hotel_owner(current_user: Users = Depends(get_current_user
         logger.warning("Role access denied", extra={"user_id": current_user.id})
         raise AccessDeniedException
     return current_user
-
-
-# async def get_current_owner_of_the_hotel(
-#     hotel_id: int,
-#     current_user: Users = Depends(get_current_hotel_owner)
-# ) -> Users:

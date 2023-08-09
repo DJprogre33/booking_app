@@ -89,7 +89,7 @@ class RoomsRepository(SQLAlchemyRepository):
                     ).label("rooms_left")
                 )
                 .select_from(Hotels)
-                .join(existing_rooms, Hotels.id == existing_rooms.c.hotel_id)
+                .join(existing_rooms, Hotels.id == existing_rooms.c.hotel_id, isouter=True)
             )
             rooms_left = await session.execute(rooms_left)
             return rooms_left.scalar()
