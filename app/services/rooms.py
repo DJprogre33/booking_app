@@ -3,15 +3,17 @@ import shutil
 import uuid
 from datetime import date
 from typing import Optional
+
 from fastapi import UploadFile
 
 from app.exceptions import IncorrectRoomIDException, RoomLimitExceedException
 from app.logger import logger
 from app.models.rooms import Rooms
 from app.repositories.rooms import RoomsRepository
-from app.utils.base import Base
+from app.schemas.rooms import SRoomResponse
 from app.services.hotels import HotelsService
-from app.schemas.hotels import SHotelsResponse
+from app.utils.base import Base
+
 
 class RoomsService:
     tasks_repo: RoomsRepository = RoomsRepository
@@ -82,8 +84,12 @@ class RoomsService:
     @classmethod
     async def delete_room(cls, hotel_id: int, room_id: int, owner_id: int) -> Rooms:
         hotel = await HotelsService.check_hotel_owner(hotel_id=hotel_id, owner_id=owner_id)
-        room = await cls.tasks_repo.find_one_or_none(id=room_id)
+        room = await cls.tasks_repo.find_one_or_none(id=room_id, hotel_id=hotel.id)
         if not room:
+            logger.warning(
+                "Incorrect hotel_id or room_id",
+                extra={"hotel_id": hotel.id, "room_id": room.id},
+            )
             raise IncorrectRoomIDException
         return await cls.tasks_repo.delete(id=room.id, hotel_id=hotel.id)
 
@@ -94,6 +100,10 @@ class RoomsService:
         hotel = await HotelsService.check_hotel_owner(hotel_id=hotel_id, owner_id=owner_id)
         room = await cls.tasks_repo.find_one_or_none(id=room_id, hotel_id=hotel.id)
         if not room:
+            logger.warning(
+                "Incorrect hotel_id or room_id",
+                extra={"hotel_id": hotel.id, "room_id": room.id},
+            )
             raise IncorrectRoomIDException
         if room.image_path:
             os.remove(room.image_path)
@@ -110,7 +120,11 @@ class RoomsService:
         hotel = await HotelsService.check_hotel_owner(hotel_id=hotel_id, owner_id=owner_id)
         room = await cls.tasks_repo.find_one_or_none(id=room_id, hotel_id=hotel.id)
         if not room:
-            raise IncorrectRoomIDException
+            logger.warning(
+                "Incorrect hotel_id or room_id",
+                extra={"hotel_id": hotel.id, "room_id": room.id},
+            )
+            raise IncorrectRoomIDExceptionv
         if room.image_path:
             os.remove(room.image_path)
         return await cls.tasks_repo.update_fields_by_id(
@@ -120,9 +134,17 @@ class RoomsService:
     @classmethod
     async def get_availible_hotel_rooms(
         cls, hotel_id: int, date_from: date, date_to: date
-    ) -> Optional[list[SHotelsResponse]]:
+    ) -> Optional[list[SRoomResponse]]:
         date_from, date_to = Base.validate_data_range(date_from, date_to)
         hotel = await HotelsService.get_hotel_by_id(hotel_id=hotel_id)
         return await cls.tasks_repo.get_available_hotel_rooms(
             hotel_id=hotel.id, date_from=date_from, date_to=date_to
         )
+
+    @classmethod
+    async def get_room(cls, room_id: int) -> Rooms:
+        room = await cls.tasks_repo.find_one_or_none(id=room_id)
+        if not room:
+            logger.warning("Incorrect room_id", extra={"room_id": room_id})
+            raise IncorrectRoomIDException
+        return room

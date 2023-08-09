@@ -8,8 +8,8 @@ from app.logger import logger
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
-from app.utils.repository import SQLAlchemyRepository
 from app.schemas.hotels import SHotelsResponse
+from app.utils.repository import SQLAlchemyRepository
 
 
 class HotelsRepository(SQLAlchemyRepository):

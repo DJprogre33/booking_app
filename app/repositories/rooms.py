@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Optional
 
 from sqlalchemy import func, select
 
@@ -6,9 +7,8 @@ from app.database import async_session_maker
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
+from app.schemas.rooms import SRoomResponse
 from app.utils.repository import SQLAlchemyRepository
-from app.schemas.hotels import SHotelsResponse
-from typing import Optional
 
 
 class RoomsRepository(SQLAlchemyRepository):
@@ -17,7 +17,7 @@ class RoomsRepository(SQLAlchemyRepository):
     @classmethod
     async def get_available_hotel_rooms(
         cls, hotel_id: int, date_from: date, date_to: date
-    ) -> Optional[list[SHotelsResponse]]:
+    ) -> Optional[list[SRoomResponse]]:
         async with async_session_maker() as session:
             get_booked_rooms = (
                 select(cls.model.id, func.count().label("booked_rooms"))

@@ -3,12 +3,13 @@ from typing import Annotated, Optional
 
 from fastapi import APIRouter, Depends, UploadFile
 from fastapi_versioning import version
-from app.models.users import Users
-from app.dependencies import get_rooms_service, get_current_hotel_owner
+
+from app.dependencies import get_current_hotel_owner, get_rooms_service
+from app.exceptions import SExstraResponse
 from app.logger import logger
+from app.models.users import Users
 from app.schemas.rooms import SRoomResponse, SRooms, SRoomsResponse
 from app.services.rooms import RoomsService
-from app.exceptions import SExstraResponse
 
 router = APIRouter(prefix="/hotels", tags=["Rooms"])
 
@@ -171,3 +172,22 @@ async def get_available_hotel_rooms(
     )
     logger.info("Rooms list successfully received")
     return rooms
+
+
+@router.get(
+    "/{room_id}",
+    response_model=SRoomResponse,
+    responses={
+        400: {"model": SExstraResponse},
+        404: {"model": SExstraResponse}
+    }
+)
+@version(1)
+async def get_room(
+    room_id: int,
+    tasks_service: Annotated[RoomsService, Depends(get_rooms_service)]
+):
+    """Returns a specific room by id"""
+    room = tasks_service.get_room(room_id=room_id)
+    logger.info("Room successfully received", extra={"room_id": room_id})
+    return room
