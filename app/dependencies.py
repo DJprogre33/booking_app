@@ -13,10 +13,10 @@ from app.exceptions import (
 )
 from app.logger import logger
 from app.models.users import Users
+from app.database import async_session_maker
 from app.repositories.users import UsersRepository
 from app.utils.auth import oauth2_scheme
 from app.utils.transaction_manager import ITransactionManager, TransactionManager
-
 
 # return a Unit of work instance for working with Session
 TManagerDep = Annotated[ITransactionManager, Depends(TransactionManager)]
@@ -41,12 +41,12 @@ async def get_current_user(
         logger.warning("Invalid token user id")
         raise InvalidTokenUserIDException
 
-    user = await UsersRepository.find_one_or_none(id=int(user_id))
-    if not user:
-        logger.warning("Invalid token user id")
-        raise InvalidTokenUserIDException
-    return user
-
+    async with async_session_maker() as session:
+        user = await UsersRepository(session).find_one_or_none(id=int(user_id))
+        if not user:
+            logger.warning("Invalid token user id")
+            raise InvalidTokenUserIDException
+        return user
 
 async def get_current_superuser(current_user: Users = Depends(get_current_user)) -> Users:
     if current_user.role != "admin":

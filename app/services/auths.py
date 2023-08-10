@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from jose import jwt
 from pydantic import EmailStr
@@ -73,7 +73,7 @@ class AuthsService:
             refresh_session = await transaction_manager.auth.find_one_or_none(refresh_token=token)
             if refresh_session is None:
                 raise TokenAbsentException
-            if datetime.utcnow() >= refresh_session.created_at + timedelta(seconds=refresh_session.expires_in):
+            if datetime.now(timezone.utc) >= refresh_session.created_at + timedelta(seconds=refresh_session.expires_in):
                 await transaction_manager.auth.delete(id=refresh_session.id)
                 raise TokenExpiredException
 

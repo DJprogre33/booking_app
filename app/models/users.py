@@ -24,6 +24,6 @@ class RefreshSessions(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     refresh_token = Column(UUID, index=True, nullable=False)
     expires_in = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    created_at = Column(TIMESTAMP, server_default=func.utcnow())
 
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)

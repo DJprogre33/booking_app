@@ -87,7 +87,7 @@ async def logout_user(
     response.delete_cookie("refresh_token")
     await AuthsService().logout_user(
         transaction_manager=transaction_manager,
-        token=uuid.UUID(request.cookies.get("refresh_token"))
+        token=request.cookies.get("refresh_token")
     )
     logger.info("Successfully logged out")
     return {"message": "Successfully logged out"}
@@ -108,7 +108,7 @@ async def refresh_token(
 ):
     new_tokens = await AuthsService().refresh_token(
         transaction_manager=transaction_manager,
-        token=uuid.UUID(request.cookies.get("refresh_token"))
+        token=request.cookies.get("refresh_token")
     )
     response.set_cookie(
         "access_token",
