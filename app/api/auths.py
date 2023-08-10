@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_versioning import version
 
 from app.config import settings
-from app.dependencies import get_auths_service, get_current_user
+from app.dependencies import get_current_user, TManagerDep
 from app.exceptions import SExstraResponse
 from app.logger import logger
 from app.models.users import Users
@@ -27,12 +27,17 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 @version(1)
 async def register_user(
     user_data: SUserRegister,
-    tasks_service: Annotated[AuthsService, Depends(get_auths_service)]
+    transaction_manager: TManagerDep
 ):
     """Register a new user"""
-    user = await tasks_service.register_user(user_data=user_data)
-    logger.info("User created", extra={"id": user.id, "email": user.email})
-    return user
+    new_user = await AuthsService().register_user(
+        transaction_manager=transaction_manager,
+        email=user_data.email,
+        password=user_data.password,
+        role=user_data.role
+    )
+    logger.info("User created", extra={"id": new_user.id, "email": new_user.email})
+    return new_user
 
 
 @router.post(
@@ -45,12 +50,14 @@ async def register_user(
 @version(1)
 async def login_user(
     response: Response,
-    tasks_service: Annotated[AuthsService, Depends(get_auths_service)],
+    transaction_manager: TManagerDep,
     credentials: OAuth2PasswordRequestForm = Depends()
 ):
     """Login an existing user"""
-    tokens, user = await tasks_service.login_user(
-        credentials.password, credentials.username
+    tokens, user = await AuthsService().login_user(
+        transaction_manager=transaction_manager,
+        password=credentials.password,
+        email=credentials.username
     )
     response.set_cookie(
         "access_token",
@@ -73,12 +80,15 @@ async def login_user(
 async def logout_user(
     request: Request,
     response: Response,
-    tasks_service: Annotated[AuthsService, Depends(get_auths_service)]
+    transaction_manager: TManagerDep
 ) -> dict:
     """Logout an existing user"""
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
-    await tasks_service.logout_user(uuid.UUID(request.cookies.get("refresh_token")))
+    await AuthsService().logout_user(
+        transaction_manager=transaction_manager,
+        token=uuid.UUID(request.cookies.get("refresh_token"))
+    )
     logger.info("Successfully logged out")
     return {"message": "Successfully logged out"}
 
@@ -94,10 +104,11 @@ async def logout_user(
 async def refresh_token(
     request: Request,
     response: Response,
-    tasks_service: Annotated[AuthsService, Depends(get_auths_service)]
-) -> SToken:
-    new_tokens = await tasks_service.refresh_token(
-        uuid.UUID(request.cookies.get("refresh_token"))
+    transaction_manager: TManagerDep
+):
+    new_tokens = await AuthsService().refresh_token(
+        transaction_manager=transaction_manager,
+        token=uuid.UUID(request.cookies.get("refresh_token"))
     )
     response.set_cookie(
         "access_token",
@@ -124,12 +135,15 @@ async def refresh_token(
 @version(1)
 async def abort_all_sessions(
     response: Response,
-    tasks_service: Annotated[AuthsService, Depends(get_auths_service)],
+    transaction_manager: TManagerDep,
     user: Users = Depends(get_current_user)
-):
+) -> dict:
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
 
-    await tasks_service.abort_all_sessions(user_id=user.id)
+    await AuthsService().abort_all_sessions(
+        transaction_manager=transaction_manager,
+        user_id=user.id
+    )
     logger.info("Successfully aborted all sessions", extra={"id": user.id, "email": user.email})
     return {"message": "All sessions was aborted"}

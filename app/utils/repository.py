@@ -4,28 +4,28 @@ from sqlalchemy import delete, insert, select, update
 
 from app.database import async_session_maker
 from app.logger import logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class AbstractRepository(ABC):
-
-    @classmethod
     @abstractmethod
-    async def find_one_or_none(cls, **filter_by):
+    def __init__(self, session: AsyncSession):
         raise NotImplementedError
 
-    @classmethod
     @abstractmethod
-    async def find_all(cls, **filter_by):
+    async def find_one_or_none(self, **filter_by):
         raise NotImplementedError
 
-    @classmethod
     @abstractmethod
-    async def insert_data(cls, **data):
+    async def find_all(self, **filter_by):
         raise NotImplementedError
 
-    @classmethod
     @abstractmethod
-    async def update_fields_by_id(cls, entity_id, **data):
+    async def insert_data(self, **data):
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_fields_by_id(self, entity_id, **data):
         raise NotImplementedError
 
     @abstractmethod
@@ -36,58 +36,48 @@ class AbstractRepository(ABC):
 class SQLAlchemyRepository(AbstractRepository):
     model = None
 
-    @classmethod
-    async def find_one_or_none(cls, **filter_by):
-        async with async_session_maker() as session:
-            logger.info("The database query begins to generate")
-            query = select(cls.model).filter_by(**filter_by)
-            result = await session.execute(query)
-            logger.info("Database query successfully completed")
-            return result.scalars().one_or_none()
+    def __init__(self, session: AsyncSession):
+        self.session = session
 
-    @classmethod
-    async def find_all(cls, **filter_by):
-        async with async_session_maker() as session:
-            logger.info("The database query begins to generate")
-            query = select(cls.model).filter_by(**filter_by)
-            result = await session.execute(query)
-            logger.info("Database query successfully completed")
-            return result.scalars().all()
+    async def find_one_or_none(self, **filter_by):
+        logger.info("The database query begins to generate")
+        query = select(self.model).filter_by(**filter_by)
+        result = await self.session.execute(query)
+        logger.info("Database query successfully completed")
+        return result.scalars().one_or_none()
 
-    @classmethod
-    async def insert_data(cls, **data):
-        async with async_session_maker() as session:
-            logger.info("The database query begins to generate")
-            query = insert(cls.model).values(**data).returning(cls.model)
-            entity_id = await session.execute(query)
-            await session.commit()
-            logger.info("Database query successfully completed")
-            return entity_id.scalar()
+    async def find_all(self, **filter_by):
+        logger.info("The database query begins to generate")
+        query = select(self.model).filter_by(**filter_by)
+        result = await self.session.execute(query)
+        logger.info("Database query successfully completed")
+        return result.scalars().all()
 
-    @classmethod
-    async def update_fields_by_id(cls, entity_id: int, **data):
-        async with async_session_maker() as session:
-            logger.info("The database query begins to generate")
-            query = (
-                update(cls.model)
-                .where(cls.model.id == entity_id)
-                .values(**data)
-                .returning(cls.model)
-            )
-            result = await session.execute(query)
-            await session.commit()
-            logger.info("Database query successfully completed")
-            return result.scalar()
+    async def insert_data(self, **data):
+        logger.info("The database query begins to generate")
+        query = insert(self.model).values(**data).returning(self.model)
+        result = await self.session.execute(query)
+        logger.info("Database query successfully completed")
+        return result.scalar()
 
-    @classmethod
-    async def delete(cls, **filter_by):
-        async with async_session_maker() as session:
-            query = (
-                delete(cls.model)
-                .filter_by(**filter_by)
-                .returning(cls.model)
-            )
-            result = await session.execute(query)
-            await session.commit()
-            logger.info("Database query successfully completed")
-            return result.scalar()
+    async def update_fields_by_id(self, entity_id: int, **data):
+        logger.info("The database query begins to generate")
+        query = (
+            update(self.model)
+            .where(self.model.id == entity_id)
+            .values(**data)
+            .returning(self.model)
+        )
+        result = await self.session.execute(query)
+        logger.info("Database query successfully completed")
+        return result.scalar()
+
+    async def delete(self, **filter_by):
+        query = (
+            delete(self.model)
+            .filter_by(**filter_by)
+            .returning(self.model)
+        )
+        result = await self.session.execute(query)
+        logger.info("Database query successfully completed")
+        return result.scalar()

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Type
+from typing import Annotated
 
 from fastapi import Depends
 from jose import JWTError, jwt
@@ -14,34 +14,12 @@ from app.exceptions import (
 from app.logger import logger
 from app.models.users import Users
 from app.repositories.users import UsersRepository
-from app.services.auths import AuthsService
-from app.services.bookings import BookingsService
-from app.services.hotels import HotelsService
-from app.services.rooms import RoomsService
-from app.services.users import UsersService
 from app.utils.auth import oauth2_scheme
+from app.utils.transaction_manager import ITransactionManager, TransactionManager
 
 
-# functions return the service instance
-def get_bookings_service() -> Type[BookingsService]:
-    return BookingsService
-
-
-def get_rooms_service() -> Type[RoomsService]:
-    return RoomsService
-
-
-def get_hotels_service() -> Type[HotelsService]:
-    return HotelsService
-
-
-def get_users_service() -> Type[UsersService]:
-    return UsersService
-
-
-def get_auths_service() -> Type[AuthsService]:
-    return AuthsService
-
+# return a Unit of work instance for working with Session
+TManagerDep = Annotated[ITransactionManager, Depends(TransactionManager)]
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme)

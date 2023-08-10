@@ -14,78 +14,98 @@ from app.exceptions import (
 )
 from app.logger import logger
 from app.models.users import Users
-from app.repositories.auths import AuthsRepository
-from app.repositories.users import UsersRepository
-from app.schemas.users import SToken, SUserRegister
+from app.schemas.users import SToken
 from app.utils.auth import get_password_hash, verify_password
+from app.utils.transaction_manager import ITransactionManager
 
 
 class AuthsService:
-    tasks_repo: AuthsRepository = AuthsRepository
+    @staticmethod
+    async def register_user(
+        transaction_manager: ITransactionManager,
+        email: EmailStr,
+        password: str,
+        role: str
+    ) -> Users:
+        async with transaction_manager:
+            existing_user = await transaction_manager.users.find_one_or_none(email=email)
+            if existing_user:
+                logger.warning("User already exists")
+                raise UserAlreadyExistException
+            hashed_password = get_password_hash(password)
+            new_user = await transaction_manager.users.insert_data(
+                email=email, hashed_password=hashed_password, role=role
+            )
+            await transaction_manager.commit()
+            return new_user
 
-    @classmethod
-    async def register_user(cls, user_data: SUserRegister) -> Users:
-        existing_user = await UsersRepository.find_one_or_none(email=user_data.email)
-        if existing_user:
-            logger.warning("User already exists")
-            raise UserAlreadyExistException
-        hashed_password = get_password_hash(user_data.password)
-        return await UsersRepository.insert_data(
-            email=user_data.email, hashed_password=hashed_password, role=user_data.role
-        )
+    async def login_user(
+        self,
+        transaction_manager: ITransactionManager,
+        password: str,
+        email: EmailStr
+    ) -> tuple[SToken, Users]:
+        async with transaction_manager:
+            existing_user = await transaction_manager.users.find_one_or_none(email=email)
+            user = self._authenticate_user(
+                existing_user=existing_user, password=password
+            )
+            access_token = self._create_access_token(user.id)
+            refresh_token = self._create_refresh_token()
+            refresh_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+            await transaction_manager.auth.insert_data(
+                refresh_token=refresh_token, expires_in=refresh_token_expires.total_seconds(), user_id=user.id
+            )
+            await transaction_manager.commit()
+            token = SToken(access_token=access_token, refresh_token=refresh_token)
+            return token, user
 
-    @classmethod
-    async def login_user(cls, password: str, email: EmailStr) -> tuple[SToken, Users]:
-        existing_user = await UsersRepository.find_one_or_none(email=email)
-        user = cls._authenticate_user(
-            existing_user=existing_user, password=password
-        )
-        access_token = cls._create_access_token(user.id)
-        refresh_token = cls._create_refresh_token()
-        refresh_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        await cls.tasks_repo.insert_data(refresh_token=refresh_token, expires_in=refresh_token_expires.total_seconds(), user_id=user.id)
-        token = SToken(access_token=access_token, refresh_token=refresh_token)
-        return token, user
+    @staticmethod
+    async def logout_user(transaction_manager: ITransactionManager, token: uuid.UUID) -> None:
+        async with transaction_manager:
+            refresh_session = await transaction_manager.auth.find_one_or_none(refresh_token=token)
+            if refresh_session:
+                await transaction_manager.auth.delete(id=refresh_session.id)
+                await transaction_manager.commit()
 
-    @classmethod
-    async def logout_user(cls, token: uuid.UUID) -> None:
-        refresh_session = await cls.tasks_repo.find_one_or_none(refresh_token=token)
-        if refresh_session:
-            await cls.tasks_repo.delete(id=refresh_session.id)
+    async def refresh_token(self, transaction_manager: ITransactionManager, token: uuid.UUID) -> SToken:
+        async with transaction_manager:
+            refresh_session = await transaction_manager.auth.find_one_or_none(refresh_token=token)
+            if refresh_session is None:
+                raise TokenAbsentException
+            if datetime.utcnow() >= refresh_session.created_at + timedelta(seconds=refresh_session.expires_in):
+                await transaction_manager.auth.delete(id=refresh_session.id)
+                raise TokenExpiredException
 
-    @classmethod
-    async def refresh_token(cls, token: uuid.UUID) -> SToken:
-        refresh_session = await cls.tasks_repo.find_one_or_none(refresh_token=token)
+            user = await transaction_manager.users.find_one_or_none(id=refresh_session.user_id)
+            if user is None:
+                raise InvalidTokenUserIDException
 
-        if refresh_session is None:
-            raise TokenAbsentException
-        if datetime.utcnow() >= refresh_session.created_at + timedelta(seconds=refresh_session.expires_in):
-            await cls.tasks_repo.delete(id=refresh_session.id)
-            raise TokenExpiredException
+            access_token = self._create_access_token(user.id)
+            refresh_token_expires = timedelta(
+                days=settings.REFRESH_TOKEN_EXPIRE_DAYS
+            )
+            refresh_token = self._create_refresh_token()
 
-        user = await UsersRepository.find_one_or_none(id=refresh_session.user_id)
-        if user is None:
-            raise InvalidTokenUserIDException
+            await transaction_manager.auth.update_fields_by_id(
+                refresh_session.id,
+                refresh_token=refresh_token,
+                expires_in=refresh_token_expires.total_seconds()
+            )
+            await transaction_manager.commit()
+            return SToken(access_token=access_token, refresh_token=refresh_token)
 
-        access_token = cls._create_access_token(user.id)
-        refresh_token_expires = timedelta(
-            days=settings.REFRESH_TOKEN_EXPIRE_DAYS
-        )
-        refresh_token = cls._create_refresh_token()
+    @staticmethod
+    async def abort_all_sessions(
+        transaction_manager: ITransactionManager,
+        user_id: uuid.UUID
+    ) -> None:
+        async with transaction_manager:
+            await transaction_manager.auth.delete(user_id=user_id)
+            await transaction_manager.commit()
 
-        await cls.tasks_repo.update_fields_by_id(
-            refresh_session.id,
-            refresh_token=refresh_token,
-            expires_in=refresh_token_expires.total_seconds()
-        )
-        return SToken(access_token=access_token, refresh_token=refresh_token)
-
-    @classmethod
-    async def abort_all_sessions(cls, user_id: uuid.UUID) -> None:
-        await cls.tasks_repo.delete(user_id=user_id)
-
-    @classmethod
-    def _authenticate_user(cls, existing_user: Users, password: str) -> Users:
+    @staticmethod
+    def _authenticate_user(existing_user: Users, password: str) -> Users:
         if existing_user:
             password_is_valid = verify_password(password, existing_user.hashed_password)
             if password_is_valid:
@@ -93,8 +113,8 @@ class AuthsService:
         logger.warning("Incorrect email or password")
         raise IncorrectEmailOrPasswordException
 
-    @classmethod
-    def _create_access_token(cls, user_id: int) -> str:
+    @staticmethod
+    def _create_access_token(user_id: int) -> str:
         expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode = {
             "sub": str(user_id),
@@ -105,6 +125,6 @@ class AuthsService:
         )
         return f"Bearer {encoded_jwt}"
 
-    @classmethod
-    def _create_refresh_token(cls) -> uuid.UUID:
+    @staticmethod
+    def _create_refresh_token() -> uuid.UUID:
         return uuid.uuid4()
