@@ -44,8 +44,8 @@ class TransactionManager(ITransactionManager):
 
     async def __aenter__(self):
         self.session = self.session_factory()
-        self.auth = AuthsRepository(self.session)
         self.users = UsersRepository(self.session)
+        self.auth = AuthsRepository(self.session)
         self.rooms = RoomsRepository(self.session)
         self.hotels = HotelsRepository(self.session)
         self.bookings = BookingsRepository(self.session)

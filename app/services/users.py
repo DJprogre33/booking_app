@@ -5,68 +5,90 @@ from pydantic import EmailStr
 from app.exceptions import IncorrectIDException
 from app.logger import logger
 from app.models.users import Users
-from app.repositories.users import UsersRepository
 from app.utils.auth import get_password_hash
+from app.utils.transaction_manager import ITransactionManager
 
 
 class UsersService:
-    tasks_repo: UsersRepository = UsersRepository
+    @staticmethod
+    async def get_users_list(
+        transaction_manager: ITransactionManager,
+        offset: int,
+        limit: int
+    ) -> Optional[list[Users]]:
+        async with transaction_manager:
+            users = await transaction_manager.users.get_users_list(offset=offset, limit=limit)
+            await transaction_manager.commit()
+            return users
 
-    @classmethod
-    async def get_users_list(cls, offset: int, limit: int) -> Optional[list[Users]]:
-        users = await cls.tasks_repo.get_users_list(offset=offset, limit=limit)
-        return users
+    @staticmethod
+    async def return_me(transaction_manager: ITransactionManager, user_id: int) -> Users:
+        async with transaction_manager:
+            user = await transaction_manager.users.find_one_or_none(id=user_id)
+            await transaction_manager.commit()
+            return user
 
-    @classmethod
-    async def return_me(cls, user_id: int) -> Users:
-        user = await cls.tasks_repo.find_one_or_none(id=user_id)
-        return user
-
-    @classmethod
-    async def update_me(cls, user_id: int, email: EmailStr, password: str) -> Users:
+    @staticmethod
+    async def update_me(
+        transaction_manager: ITransactionManager,
+        user_id: int,
+        email: EmailStr,
+        password: str
+    ) -> Users:
         hashed_password = get_password_hash(password)
-        user = await cls.tasks_repo.update_fields_by_id(
-            entity_id=user_id,
-            email=email,
-            hashed_password=hashed_password
-        )
-        return user
+        async with transaction_manager:
+            updated_user = await transaction_manager.users.update_fields_by_id(
+                entity_id=user_id,
+                email=email,
+                hashed_password=hashed_password
+            )
+            await transaction_manager.commit()
+            return updated_user
 
-    @classmethod
-    async def delete_me(cls, user_id: int) -> Users:
-        return await cls.tasks_repo.delete(id=user_id)
+    @staticmethod
+    async def delete_me(transaction_manager: ITransactionManager, user_id: int) -> Users:
+        async with transaction_manager:
+            deleted_user = await transaction_manager.users.delete(id=user_id)
+            await transaction_manager.commit()
+            return deleted_user
 
-    @classmethod
-    async def get_user(cls, user_id: int) -> Users:
-        user = await cls.tasks_repo.find_one_or_none(id=user_id)
-        if not user:
-            raise IncorrectIDException
-        return user
+    @staticmethod
+    async def get_user(transaction_manager: ITransactionManager, user_id: int) -> Users:
+        async with transaction_manager:
+            user = await transaction_manager.users.find_one_or_none(id=user_id)
+            if not user:
+                raise IncorrectIDException
+            await transaction_manager.commit()
+            return user
 
-    @classmethod
+    @staticmethod
     async def update_user_from_superuser(
-        cls,
+        transaction_manager: ITransactionManager,
         user_id: int,
         password: str,
         email: EmailStr
     ) -> Users:
-        exists_user = await cls.tasks_repo.find_one_or_none(id=user_id)
-        if not exists_user:
-            logger.warning("Entity id not found", extra={"entity_id": user_id})
-            raise IncorrectIDException
-        hashed_password = get_password_hash(password)
-        user = await cls.tasks_repo.update_fields_by_id(
-            entity_id=user_id,
-            hashed_password=hashed_password,
-            email=email
-        )
-        return user
+        async with transaction_manager:
+            exists_user = await transaction_manager.users.find_one_or_none(id=user_id)
+            if not exists_user:
+                logger.warning("Entity id not found", extra={"entity_id": user_id})
+                raise IncorrectIDException
+            hashed_password = get_password_hash(password)
+            updated_user = await transaction_manager.users.update_fields_by_id(
+                entity_id=user_id,
+                hashed_password=hashed_password,
+                email=email
+            )
+            await transaction_manager.commit()
+            return updated_user
 
-    @classmethod
-    async def delete_user_from_superuser(cls, user_id: int) -> Users:
-        exists_user = await cls.tasks_repo.find_one_or_none(id=user_id)
-        if not exists_user:
-            logger.warning("Entity id not found", extra={"entity_id": user_id})
-            raise IncorrectIDException
-        user = await cls.tasks_repo.delete(id=user_id)
-        return user
+    @staticmethod
+    async def delete_user_from_superuser(transaction_manager: ITransactionManager, user_id: int) -> Users:
+        async with transaction_manager:
+            exists_user = await transaction_manager.users.find_one_or_none(id=user_id)
+            if not exists_user:
+                logger.warning("Entity id not found", extra={"entity_id": user_id})
+                raise IncorrectIDException
+            deleted_user = await transaction_manager.users.delete(id=user_id)
+            await transaction_manager.commit()
+            return deleted_user

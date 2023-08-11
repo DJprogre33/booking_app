@@ -1,6 +1,3 @@
-import uuid
-from typing import Annotated
-
 from fastapi import APIRouter, Depends, Request, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_versioning import version
