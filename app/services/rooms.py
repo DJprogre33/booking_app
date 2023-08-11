@@ -9,7 +9,6 @@ from fastapi import UploadFile
 from app.exceptions import IncorrectRoomIDException, RoomLimitExceedException
 from app.logger import logger
 from app.models.rooms import Rooms
-from app.repositories.rooms import RoomsRepository
 from app.schemas.rooms import SRoomResponse
 from app.services.hotels import HotelsService
 from app.utils.base import Base
@@ -17,7 +16,6 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 class RoomsService:
-    tasks_repo: RoomsRepository = RoomsRepository
 
     @staticmethod
     async def create_room(
@@ -75,6 +73,10 @@ class RoomsService:
         async with transaction_manager:
             room = await transaction_manager.rooms.find_one_or_none(id=room_id)
             if not room:
+                logger.warning(
+                    "Incorrect hotel_id or room_id",
+                    extra={"hotel_id": hotel.id, "room_id": room_id},
+                )
                 raise IncorrectRoomIDException
 
             rooms_left = await transaction_manager.rooms.get_rooms_left(hotel_id=hotel.id)
@@ -138,7 +140,7 @@ class RoomsService:
             if not room:
                 logger.warning(
                     "Incorrect hotel_id or room_id",
-                    extra={"hotel_id": hotel.id, "room_id": room.id},
+                    extra={"hotel_id": hotel.id, "room_id": room_id},
                 )
                 raise IncorrectRoomIDException
 

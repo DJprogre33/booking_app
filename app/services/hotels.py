@@ -9,14 +9,12 @@ from fastapi import UploadFile
 from app.exceptions import AccessDeniedException, IncorrectHotelIDException
 from app.logger import logger
 from app.models.hotels import Hotels
-from app.repositories.hotels import HotelsRepository
 from app.schemas.hotels import SHotelsResponse
 from app.utils.base import Base
 from app.utils.transaction_manager import ITransactionManager
 
 
 class HotelsService:
-    tasks_repo: HotelsRepository = HotelsRepository
 
     @staticmethod
     async def check_hotel_owner(

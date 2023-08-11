@@ -3,7 +3,6 @@ from typing import Optional
 
 from sqlalchemy import func, select
 
-from app.database import async_session_maker
 from app.logger import logger
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels

@@ -2,7 +2,6 @@ from typing import Optional
 
 from sqlalchemy import select
 
-from app.database import async_session_maker
 from app.logger import logger
 from app.models.users import Users
 from app.utils.repository import SQLAlchemyRepository

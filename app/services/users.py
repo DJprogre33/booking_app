@@ -10,6 +10,7 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 class UsersService:
+
     @staticmethod
     async def get_users_list(
         transaction_manager: ITransactionManager,
