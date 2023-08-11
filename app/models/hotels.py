@@ -1,5 +1,7 @@
+from typing import Any, Optional, Union
+
 from sqlalchemy import JSON, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
@@ -7,15 +9,15 @@ from app.database import Base
 class Hotels(Base):
     __tablename__ = "hotels"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    owner_id = Column(
-        ForeignKey("users.id", name="owner_id", ondelete="CASCADE"), nullable=False
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    owner_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", name="owner_id", ondelete="CASCADE")
     )
-    name = Column(String, nullable=False)
-    location = Column(String, nullable=False)
-    services = Column(JSON)
-    rooms_quantity = Column(Integer, nullable=False)
-    image_path = Column(String, nullable=True)
+    name: Mapped[str]
+    location: Mapped[str]
+    services: Mapped[dict[str, Any]]
+    rooms_quantity: Mapped[int]
+    image_path: Mapped[Optional[str]]
 
     rooms = relationship("Rooms", back_populates="hotels")
 

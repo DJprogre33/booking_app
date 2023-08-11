@@ -3,7 +3,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Depends
 from fastapi_versioning import version
 
-from app.dependencies import get_current_superuser, get_current_user, TManagerDep
+from app.dependencies import TManagerDep, get_current_superuser, get_current_user
 from app.exceptions import SExstraResponse
 from app.logger import logger
 from app.models.users import Users

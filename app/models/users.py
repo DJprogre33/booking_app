@@ -1,16 +1,19 @@
+import uuid
+from datetime import datetime
+
 from sqlalchemy import Column, ForeignKey, Integer, String, func
 from sqlalchemy.dialects.postgresql import ENUM, TIMESTAMP, UUID
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
 
 class Users(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, nullable=False)
-    email = Column(String, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    role = Column(ENUM("user", "hotel owner", "admin", name="role", create_type=True), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str]
+    hashed_password: Mapped[str]
+    role: Mapped[str] = mapped_column(ENUM("user", "hotel owner", "admin", name="role", create_type=True))
 
     bookings = relationship("Bookings", back_populates="users")
 
@@ -21,9 +24,8 @@ class Users(Base):
 class RefreshSessions(Base):
     __tablename__ = "refresh_sessions"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    refresh_token = Column(UUID, index=True, nullable=False)
-    expires_in = Column(Integer, nullable=False)
-    created_at = Column(TIMESTAMP, server_default=func.utcnow())
-
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    refresh_token: Mapped[uuid.UUID] = mapped_column(UUID, index=True)
+    expires_in: Mapped[int]
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.utcnow())
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"))

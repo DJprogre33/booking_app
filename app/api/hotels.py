@@ -5,13 +5,12 @@ from fastapi import APIRouter, Depends, UploadFile
 from fastapi_cache.decorator import cache
 from fastapi_versioning import version
 
-from app.dependencies import get_current_hotel_owner, TManagerDep
+from app.dependencies import TManagerDep, get_current_hotel_owner
 from app.exceptions import SExstraResponse
 from app.logger import logger
 from app.models.users import Users
 from app.schemas.hotels import SHotel, SHotelResponse, SHotelsResponse
 from app.services.hotels import HotelsService
-
 
 router = APIRouter(prefix="/hotels", tags=["Hotels"])
 

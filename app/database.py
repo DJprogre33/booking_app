@@ -1,4 +1,6 @@
-from sqlalchemy import NullPool
+from typing import Any
+
+from sqlalchemy import JSON, NullPool
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -19,4 +21,7 @@ async_session_maker = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy tables"""
-    pass
+
+    type_annotation_map = {
+        dict[str, Any]: JSON
+    }

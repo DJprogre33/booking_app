@@ -5,6 +5,7 @@ from fastapi import Depends
 from jose import JWTError, jwt
 
 from app.config import settings
+from app.database import async_session_maker
 from app.exceptions import (
     AccessDeniedException,
     IncorrectTokenFormatException,
@@ -13,7 +14,6 @@ from app.exceptions import (
 )
 from app.logger import logger
 from app.models.users import Users
-from app.database import async_session_maker
 from app.repositories.users import UsersRepository
 from app.utils.auth import oauth2_scheme
 from app.utils.transaction_manager import ITransactionManager, TransactionManager
