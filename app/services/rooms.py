@@ -113,7 +113,7 @@ class RoomsService:
             if not room:
                 logger.warning(
                     "Incorrect hotel_id or room_id",
-                    extra={"hotel_id": hotel.id, "room_id": room.id},
+                    extra={"hotel_id": hotel.id, "room_id": room_id},
                 )
                 raise IncorrectRoomIDException
             deleted_room = await transaction_manager.rooms.delete(id=room.id, hotel_id=hotel.id)
@@ -172,7 +172,7 @@ class RoomsService:
             if not room:
                 logger.warning(
                     "Incorrect hotel_id or room_id",
-                    extra={"hotel_id": hotel.id, "room_id": room.id},
+                    extra={"hotel_id": hotel.id, "room_id": room_id},
                 )
                 raise IncorrectRoomIDException
             if room.image_path:
