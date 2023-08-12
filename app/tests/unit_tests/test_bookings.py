@@ -1,9 +1,5 @@
-from datetime import date
-
 import pytest
 
-from app.exceptions import IncorrectBookingIdException, RoomCanNotBeBookedException
-from app.models.bookings import Bookings
 from app.utils.transaction_manager import ITransactionManager
 
 
