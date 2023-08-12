@@ -1,6 +1,8 @@
-import pytest
-from app.utils.transaction_manager import TransactionManager
 from typing import AsyncGenerator
+
+import pytest
+
+from app.utils.transaction_manager import TransactionManager
 
 
 @pytest.fixture(scope="module")

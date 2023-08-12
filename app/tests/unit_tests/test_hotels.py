@@ -2,9 +2,7 @@ from datetime import date
 
 import pytest
 
-from app.repositories.hotels import HotelsRepository
-
-tasks_repo = HotelsRepository
+from app.utils.transaction_manager import ITransactionManager
 
 
 @pytest.mark.parametrize(
@@ -19,12 +17,16 @@ tasks_repo = HotelsRepository
     ],
 )
 async def test_get_hotels_by_location_and_time(
-    location: str, date_from: date, date_to: date, total_hotels: int
+    location: str,
+    date_from: date,
+    date_to: date,
+    total_hotels: int,
+    transaction_manager: ITransactionManager
 ) -> None:
-    hotels = await tasks_repo.get_hotels_by_location_and_time(
-        location=location, date_from=date_from, date_to=date_to
-    )
-
-    assert len(hotels) == total_hotels
-    for hotel in hotels:
-        assert location.lower() in hotel["location"].lower()
+    async with transaction_manager:
+        hotels = await transaction_manager.hotels.get_hotels_by_location_and_time(
+            location=location, date_from=date_from, date_to=date_to
+        )
+        assert len(hotels) == total_hotels
+        for hotel in hotels:
+            assert location.lower() in hotel["location"].lower()

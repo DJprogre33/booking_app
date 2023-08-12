@@ -12,7 +12,7 @@ from app.main import app as fastapi_app
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
-from app.models.users import Users, RefreshSessions
+from app.models.users import RefreshSessions, Users
 
 
 async def create_async_client(login_data):

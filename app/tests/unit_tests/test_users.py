@@ -5,8 +5,8 @@ this file tests the SQLAlchemy repository's basic functions.
 
 import pytest
 
-from app.utils.auth import get_password_hash
 from app.models.users import Users
+from app.utils.auth import get_password_hash
 from app.utils.transaction_manager import ITransactionManager
 
 
