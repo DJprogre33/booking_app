@@ -64,7 +64,7 @@ class RoomsRepository(SQLAlchemyRepository):
         it checks that the owner does not add more rooms than there are rooms
         in the hotel
         :param hotel_id:
-        :return:
+        :return: int
         """
         existing_rooms = (
             select(
@@ -84,7 +84,8 @@ class RoomsRepository(SQLAlchemyRepository):
                 ).label("rooms_left")
             )
             .select_from(Hotels)
-            .join(existing_rooms, Hotels.id == existing_rooms.c.hotel_id, isouter=True)
+            .outerjoin(existing_rooms, Hotels.id == existing_rooms.c.hotel_id)
+            .where(Hotels.id == hotel_id)
         )
         rooms_left = await self.session.execute(rooms_left)
         return rooms_left.scalar()

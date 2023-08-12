@@ -47,5 +47,12 @@
         "services": ["Wi-Fi", "Парковка", "Кондиционер в номере"],
         "rooms_quantity": 2,
         "owner_id": 4
+    },
+    {
+        "name": "ParkFood",
+        "location": "Петергоф, Улица Пушкина, 13",
+        "services": ["Wi-Fi", "Парковка", "Кондиционер в номере"],
+        "rooms_quantity": 2,
+        "owner_id": 4
     }
 ]
