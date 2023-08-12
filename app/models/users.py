@@ -27,5 +27,5 @@ class RefreshSessions(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     refresh_token: Mapped[uuid.UUID] = mapped_column(UUID, index=True)
     expires_in: Mapped[int]
-    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.utcnow())
+    created_at: Mapped[datetime] = mapped_column(TIMESTAMP, server_default=func.now())
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"))

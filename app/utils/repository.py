@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from sqlalchemy import delete, insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import async_session_maker
 from app.logger import logger
 
 

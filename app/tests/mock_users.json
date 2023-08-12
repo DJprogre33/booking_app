@@ -18,5 +18,10 @@
         "email": "owner2@example.com",
         "hashed_password": "$2b$12$qEcLm61m0iJIH0dBIjvCSei0kkMxCXxrkM395bxjowVCj1fiqqYWu",
         "role": "hotel owner"
+    },
+    {
+        "email": "admin@example.com",
+        "hashed_password": "$2b$12$1yuyvfOftFnNy4Twx6MpjOfBYPg.aaNRHjMzDS7ruv.dblEt3glXq",
+        "role": "admin"
     }
 ]

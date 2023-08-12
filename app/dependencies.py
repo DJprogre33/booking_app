@@ -24,6 +24,7 @@ TManagerDep = Annotated[ITransactionManager, Depends(TransactionManager)]
 async def get_current_user(
     token: str = Depends(oauth2_scheme)
 ) -> Users:
+    """Returns current authenticated user"""
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, settings.HASHING_ALGORITHM)
     except JWTError as exc:
@@ -49,6 +50,7 @@ async def get_current_user(
         return user
 
 async def get_current_superuser(current_user: Users = Depends(get_current_user)) -> Users:
+    """Returns current authenticated superuser"""
     if current_user.role != "admin":
         logger.warning("Role access denied", extra={"user_id": current_user.id})
         raise AccessDeniedException
@@ -56,6 +58,7 @@ async def get_current_superuser(current_user: Users = Depends(get_current_user))
 
 
 async def get_current_hotel_owner(current_user: Users = Depends(get_current_user)) -> Users:
+    """Returns current authenticated hotel owner"""
     if current_user.role != "hotel owner":
         logger.warning("Role access denied", extra={"user_id": current_user.id})
         raise AccessDeniedException
