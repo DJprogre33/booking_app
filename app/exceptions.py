@@ -21,6 +21,11 @@ class UserAlreadyExistException(BookingAppException):
     detail = "The user alredy exists"
 
 
+class IncorrectCredentials(BookingAppException):
+    status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+    detail = "Incorrect credentials, email should be valid (user@example.com)"
+
+
 class IncorrectEmailOrPasswordException(BookingAppException):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = "Invalid email or password"

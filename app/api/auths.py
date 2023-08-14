@@ -51,6 +51,7 @@ async def login_user(
     credentials: OAuth2PasswordRequestForm = Depends()
 ):
     """Login an existing user"""
+    # check that credentias is valid
     tokens, user = await AuthsService().login_user(
         transaction_manager=transaction_manager,
         password=credentials.password,

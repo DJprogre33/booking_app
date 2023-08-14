@@ -2,10 +2,11 @@ import uuid
 from datetime import datetime, timedelta, timezone
 
 from jose import jwt
-from pydantic import EmailStr
+from pydantic import EmailStr, ValidationError
 
 from app.config import settings
 from app.exceptions import (
+    IncorrectCredentials,
     IncorrectEmailOrPasswordException,
     InvalidTokenUserIDException,
     TokenAbsentException,
@@ -14,7 +15,7 @@ from app.exceptions import (
 )
 from app.logger import logger
 from app.models.users import Users
-from app.schemas.users import SToken
+from app.schemas.users import SToken, SUserLogin
 from app.utils.auth import get_password_hash, verify_password
 from app.utils.transaction_manager import ITransactionManager
 
@@ -46,6 +47,7 @@ class AuthsService:
         password: str,
         email: EmailStr
     ) -> tuple[SToken, Users]:
+        self._validate_credentials(email=email, password=password)
         async with transaction_manager:
             existing_user = await transaction_manager.users.find_one_or_none(email=email)
             user = self._authenticate_user(
@@ -62,14 +64,14 @@ class AuthsService:
             return token, user
 
     @staticmethod
-    async def logout_user(transaction_manager: ITransactionManager, token: uuid.UUID) -> None:
+    async def logout_user(transaction_manager: ITransactionManager, token: str) -> None:
         async with transaction_manager:
             refresh_session = await transaction_manager.auth.find_one_or_none(refresh_token=token)
             if refresh_session:
                 await transaction_manager.auth.delete(id=refresh_session.id)
                 await transaction_manager.commit()
 
-    async def refresh_token(self, transaction_manager: ITransactionManager, token: uuid.UUID) -> SToken:
+    async def refresh_token(self, transaction_manager: ITransactionManager, token: str) -> SToken:
         async with transaction_manager:
             refresh_session = await transaction_manager.auth.find_one_or_none(refresh_token=token)
             if refresh_session is None:
@@ -99,7 +101,7 @@ class AuthsService:
     @staticmethod
     async def abort_all_sessions(
         transaction_manager: ITransactionManager,
-        user_id: uuid.UUID
+        user_id: int
     ) -> None:
         async with transaction_manager:
             await transaction_manager.auth.delete(user_id=user_id)
@@ -129,3 +131,10 @@ class AuthsService:
     @staticmethod
     def _create_refresh_token() -> uuid.UUID:
         return uuid.uuid4()
+
+    @staticmethod
+    def _validate_credentials(email: EmailStr, password: str) -> None:
+        try:
+            SUserLogin(email=email, password=password)
+        except ValidationError as err:
+            raise IncorrectCredentials from err

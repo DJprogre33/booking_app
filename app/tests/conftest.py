@@ -1,6 +1,7 @@
 import asyncio
 import json
 from datetime import datetime
+from typing import AsyncGenerator
 
 import pytest
 from httpx import AsyncClient
@@ -13,6 +14,7 @@ from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
 from app.models.users import RefreshSessions, Users
+from app.utils.transaction_manager import TransactionManager
 
 
 async def create_async_client(login_data):
@@ -20,10 +22,10 @@ async def create_async_client(login_data):
     async with AsyncClient(app=fastapi_app, base_url="http://test") as async_client:
         email, password = login_data["email"], login_data["password"]
         await async_client.post(
-            "/v1/auth/login", json={"email": email, "password": password}
+            "/v1/auth/login", data={"username": email, "password": password}
         )
-        # assert async_client.cookies["booking_access_token"]
-
+        assert async_client.cookies["access_token"]
+        assert async_client.cookies["refresh_token"]
         yield async_client
 
 
@@ -100,3 +102,9 @@ async def async_client_from_params(request):
     login_data = request.param
     async for async_client in create_async_client(login_data):
         yield async_client
+
+
+@pytest.fixture(scope="module")
+async def transaction_manager() -> AsyncGenerator:
+    """Creates a transaction manager for working with Repository"""
+    yield TransactionManager()

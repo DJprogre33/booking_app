@@ -10,6 +10,11 @@ class SUserRegister(BaseModel):
     role: Literal["user", "hotel owner"]
 
 
+class SUserLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
 class SUserUpdate(BaseModel):
     email: EmailStr
     password: str
