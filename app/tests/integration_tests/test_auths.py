@@ -39,16 +39,19 @@ async def test_register_user(
             user = await transaction_manager.users.find_one_or_none(email=email)
             assert user.email == email
             assert user.role == role
+            # delete created user
+            await transaction_manager.users.delete(id=user.id)
+            await transaction_manager.commit()
 
 
 @pytest.mark.parametrize(
     "email,password,status_code",
     [
-        ("user3example.com", "user3", 422),
-        ("user4@example.com", "user3", 401),
-        ("user3@example.com", "wrong password", 401),
-        ("user3@example.com", "user3", 200),
-        ("owner3@example.com", "owner3", 200),
+        ("user2example.com", "user2", 422),
+        ("user3@example.com", "user2", 401),
+        ("user2@example.com", "wrong password", 401),
+        ("user2@example.com", "user2", 200),
+        ("owner2@example.com", "owner2", 200),
     ],
 )
 async def test_login_user(
@@ -74,7 +77,7 @@ async def test_login_user(
 @pytest.mark.parametrize(
     "async_client_from_params,status_code",
     [
-        ({"email": "user3@example.com", "password": "user3"}, 200)
+        ({"email": "user2@example.com", "password": "user2"}, 200)
     ],
     indirect=["async_client_from_params"]
 )
@@ -88,11 +91,12 @@ async def test_logout_user(
     assert "access_token" not in response.cookies
     assert "refresh_token" not in response.cookies
 
+
 @pytest.mark.parametrize(
     "async_client_from_params,status_code",
     [
-        ({"email": "user3@example.com", "password": "user3"}, 401),
-        ({"email": "user3@example.com", "password": "user3"}, 200)
+        ({"email": "user2@example.com", "password": "user2"}, 401),
+        ({"email": "user2@example.com", "password": "user2"}, 200)
 
     ],
     indirect=["async_client_from_params"]
@@ -113,7 +117,7 @@ async def test_refresh_token(
 @pytest.mark.parametrize(
     "email,password,total_sessions,status_code,user_id",
     [
-        ("user3@example.com", "user3", 5, 200, 6)
+        ("user2@example.com", "user2", 5, 200, 2)
     ],
 )
 async def test_abort_all_sessions(

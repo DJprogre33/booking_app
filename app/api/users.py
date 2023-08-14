@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends
 from fastapi_versioning import version
@@ -9,6 +9,7 @@ from app.logger import logger
 from app.models.users import Users
 from app.schemas.users import SUserResponse, SUserUpdate
 from app.services.users import UsersService
+
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
