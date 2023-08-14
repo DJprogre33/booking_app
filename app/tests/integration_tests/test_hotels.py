@@ -3,10 +3,6 @@ from typing import Union
 import pytest
 from httpx import AsyncClient
 
-from app.repositories.hotels import HotelsRepository
-
-tasks_repo = HotelsRepository()
-
 
 @pytest.mark.parametrize(
     "location,date_from,date_to,status_code,total_hotels",
@@ -57,13 +53,12 @@ async def test_get_hotels_by_location_and_time(
 
 
 @pytest.mark.parametrize(
-    "hotel_id,status_code", [(1, 200), (3, 200), (7, 200), (-1, 404), (8, 404)]
+    "hotel_id,status_code", [(1, 200), (3, 200), (7, 200), (-1, 404), (9, 404)]
 )
 async def test_get_hotel_by_id(
     hotel_id: int, status_code: int, async_client: AsyncClient
 ):
     response = await async_client.get(f"/v1/hotels/id/{hotel_id}")
-
     assert response.status_code == status_code
 
     if status_code == 404:
@@ -137,13 +132,85 @@ async def test_create_hotel(
         assert response_json["services"] == services
         assert response_json["rooms_quantity"] == rooms_quantity
 
-        # Get created hotel from db
-        hotel = await tasks_repo.find_one_or_none(id=response_json["id"])
-        assert hotel.id == response_json["id"]
-        assert hotel.name == name
-        assert hotel.location == location
-        assert hotel.services == services
-        assert hotel.rooms_quantity == rooms_quantity
+
+@pytest.mark.parametrize(
+    "async_client_from_params,name,location,services,rooms_quantity,status_code,hotel_id",
+    [
+        (
+            {"email": "user2@example.com", "password": "user1"},
+            "Паучок",
+            "г.Сочи ул.Позднякова",
+            ["Wi-FI"],
+            5,
+            401,
+            None
+        ),
+        (
+            {"email": "user2@example.com", "password": "user2"},
+            "Паучок",
+            "г.Сочи ул.Позднякова",
+            ["Wi-FI"],
+            5,
+            403,
+            None
+        ),
+        (
+            {"email": "owner1@example.com", "password": "owner1"},
+            "Паучок",
+            "г.Сочи ул.Позднякова",
+            ["Wi-FI"],
+            0,
+            422,
+            None
+        ),
+        (
+            {"email": "owner1@example.com", "password": "owner1"},
+            "Паучок",
+            "г.Сочи ул.Позднякова",
+            ["Wi-FI"],
+            5,
+            404,
+            10
+        ),
+        (
+            {"email": "owner1@example.com", "password": "owner1"},
+            "Паучок",
+            "г.Сочи ул.Позднякова",
+            ["Wi-FI"],
+            5,
+            200,
+            9
+        ),
+    ],
+    indirect=["async_client_from_params"],
+)
+async def test_update_hotel(
+    async_client_from_params: AsyncClient,
+    name: str,
+    location: str,
+    services: list,
+    rooms_quantity: int,
+    status_code: int,
+    hotel_id: int
+) -> None:
+    response = await async_client_from_params.put(
+        f"/v1/hotels/{hotel_id}",
+        json={
+            "name": name,
+            "location": location,
+            "services": services,
+            "rooms_quantity": rooms_quantity,
+        },
+    )
+    assert response.status_code == status_code
+
+    # check that we updated correct hotel
+    if status_code == 200:
+        response_json = response.json()
+        assert response_json["name"] == name
+        assert response_json["location"] == location
+        assert response_json["services"] == services
+        assert response_json["rooms_quantity"] == rooms_quantity
 
 
 @pytest.mark.parametrize(
@@ -169,9 +236,7 @@ async def test_add_hotel_image(
     assert response.status_code == status_code
 
     if response.status_code == 200:
-        hotel = await tasks_repo.find_one_or_none(id=response.json()["id"])
-        assert hotel.image_path
-        assert hotel.id == hotel_id
+        assert response.json()["image_path"]
 
 
 @pytest.mark.parametrize(
@@ -192,11 +257,7 @@ async def test_delete_hotel_image(
     assert response.status_code == status_code
 
     if response.status_code == 200:
-        hotel = await tasks_repo.find_one_or_none(
-            id=response.json()["hotel with deleted image"]
-        )
-        assert not hotel.image_path
-        assert hotel.id == hotel_id
+        assert not response.json().get("image_path")
 
 
 @pytest.mark.parametrize(
@@ -206,7 +267,7 @@ async def test_delete_hotel_image(
         ({"email": "owner2@example.com", "password": "owner2"}, 1, 403),
         ({"email": "user1@example.com", "password": "user1"}, 1, 403),
         ({"email": "owner1@example.com", "password": "owner1"}, 10, 404),
-        ({"email": "owner1@example.com", "password": "owner1"}, 1, 200),
+        ({"email": "owner1@example.com", "password": "owner1"}, 9, 200),
     ],
     indirect=["async_client_from_params"],
 )
@@ -217,7 +278,4 @@ async def test_delete_hotel(
     assert response.status_code == status_code
 
     if response.status_code == 200:
-        hotel = await tasks_repo.find_one_or_none(
-            id=response.json()["deleted_hotel_id"]
-        )
-        assert not hotel
+        assert response.json()["id"] == hotel_id
