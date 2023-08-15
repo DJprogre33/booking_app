@@ -12,7 +12,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from redis import asyncio as aioredis
 from sqladmin import Admin
 
-# from app.admin.auth import authentication_backend
+from app.admin.auth import authentication_backend
 from app.admin.views import BookingsAdmin, HotelsAdmin, RoomsAdmin, UsersAdmin
 from app.api.auths import router as auth_router
 from app.api.bookings import router as router_bookings
@@ -81,13 +81,13 @@ origins = ["http://localhost:3000"]
 
 
 # Add SQLAdmin to the project
-# admin = Admin(app, engine, authentication_backend=authentication_backend)
+admin = Admin(app, engine, authentication_backend=authentication_backend)
 
-#
-# admin.add_view(UsersAdmin)
-# admin.add_view(BookingsAdmin)
-# admin.add_view(RoomsAdmin)
-# admin.add_view(HotelsAdmin)
+
+admin.add_view(UsersAdmin)
+admin.add_view(BookingsAdmin)
+admin.add_view(RoomsAdmin)
+admin.add_view(HotelsAdmin)
 
 
 @app.middleware("http")
