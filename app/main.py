@@ -64,8 +64,8 @@ app.include_router(router_prometheus)
 # add API versioning
 app = VersionedFastAPI(
     app,
-    version_format='{major}',
-    prefix_format='/v{major}',
+    version_format="{major}",
+    prefix_format="/v{major}",
     description="""
     To access the required documentation,
     select the required version and follow the link,
@@ -73,7 +73,7 @@ app = VersionedFastAPI(
     of the API go to "latest/docs"
     """,
     enable_latest=True,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 
@@ -109,8 +109,7 @@ async def add_process_time_header(request: Request, call_next):
 
 # setup prometheus
 instrumentator = Instrumentator(
-    should_group_status_codes=False,
-    excluded_handlers=[".*admin.*", "/metrics"]
+    should_group_status_codes=False, excluded_handlers=[".*admin.*", "/metrics"]
 )
 
 instrumentator.instrument(app).expose(app)

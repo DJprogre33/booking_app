@@ -19,7 +19,7 @@ async def test_get_available_hotel_rooms(
     date_to: date,
     available_rooms: int,
     exists: bool,
-    transaction_manager: ITransactionManager
+    transaction_manager: ITransactionManager,
 ) -> None:
     async with transaction_manager:
         rooms = await transaction_manager.rooms.get_available_hotel_rooms(
@@ -36,13 +36,13 @@ async def test_get_available_hotel_rooms(
 
 @pytest.mark.parametrize(
     "hotel_id,rooms_left,exists",
-    [(1, 0, True), (3, 0, True), (7, 0, True), (8, 2, True), (9, 0, False)]
+    [(1, 0, True), (3, 0, True), (7, 0, True), (8, 2, True), (9, 0, False)],
 )
 async def test_get_rooms_left(
     hotel_id: int,
     rooms_left: int,
     exists: bool,
-    transaction_manager: ITransactionManager
+    transaction_manager: ITransactionManager,
 ) -> None:
     async with transaction_manager:
         current_rooms_left = await transaction_manager.rooms.get_rooms_left(hotel_id)

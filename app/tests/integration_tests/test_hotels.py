@@ -19,7 +19,7 @@ from httpx import AsyncClient
         ("Ижора", "2024-11-01", "2024-11-05", 200, 1),
         ("Алтай", "2024-11-01", "2024-11-05", 200, 3),
         ("Коми", "2024-11-01", "2024-11-05", 200, 2),
-        ("Будапешт", "2024-01-01", "2024-01-02", 200, 0)
+        ("Будапешт", "2024-01-01", "2024-01-02", 200, 0),
     ],
 )
 async def test_get_hotels_by_location_and_time(
@@ -143,7 +143,7 @@ async def test_create_hotel(
             ["Wi-FI"],
             5,
             401,
-            None
+            None,
         ),
         (
             {"email": "user2@example.com", "password": "user2"},
@@ -152,7 +152,7 @@ async def test_create_hotel(
             ["Wi-FI"],
             5,
             403,
-            None
+            None,
         ),
         (
             {"email": "owner1@example.com", "password": "owner1"},
@@ -161,7 +161,7 @@ async def test_create_hotel(
             ["Wi-FI"],
             0,
             422,
-            None
+            None,
         ),
         (
             {"email": "owner1@example.com", "password": "owner1"},
@@ -170,7 +170,7 @@ async def test_create_hotel(
             ["Wi-FI"],
             5,
             404,
-            10
+            10,
         ),
         (
             {"email": "owner1@example.com", "password": "owner1"},
@@ -179,7 +179,7 @@ async def test_create_hotel(
             ["Wi-FI"],
             5,
             200,
-            9
+            9,
         ),
     ],
     indirect=["async_client_from_params"],
@@ -191,7 +191,7 @@ async def test_update_hotel(
     services: list,
     rooms_quantity: int,
     status_code: int,
-    hotel_id: int
+    hotel_id: int,
 ) -> None:
     response = await async_client_from_params.put(
         f"/v1/hotels/{hotel_id}",

@@ -22,10 +22,7 @@ from app.utils.transaction_manager import ITransactionManager
     ],
 )
 async def test_users_find_one_or_none(
-    user_id: int,
-    email: str,
-    exists: bool,
-    transaction_manager: ITransactionManager
+    user_id: int, email: str, exists: bool, transaction_manager: ITransactionManager
 ) -> None:
     async with transaction_manager:
         user = await transaction_manager.users.find_one_or_none(email=email)
@@ -41,14 +38,11 @@ async def test_users_find_one_or_none(
     [
         ("user", 2, ("user1@example.com", "user2@example.com")),
         ("hotel owner", 2, ("owner1@example.com", "owner2@example.com")),
-        ("admin", 1, ("admin@example.com",))
+        ("admin", 1, ("admin@example.com",)),
     ],
 )
 async def test_users_find_all(
-    role: str,
-    total: int,
-    emails: tuple,
-    transaction_manager: ITransactionManager
+    role: str, total: int, emails: tuple, transaction_manager: ITransactionManager
 ) -> None:
     async with transaction_manager:
         users = await transaction_manager.users.find_all(role=role)
@@ -66,10 +60,7 @@ async def test_users_find_all(
     ],
 )
 async def test_insert_data(
-    email: str,
-    password: str,
-    role: str,
-    transaction_manager: ITransactionManager
+    email: str, password: str, role: str, transaction_manager: ITransactionManager
 ) -> None:
     async with transaction_manager:
         new_user = await transaction_manager.users.insert_data(
@@ -95,7 +86,7 @@ async def test_update_fields_by_id(
     new_email: str,
     new_role: str,
     exists: bool,
-    transaction_manager: ITransactionManager
+    transaction_manager: ITransactionManager,
 ) -> None:
     async with transaction_manager:
         user = await transaction_manager.users.find_one_or_none(id=user_id)
@@ -115,8 +106,7 @@ async def test_update_fields_by_id(
 
 
 @pytest.mark.parametrize(
-    "user_id,exists",
-    [(1, True), (2, True), (3, True), (6, False)]
+    "user_id,exists", [(1, True), (2, True), (3, True), (6, False)]
 )
 async def test_delete(
     user_id: int, transaction_manager: ITransactionManager, exists: bool
@@ -125,18 +115,22 @@ async def test_delete(
         deleted_user = await transaction_manager.users.delete(id=user_id)
         if exists:
             assert deleted_user.id == user_id
-            assert not await transaction_manager.users.find_one_or_none(id=deleted_user.id)
+            assert not await transaction_manager.users.find_one_or_none(
+                id=deleted_user.id
+            )
         else:
             assert not deleted_user
 
 
 @pytest.mark.parametrize(
     "offset,limit,total_users",
-    [(0, 1, 1), (0, 5, 5), (0, 10, 5), (5, 5, 0), (4, 5, 1), (2, 2, 2)]
+    [(0, 1, 1), (0, 5, 5), (0, 10, 5), (5, 5, 0), (4, 5, 1), (2, 2, 2)],
 )
 async def test_get_users_list(
     offset: int, limit: int, total_users: int, transaction_manager: ITransactionManager
 ) -> None:
     async with transaction_manager:
-        users = await transaction_manager.users.get_users_list(offset=offset, limit=limit)
+        users = await transaction_manager.users.get_users_list(
+            offset=offset, limit=limit
+        )
         assert len(users) == total_users

@@ -40,7 +40,6 @@ class ITransactionManager(ABC):
 
 
 class TransactionManager(ITransactionManager):
-
     def __init__(self):
         self.session_factory = async_session_maker
 

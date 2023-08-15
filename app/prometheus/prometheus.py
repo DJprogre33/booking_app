@@ -8,10 +8,7 @@ from random import random
 
 from fastapi import APIRouter
 
-router = APIRouter(
-    prefix="/prometheus",
-    tags=["Testing Grafana + Prometheus"]
-)
+router = APIRouter(prefix="/prometheus", tags=["Testing Grafana + Prometheus"])
 
 
 @router.get("/get_error")

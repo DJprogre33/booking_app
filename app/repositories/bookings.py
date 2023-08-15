@@ -13,9 +13,7 @@ from app.utils.repository import SQLAlchemyRepository
 class BookingsRepository(SQLAlchemyRepository):
     model = Bookings
 
-    async def get_rooms_left(
-        self, room_id: int, date_from: date, date_to: date
-    ) -> int:
+    async def get_rooms_left(self, room_id: int, date_from: date, date_to: date) -> int:
         logger.info("The database query begins to generate")
         booked_rooms = (
             select(self.model)

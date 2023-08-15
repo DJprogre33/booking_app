@@ -23,6 +23,4 @@ class Base(DeclarativeBase):
     """Base class for all SQLAlchemy tables"""
 
     # Create annotation map for working with Mapped sqlalchemy 2.0
-    type_annotation_map = {
-        dict[str, Any]: JSON
-    }
+    type_annotation_map = {dict[str, Any]: JSON}

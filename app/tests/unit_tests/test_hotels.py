@@ -21,7 +21,7 @@ async def test_get_hotels_by_location_and_time(
     date_from: date,
     date_to: date,
     total_hotels: int,
-    transaction_manager: ITransactionManager
+    transaction_manager: ITransactionManager,
 ) -> None:
     async with transaction_manager:
         hotels = await transaction_manager.hotels.get_hotels_by_location_and_time(

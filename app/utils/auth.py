@@ -11,6 +11,7 @@ from app.logger import logger
 
 class OAuth2PasswordBearerWithCookie(OAuth2PasswordBearer):
     """Rewrite the original class to make OAuth2 work with cookies"""
+
     async def __call__(self, request: Request) -> Optional[str]:
         authorization: str = request.cookies.get("access_token")
         scheme, param = get_authorization_scheme_param(authorization)

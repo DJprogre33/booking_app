@@ -15,12 +15,9 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 class HotelsService:
-
     @staticmethod
     async def check_hotel_owner(
-        transaction_manager: ITransactionManager,
-        hotel_id: int,
-        owner_id: int
+        transaction_manager: ITransactionManager, hotel_id: int, owner_id: int
     ) -> Hotels:
         async with transaction_manager:
             hotel = await transaction_manager.hotels.find_one_or_none(id=hotel_id)
@@ -29,7 +26,8 @@ class HotelsService:
                 raise IncorrectHotelIDException
             if hotel.owner_id != owner_id:
                 logger.warning(
-                    "User isn't an owner", extra={"hotel_id": hotel_id, "user_id": owner_id}
+                    "User isn't an owner",
+                    extra={"hotel_id": hotel_id, "user_id": owner_id},
                 )
                 raise AccessDeniedException
             await transaction_manager.commit()
@@ -37,12 +35,12 @@ class HotelsService:
 
     @staticmethod
     async def create_hotel(
-            transaction_manager: ITransactionManager,
-            name: str,
-            location: str,
-            services: list,
-            rooms_quantity: int,
-            owner_id: int
+        transaction_manager: ITransactionManager,
+        name: str,
+        location: str,
+        services: list,
+        rooms_quantity: int,
+        owner_id: int,
     ) -> Hotels:
         async with transaction_manager:
             new_hotel = await transaction_manager.hotels.insert_data(
@@ -50,26 +48,26 @@ class HotelsService:
                 location=location,
                 services=services,
                 rooms_quantity=rooms_quantity,
-                owner_id=owner_id
+                owner_id=owner_id,
             )
             await transaction_manager.commit()
             return new_hotel
 
     async def update_hotel(
-            self,
-            transaction_manager: ITransactionManager,
-            hotel_id: int,
-            name: str,
-            location: str,
-            services: list,
-            rooms_quantity: int,
-            owner_id: int
+        self,
+        transaction_manager: ITransactionManager,
+        hotel_id: int,
+        name: str,
+        location: str,
+        services: list,
+        rooms_quantity: int,
+        owner_id: int,
     ) -> Hotels:
         async with transaction_manager:
             current_hotel = await self.check_hotel_owner(
                 transaction_manager=transaction_manager,
                 hotel_id=hotel_id,
-                owner_id=owner_id
+                owner_id=owner_id,
             )
             updated_hotel = await transaction_manager.hotels.update_fields_by_id(
                 entity_id=current_hotel.id,
@@ -87,13 +85,13 @@ class HotelsService:
         transaction_manager: ITransactionManager,
         hotel_id: int,
         hotel_image: UploadFile,
-        owner_id: int
+        owner_id: int,
     ) -> Hotels:
         async with transaction_manager:
             current_hotel = await self.check_hotel_owner(
                 transaction_manager=transaction_manager,
                 hotel_id=hotel_id,
-                owner_id=owner_id
+                owner_id=owner_id,
             )
             if current_hotel.image_path:
                 os.remove(current_hotel.image_path)
@@ -102,39 +100,37 @@ class HotelsService:
             file_path = f"app/static/images/hotels/{hotel_image.filename}.webp"
             with open(file_path, "wb") as file:
                 shutil.copyfileobj(hotel_image.file, file)
-            updated_hotel = await transaction_manager.hotels.update_fields_by_id(hotel_id, image_path=file_path)
+            updated_hotel = await transaction_manager.hotels.update_fields_by_id(
+                hotel_id, image_path=file_path
+            )
             await transaction_manager.commit()
             return updated_hotel
 
     async def delete_hotel_image(
-        self,
-        transaction_manager: ITransactionManager,
-        hotel_id: int,
-        owner_id: int
+        self, transaction_manager: ITransactionManager, hotel_id: int, owner_id: int
     ) -> Hotels:
         async with transaction_manager:
             current_hotel = await self.check_hotel_owner(
                 transaction_manager=transaction_manager,
                 hotel_id=hotel_id,
-                owner_id=owner_id
+                owner_id=owner_id,
             )
             if current_hotel.image_path:
                 os.remove(current_hotel.image_path)
-            updated_hotel = await transaction_manager.hotels.update_fields_by_id(hotel_id, image_path="")
+            updated_hotel = await transaction_manager.hotels.update_fields_by_id(
+                hotel_id, image_path=""
+            )
             await transaction_manager.commit()
             return updated_hotel
 
     async def delete_hotel(
-        self,
-        transaction_manager: ITransactionManager,
-        hotel_id: int,
-        owner_id: int
+        self, transaction_manager: ITransactionManager, hotel_id: int, owner_id: int
     ) -> Hotels:
         async with transaction_manager:
             current_hotel = await self.check_hotel_owner(
                 transaction_manager=transaction_manager,
                 hotel_id=hotel_id,
-                owner_id=owner_id
+                owner_id=owner_id,
             )
             deleted_hotel = await transaction_manager.hotels.delete(id=current_hotel.id)
             await transaction_manager.commit()
@@ -145,7 +141,7 @@ class HotelsService:
         transaction_manager: ITransactionManager,
         location: str,
         date_from: date,
-        date_to: date
+        date_to: date,
     ) -> Optional[list[SHotelsResponse]]:
         date_from, date_to = Base.validate_data_range(date_from, date_to)
         async with transaction_manager:
@@ -156,7 +152,9 @@ class HotelsService:
             return hotels
 
     @staticmethod
-    async def get_hotel_by_id(transaction_manager: ITransactionManager, hotel_id: int) -> Hotels:
+    async def get_hotel_by_id(
+        transaction_manager: ITransactionManager, hotel_id: int
+    ) -> Hotels:
         async with transaction_manager:
             hotel = await transaction_manager.hotels.find_one_or_none(id=hotel_id)
             if not hotel:

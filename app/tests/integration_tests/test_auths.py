@@ -21,7 +21,7 @@ async def test_register_user(
     role: str,
     status_code: int,
     async_client: AsyncClient,
-    transaction_manager: ITransactionManager
+    transaction_manager: ITransactionManager,
 ) -> None:
     response = await async_client.post(
         "/v1/auth/register", json={"email": email, "password": password, "role": role}
@@ -76,14 +76,11 @@ async def test_login_user(
 
 @pytest.mark.parametrize(
     "async_client_from_params,status_code",
-    [
-        ({"email": "user2@example.com", "password": "user2"}, 200)
-    ],
-    indirect=["async_client_from_params"]
+    [({"email": "user2@example.com", "password": "user2"}, 200)],
+    indirect=["async_client_from_params"],
 )
 async def test_logout_user(
-    status_code: int,
-    async_client_from_params: AsyncClient
+    status_code: int, async_client_from_params: AsyncClient
 ) -> None:
     response = await async_client_from_params.post("/v1/auth/logout")
     assert response.status_code == status_code
@@ -96,14 +93,12 @@ async def test_logout_user(
     "async_client_from_params,status_code",
     [
         ({"email": "user2@example.com", "password": "user2"}, 401),
-        ({"email": "user2@example.com", "password": "user2"}, 200)
-
+        ({"email": "user2@example.com", "password": "user2"}, 200),
     ],
-    indirect=["async_client_from_params"]
+    indirect=["async_client_from_params"],
 )
 async def test_refresh_token(
-    status_code: int,
-    async_client_from_params: AsyncClient
+    status_code: int, async_client_from_params: AsyncClient
 ) -> None:
     if status_code == 401:
         async_client_from_params.cookies.pop("refresh_token")
@@ -116,9 +111,7 @@ async def test_refresh_token(
 
 @pytest.mark.parametrize(
     "email,password,total_sessions,status_code,user_id",
-    [
-        ("user2@example.com", "user2", 5, 200, 2)
-    ],
+    [("user2@example.com", "user2", 5, 200, 2)],
 )
 async def test_abort_all_sessions(
     email: str,
@@ -127,7 +120,7 @@ async def test_abort_all_sessions(
     status_code: int,
     user_id: int,
     async_client: AsyncClient,
-    transaction_manager: ITransactionManager
+    transaction_manager: ITransactionManager,
 ) -> None:
     for _ in range(total_sessions):
         await async_client.post(

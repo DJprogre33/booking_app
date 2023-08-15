@@ -1,6 +1,6 @@
 from typing import Any, Optional, Union
 
-from sqlalchemy import JSON, Column, ForeignKey, Integer, String
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base

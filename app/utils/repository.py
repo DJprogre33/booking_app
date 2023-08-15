@@ -72,11 +72,7 @@ class SQLAlchemyRepository(AbstractRepository):
         return result.scalar()
 
     async def delete(self, **filter_by):
-        query = (
-            delete(self.model)
-            .filter_by(**filter_by)
-            .returning(self.model)
-        )
+        query = delete(self.model).filter_by(**filter_by).returning(self.model)
         result = await self.session.execute(query)
         logger.info("Database query successfully completed")
         return result.scalar()

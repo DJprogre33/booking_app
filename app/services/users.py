@@ -10,20 +10,21 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 class UsersService:
-
     @staticmethod
     async def get_users_list(
-        transaction_manager: ITransactionManager,
-        offset: int,
-        limit: int
+        transaction_manager: ITransactionManager, offset: int, limit: int
     ) -> Optional[list[Users]]:
         async with transaction_manager:
-            users = await transaction_manager.users.get_users_list(offset=offset, limit=limit)
+            users = await transaction_manager.users.get_users_list(
+                offset=offset, limit=limit
+            )
             await transaction_manager.commit()
             return users
 
     @staticmethod
-    async def return_me(transaction_manager: ITransactionManager, user_id: int) -> Users:
+    async def return_me(
+        transaction_manager: ITransactionManager, user_id: int
+    ) -> Users:
         async with transaction_manager:
             user = await transaction_manager.users.find_one_or_none(id=user_id)
             await transaction_manager.commit()
@@ -34,20 +35,20 @@ class UsersService:
         transaction_manager: ITransactionManager,
         user_id: int,
         email: EmailStr,
-        password: str
+        password: str,
     ) -> Users:
         hashed_password = get_password_hash(password)
         async with transaction_manager:
             updated_user = await transaction_manager.users.update_fields_by_id(
-                entity_id=user_id,
-                email=email,
-                hashed_password=hashed_password
+                entity_id=user_id, email=email, hashed_password=hashed_password
             )
             await transaction_manager.commit()
             return updated_user
 
     @staticmethod
-    async def delete_me(transaction_manager: ITransactionManager, user_id: int) -> Users:
+    async def delete_me(
+        transaction_manager: ITransactionManager, user_id: int
+    ) -> Users:
         async with transaction_manager:
             deleted_user = await transaction_manager.users.delete(id=user_id)
             await transaction_manager.commit()
@@ -67,7 +68,7 @@ class UsersService:
         transaction_manager: ITransactionManager,
         user_id: int,
         password: str,
-        email: EmailStr
+        email: EmailStr,
     ) -> Users:
         async with transaction_manager:
             exists_user = await transaction_manager.users.find_one_or_none(id=user_id)
@@ -76,15 +77,15 @@ class UsersService:
                 raise IncorrectIDException
             hashed_password = get_password_hash(password)
             updated_user = await transaction_manager.users.update_fields_by_id(
-                entity_id=user_id,
-                hashed_password=hashed_password,
-                email=email
+                entity_id=user_id, hashed_password=hashed_password, email=email
             )
             await transaction_manager.commit()
             return updated_user
 
     @staticmethod
-    async def delete_user_from_superuser(transaction_manager: ITransactionManager, user_id: int) -> Users:
+    async def delete_user_from_superuser(
+        transaction_manager: ITransactionManager, user_id: int
+    ) -> Users:
         async with transaction_manager:
             exists_user = await transaction_manager.users.find_one_or_none(id=user_id)
             if not exists_user:

@@ -21,9 +21,8 @@ from app.utils.transaction_manager import ITransactionManager, TransactionManage
 # return a Unit of work instance for working with Session
 TManagerDep = Annotated[ITransactionManager, Depends(TransactionManager)]
 
-async def get_current_user(
-    token: str = Depends(oauth2_scheme)
-) -> Users:
+
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> Users:
     """Returns current authenticated user"""
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, settings.HASHING_ALGORITHM)
@@ -49,7 +48,10 @@ async def get_current_user(
             raise InvalidTokenUserIDException
         return user
 
-async def get_current_superuser(current_user: Users = Depends(get_current_user)) -> Users:
+
+async def get_current_superuser(
+    current_user: Users = Depends(get_current_user),
+) -> Users:
     """Returns current authenticated superuser"""
     if current_user.role != "admin":
         logger.warning("Role access denied", extra={"user_id": current_user.id})
@@ -57,7 +59,9 @@ async def get_current_superuser(current_user: Users = Depends(get_current_user))
     return current_user
 
 
-async def get_current_hotel_owner(current_user: Users = Depends(get_current_user)) -> Users:
+async def get_current_hotel_owner(
+    current_user: Users = Depends(get_current_user),
+) -> Users:
     """Returns current authenticated hotel owner"""
     if current_user.role != "hotel owner":
         logger.warning("Role access denied", extra={"user_id": current_user.id})

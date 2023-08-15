@@ -4,14 +4,13 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 @pytest.mark.parametrize(
-    "user_id,total_bookings,exists",
-    [(1, 3, True), (2, 2, True), (3, 0, False)]
+    "user_id,total_bookings,exists", [(1, 3, True), (2, 2, True), (3, 0, False)]
 )
 async def test_get_bookings(
     user_id: int,
     total_bookings: int,
     exists: bool,
-    transaction_manager: ITransactionManager
+    transaction_manager: ITransactionManager,
 ) -> None:
     async with transaction_manager:
         bookings = await transaction_manager.bookings.get_bookings(user_id)
@@ -40,7 +39,7 @@ async def test_delete_bookings(
     user_id: int,
     booking_id: int,
     exists: bool,
-    transaction_manager: ITransactionManager
+    transaction_manager: ITransactionManager,
 ) -> None:
     async with transaction_manager:
         deleted_booking = await transaction_manager.bookings.delete(

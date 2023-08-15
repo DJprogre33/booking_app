@@ -28,7 +28,8 @@ async def test_get_available_hotel_rooms(
     async_client: AsyncClient,
 ) -> None:
     response = await async_client.get(
-        f"/v1/hotels/{hotel_id}/rooms", params={"date_from": date_from, "date_to": date_to}
+        f"/v1/hotels/{hotel_id}/rooms",
+        params={"date_from": date_from, "date_to": date_to},
     )
     assert response.status_code == status_code
 
@@ -37,15 +38,10 @@ async def test_get_available_hotel_rooms(
 
 
 @pytest.mark.parametrize(
-    "status_code,room_id",
-    [
-        (200, 1), (200, 8), (404, 15), (404, 20)
-    ]
+    "status_code,room_id", [(200, 1), (200, 8), (404, 15), (404, 20)]
 )
 async def test_get_room(
-    async_client: AsyncClient,
-    status_code: int,
-    room_id: int
+    async_client: AsyncClient, status_code: int, room_id: int
 ) -> None:
     response = await async_client.get(f"v1/hotels/rooms/{room_id}")
     assert response.status_code == status_code

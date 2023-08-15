@@ -23,9 +23,7 @@ class HotelsRepository(SQLAlchemyRepository):
             select(Rooms.hotel_id, func.count().label("booked_rooms"))
             .select_from(Bookings)
             .join(Rooms, Bookings.room_id == Rooms.id)
-            .where(
-                (Bookings.date_from <= date_to) & (Bookings.date_to >= date_from)
-            )
+            .where((Bookings.date_from <= date_to) & (Bookings.date_to >= date_from))
             .group_by(Rooms.hotel_id)
             .subquery("booked_rooms")
         )
@@ -44,9 +42,7 @@ class HotelsRepository(SQLAlchemyRepository):
                 ).label("rooms_left"),
             )
             .select_from(self.model)
-            .outerjoin(
-                get_booked_rooms, self.model.id == get_booked_rooms.c.hotel_id
-            )
+            .outerjoin(get_booked_rooms, self.model.id == get_booked_rooms.c.hotel_id)
             .where(
                 (self.model.location.ilike(f"%{location}%"))
                 & (

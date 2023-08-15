@@ -20,9 +20,7 @@ class RoomsRepository(SQLAlchemyRepository):
             select(self.model.id, func.count().label("booked_rooms"))
             .select_from(self.model)
             .join(Bookings, Bookings.room_id == self.model.id)
-            .where(
-                (Bookings.date_from <= date_to) & (Bookings.date_to >= date_from)
-            )
+            .where((Bookings.date_from <= date_to) & (Bookings.date_to >= date_from))
             .group_by(self.model.id)
             .subquery("booked_rooms")
         )
@@ -57,7 +55,7 @@ class RoomsRepository(SQLAlchemyRepository):
         )
         available_rooms = await self.session.execute(get_available_rooms)
         return available_rooms.mappings().all()
-    
+
     async def get_rooms_left(self, hotel_id: int) -> int:
         """
         The function is used when creating hotels and adding rooms by the owner,
