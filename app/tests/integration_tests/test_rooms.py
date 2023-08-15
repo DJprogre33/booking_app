@@ -347,7 +347,7 @@ async def test_add_hotel_image(
     ],
     indirect=["async_client_from_params"],
 )
-async def test_add_hotel_image(
+async def test_delete_hotel_image(
     async_client_from_params: AsyncClient, hotel_id: int, room_id: int, status_code: int
 ):
     response = await async_client_from_params.delete(

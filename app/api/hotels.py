@@ -12,6 +12,7 @@ from app.models.users import Users
 from app.schemas.hotels import SHotel, SHotelResponse, SHotelsResponse
 from app.services.hotels import HotelsService
 
+
 router = APIRouter(prefix="/hotels", tags=["Hotels"])
 
 

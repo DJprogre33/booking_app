@@ -13,20 +13,20 @@ from app.main import app as fastapi_app
 from app.models.bookings import Bookings
 from app.models.hotels import Hotels
 from app.models.rooms import Rooms
-from app.models.users import RefreshSessions, Users
+from app.models.users import Users
 from app.utils.transaction_manager import TransactionManager
 
 
 async def create_async_client(login_data):
     """Function which create async client"""
-    async with AsyncClient(app=fastapi_app, base_url="http://test") as async_client:
+    async with AsyncClient(app=fastapi_app, base_url="http://test") as client:
         email, password = login_data["email"], login_data["password"]
-        await async_client.post(
+        await client.post(
             "/v1/auth/login", data={"username": email, "password": password}
         )
         # assert async_client.cookies["access_token"]
         # assert async_client.cookies["refresh_token"]
-        yield async_client
+        yield client
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -80,8 +80,8 @@ def event_loop(request):
 @pytest.fixture(scope="function")
 async def async_client():
     """Creates default async client"""
-    async with AsyncClient(app=fastapi_app, base_url="http://test") as async_client:
-        yield async_client
+    async with AsyncClient(app=fastapi_app, base_url="http://test") as client:
+        yield client
 
 
 @pytest.fixture(scope="session")
@@ -92,16 +92,16 @@ async def auth_async_client(request):
 
     login_data = {"email": default_email, "password": default_password}
 
-    async for async_client in create_async_client(login_data):
-        yield async_client
+    async for client in create_async_client(login_data):
+        yield client
 
 
 @pytest.fixture(scope="function")
 async def async_client_from_params(request):
     """Creates authenticated async client from multiple parameters"""
     login_data = request.param
-    async for async_client in create_async_client(login_data):
-        yield async_client
+    async for client in create_async_client(login_data):
+        yield client
 
 
 @pytest.fixture(scope="module")

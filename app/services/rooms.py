@@ -16,6 +16,7 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 class RoomsService:
+
     @staticmethod
     async def create_room(
         transaction_manager: ITransactionManager,

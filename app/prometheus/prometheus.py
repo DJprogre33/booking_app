@@ -2,11 +2,11 @@
 The test module is for development only, to load the server,
 to test the operation of prometheus and grafana
 """
-
 import time
 from random import random
 
 from fastapi import APIRouter
+
 
 router = APIRouter(prefix="/prometheus", tags=["Testing Grafana + Prometheus"])
 
@@ -15,8 +15,7 @@ router = APIRouter(prefix="/prometheus", tags=["Testing Grafana + Prometheus"])
 def get_error():
     if random() > 0.5:
         raise ZeroDivisionError
-    else:
-        raise KeyError
+    raise KeyError
 
 
 @router.get("/time_consumer")

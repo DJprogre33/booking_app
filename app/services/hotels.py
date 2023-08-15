@@ -15,6 +15,7 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 class HotelsService:
+
     @staticmethod
     async def check_hotel_owner(
         transaction_manager: ITransactionManager, hotel_id: int, owner_id: int

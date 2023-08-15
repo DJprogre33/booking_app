@@ -21,6 +21,7 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 class AuthsService:
+
     @staticmethod
     async def register_user(
         transaction_manager: ITransactionManager,

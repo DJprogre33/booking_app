@@ -4,13 +4,11 @@ from pydantic import BaseModel
 
 class SExstraResponse(BaseModel):
     """Class for extra responses in OpenAPI doc"""
-
     detail: str
 
 
 class BookingAppException(HTTPException):
     """Base class for all project exceptions"""
-
     status_code = 500
     detail = ""
 

@@ -11,6 +11,7 @@ from app.models.users import Users
 from app.schemas.booking import SBookingResponse, SBookingsResponse
 from app.services.bookings import BookingsService
 
+
 router = APIRouter(prefix="/bookings", tags=["Bookings"])
 
 

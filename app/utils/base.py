@@ -8,7 +8,6 @@ class Base:
     """
     Contains general useful functions for the project
     """
-
     @staticmethod
     def validate_data_range(date_from: date, date_to: date) -> tuple:
         booking_period = date_to - date_from

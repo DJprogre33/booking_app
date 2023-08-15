@@ -13,6 +13,7 @@ from app.utils.transaction_manager import ITransactionManager
 
 
 class BookingsService:
+
     @staticmethod
     async def get_bookings(
         transaction_manager: ITransactionManager, user_id: int

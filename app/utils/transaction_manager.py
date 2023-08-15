@@ -11,6 +11,8 @@ from app.repositories.users import UsersRepository
 
 
 class ITransactionManager(ABC):
+    """Interface for implementing the UOW pattern
+    for working with transactions to the database"""
     auth: AuthsRepository
     users: UsersRepository
     rooms: RoomsRepository
@@ -27,7 +29,7 @@ class ITransactionManager(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def __aexit__(self):
+    async def __aexit__(self, *args):
         raise NotImplementedError
 
     @abstractmethod
@@ -40,6 +42,7 @@ class ITransactionManager(ABC):
 
 
 class TransactionManager(ITransactionManager):
+    """Implementation of the interface for working with transactions"""
     def __init__(self):
         self.session_factory = async_session_maker
 

@@ -21,6 +21,5 @@ async_session_maker = async_sessionmaker(bind=engine, expire_on_commit=False)
 
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy tables"""
-
     # Create annotation map for working with Mapped sqlalchemy 2.0
     type_annotation_map = {dict[str, Any]: JSON}

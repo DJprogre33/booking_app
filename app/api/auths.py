@@ -10,6 +10,7 @@ from app.models.users import Users
 from app.schemas.users import SToken, SUserRegister, SUserResponse
 from app.services.auths import AuthsService
 
+
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
