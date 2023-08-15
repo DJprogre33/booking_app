@@ -21,9 +21,8 @@ async def test_add_and_get_booking(
     """In this test function we order until we run out of numbers,
     then there's an error."""
     response = await auth_async_client.post(
-        "v1/bookings",
+        f"/v1/bookings/{room_id}",
         params={
-            "room_id": room_id,
             "date_from": date_from,
             "date_to": date_to,
         },
@@ -46,7 +45,7 @@ async def test_get_and_delete_all_bookings(auth_async_client: AsyncClient) -> No
     for booking in bookings_dict:
         response = await auth_async_client.delete(f"/v1/bookings/{booking['id']}")
         assert response.status_code == 200
-        assert response.json()["deleted_booking_id"] == booking["id"]
+        assert response.json()["id"] == booking["id"]
 
     response = await auth_async_client.get("/v1/bookings")
 
@@ -82,7 +81,7 @@ async def test_add_booking(
     status_code: int,
 ) -> None:
     response = await async_client_from_params.post(
-        "/v1/bookings",
-        params={"room_id": room_id, "date_from": date_from, "date_to": date_to},
+        f"/v1/bookings/{room_id}",
+        params={"date_from": date_from, "date_to": date_to},
     )
     assert response.status_code == status_code

@@ -37,6 +37,7 @@ async def get_bookings(
     )
     return bookings
 
+
 @router.get(
     "/{booking_id}",
     response_model=SBookingResponse,
