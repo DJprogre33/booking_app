@@ -71,7 +71,7 @@ class RoomsService:
             owner_id=owner_id
         )
         async with transaction_manager:
-            room = await transaction_manager.rooms.find_one_or_none(id=room_id)
+            room = await transaction_manager.rooms.find_one_or_none(id=room_id, hotel_id=hotel_id)
             if not room:
                 logger.warning(
                     "Incorrect hotel_id or room_id",

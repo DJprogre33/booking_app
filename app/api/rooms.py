@@ -193,7 +193,6 @@ async def get_available_hotel_rooms(
     "/rooms/{room_id}",
     response_model=SRoomResponse,
     responses={
-        400: {"model": SExstraResponse},
         404: {"model": SExstraResponse}
     }
 )
